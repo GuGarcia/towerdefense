@@ -4,7 +4,15 @@
 BUN_IMAGE := oven/bun:latest
 PLAYER_DIR := $(CURDIR)/player
 
-.PHONY: dev build preview shell
+.PHONY: dev build preview shell ci
+
+# CI : install deps puis typage, tests, lint
+ci:
+	docker run --rm \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		$(BUN_IMAGE) \
+		sh -c "bun install && bun run ci"
 
 # Serveur de dev (hot reload) — http://localhost:5173
 dev:

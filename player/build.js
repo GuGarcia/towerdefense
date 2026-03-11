@@ -1,5 +1,5 @@
 /**
- * Build pour la prod : bundle le JS, copie index.html en pointant vers le bundle.
+ * Production build: bundle JS, copy index.html pointing to the bundle.
  */
 import { mkdir, writeFile, readFile } from "fs/promises";
 import { join } from "path";
@@ -9,9 +9,9 @@ const DIST = join(ROOT, "dist");
 
 await mkdir(DIST, { recursive: true });
 
-// Bundle avec Bun
+// Bundle with Bun (native TypeScript)
 const result = await Bun.build({
-  entrypoints: [join(ROOT, "src", "index.js")],
+  entrypoints: [join(ROOT, "src", "index.ts")],
   outdir: DIST,
   minify: true,
   target: "browser",
@@ -22,7 +22,7 @@ if (!result.success) {
   process.exit(1);
 }
 
-// Copier index.html en remplaçant le script par le bundle
+// Copy index.html and point script to the bundle
 const indexPath = join(ROOT, "index.html");
 let html = await readFile(indexPath, "utf-8");
 html = html.replace(/src="\/src\/index\.js"/, 'src="index.js"');

@@ -1,13 +1,13 @@
 # Tower Defense — Player
 
-Application de jeu (et plus tard replay).
+Application de jeu (et plus tard replay). **TypeScript** (Bun exécute le TS nativement).
 
 ## Avec Docker (depuis la racine du projet)
 
 ```bash
-make dev      # Serveur de dev → http://localhost:5173
+make dev      # Build + watch + serveur → http://localhost:5173
 make build    # Build prod → player/dist/
-make preview  # Servir les fichiers (même port)
+make preview  # Servir dist/ (après make build)
 make shell    # Shell dans le conteneur (Bun) avec player/ monté
 ```
 
@@ -16,9 +16,18 @@ Nécessite uniquement Docker ; l’image utilisée est `oven/bun:latest`.
 ## En local (Bun installé)
 
 ```bash
-bun run dev
+bun install   # optionnel : bun-types pour l’IDE
+bun run dev   # build + watch + serve dist/
 bun run build
-bun run preview
+bun run preview   # sert dist/ (SERVEDIR=dist)
 ```
 
-Aucune dépendance npm : le serveur de dev et le build sont assurés par des scripts Bun (`serve.js`, `build.js`).
+Le code source est en **TypeScript** (`src/**/*.ts`). Le build produit du JavaScript dans `dist/`.
+
+## CI (typage, tests, lint)
+
+À la racine du projet : `make ci` (Docker) ou dans `player/` : `bun run ci`.
+
+- **typecheck** : `tsc --noEmit`
+- **test** : `bun test` (tests unitaires dans `src/**/*.test.ts`)
+- **lint** : `eslint src build.js dev.js serve.js`

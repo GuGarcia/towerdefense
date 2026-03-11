@@ -1,9 +1,11 @@
 /**
- * Serveur de dev / preview : sert les fichiers statiques (HTML, JS, etc.).
- * Lancer avec : bun run dev (hot reload) ou bun run preview
+ * Dev / preview server: serves static files (HTML, JS, etc.).
+ * SERVEDIR=dist: serve the dist/ folder (after build).
  */
+import { join } from "path";
+
 const PORT = 5173;
-const ROOT = import.meta.dir;
+const ROOT = process.env.SERVEDIR ? join(import.meta.dir, process.env.SERVEDIR) : import.meta.dir;
 
 const MIME = {
   ".html": "text/html",

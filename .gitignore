@@ -1,0 +1,8 @@
+# Dependencies and build
+node_modules/
+player/node_modules/
+dist/
+player/dist/
+
+# Lockfiles: keep bun.lock for reproducible installs (uncomment to ignore)
+# player/bun.lock

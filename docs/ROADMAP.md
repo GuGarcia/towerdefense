@@ -14,6 +14,10 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 - [x] Page HTML minimale + un canvas plein écran (ou zone de jeu fixe)
 - [x] Point d’entrée JS qui affiche quelque chose dans le canvas (ex. un cercle) pour valider le pipeline
 - [x] Makefile à la racine + Docker (`make dev`, `make build`, `make preview`) — validé
+- [x] Migration TypeScript (`player/src/**/*.ts`), dev avec watch (refresh manuel)
+- [x] Tests unitaires (`bun test`), typecheck (`tsc --noEmit`), lint (ESLint), `make ci`
+- [x] `player/GUIDELINES.md` — conventions et bonnes pratiques
+- [x] Commentaires dans le code en anglais
 
 ---
 
@@ -21,37 +25,37 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ### GameParams & état
 
-- [ ] `GameParams.js` — Value Object avec seed, durée, config player initial, économie, vagues, ennemis (voir [GAME_PARAMS.md](./GAME_PARAMS.md))
-- [ ] `GameState.js` — états possibles (Playing, GameOver, Victory si besoin)
+- [x] `GameParams.js` — Value Object avec seed, durée, config player initial, économie, vagues, ennemis (voir [GAME_PARAMS.md](./GAME_PARAMS.md))
+- [x] `GameState.js` — états possibles (Playing, GameOver, Victory si besoin)
 
 ### Player
 
-- [ ] `UpgradeType.js` — constantes ou enum (damage, life, regen, attackSpeed)
-- [ ] `PlayerStats.js` ou champs dans Player — life, maxLife, damage, regen, attackSpeed + niveaux d’upgrade
-- [ ] `Player.js` — entité : recevoir dégâts, regen par frame, “peut tirer ?” (attackSpeed), appliquer un upgrade
+- [x] `UpgradeType.js` — constantes ou enum (damage, life, regen, attackSpeed)
+- [x] `PlayerStats.js` ou champs dans Player — life, maxLife, damage, regen, attackSpeed + niveaux d’upgrade
+- [x] `Player.js` — entité : recevoir dégâts, regen par frame, “peut tirer ?” (attackSpeed), appliquer un upgrade
 
 ### Economy (domain service)
 
-- [ ] `UpgradeCost.js` — formule coût(upgradeType, level, params) à partir de GameParams
+- [x] `UpgradeCost.js` — formule coût(upgradeType, level, params) à partir de GameParams
 
 ### Ennemis
 
-- [ ] `EnemyArchetype.js` — base, rapide, boss (value object ou constantes)
-- [ ] `Enemy.js` — entité : position, direction, PV, dégâts, taille, archétype ; avancer vers le centre, recevoir dégâts
+- [x] `EnemyArchetype.js` — base, rapide, boss (value object ou constantes)
+- [x] `Enemy.js` — entité : position, direction, PV, dégâts, taille, archétype ; avancer vers le centre, recevoir dégâts
 
 ### Projectiles
 
-- [ ] `Projectile.js` — entité : position, direction/vitesse, dégâts, cible éventuelle ; mise à jour position
+- [x] `Projectile.js` — entité : position, direction/vitesse, dégâts, cible éventuelle ; mise à jour position
 
 ### Vagues & spawn
 
-- [ ] `Wave.js` — numéro de vague, infos utiles (ex. boss ou pas)
-- [ ] `WaveSpawner.js` — service déterministe : à partir de seed + frame + GameParams, retourne les ennemis à spawn à cette frame (positions sur le cercle, archétypes, stats)
+- [x] `Wave.js` — numéro de vague, infos utiles (ex. boss ou pas)
+- [x] `WaveSpawner.js` — service déterministe : à partir de seed + frame + GameParams, retourne les ennemis à spawn à cette frame (positions sur le cercle, archétypes, stats)
 
 ### Agrégat Game
 
-- [ ] `Game.js` — agrégat racine : GameParams, Player, liste Enemies, liste Projectiles, vague courante, argent, GameState
-- [ ] `Game.tick(frameIndex, input)` — applique input (achat upgrade), spawn (WaveSpawner), déplacements, tirs (auto-aim ennemi le plus proche), collisions, régen, mort joueur, gains d’argent
+- [x] `Game.js` — agrégat racine : GameParams, Player, liste Enemies, liste Projectiles, vague courante, argent, GameState
+- [x] `Game.tick(frameIndex, input)` — applique input (achat upgrade), spawn (WaveSpawner), déplacements, tirs (auto-aim ennemi le plus proche), collisions, régen, mort joueur, gains d’argent
 
 ---
 
@@ -84,7 +88,7 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ## Phase 4 — Intégration & boucle de jeu
 
-- [ ] `player/src/index.js` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
+- [ ] `player/src/index.ts` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
 - [ ] UI minimale : affichage vie, argent, boutons ou raccourcis pour acheter les 4 upgrades
 - [ ] Vérifier que la partie est déterministe (même seed + mêmes inputs → même déroulé)
 
