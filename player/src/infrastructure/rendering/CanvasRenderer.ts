@@ -58,27 +58,39 @@ function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile): void {
   ctx.stroke();
 }
 
+export interface Viewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export function createCanvasRenderer(
   canvas: HTMLCanvasElement,
   getScale: () => number
-): (game: Game) => void {
-  return function render(game: Game): void {
+): (game: Game, viewport?: Viewport) => void {
+  return function render(game: Game, viewport?: Viewport): void {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const w = canvas.width;
     const h = canvas.height;
-    const cx = w / 2;
-    const cy = h / 2;
-    const scale = getScale();
+    const vp = viewport ?? { x: 0, y: 0, width: w, height: h };
+    const cx = vp.x + vp.width / 2;
+    const cy = vp.y + vp.height / 2;
+    const scale = viewport
+      ? Math.min(vp.width, vp.height) / 1200
+      : getScale();
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-
+    if (!viewport) ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = NEON.bg;
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(vp.x, vp.y, vp.width, vp.height);
 
     ctx.save();
+    ctx.beginPath();
+    ctx.rect(vp.x, vp.y, vp.width, vp.height);
+    ctx.clip();
     ctx.translate(cx, cy);
     ctx.scale(scale, scale);
 
@@ -89,16 +101,13 @@ export function createCanvasRenderer(
     ctx.restore();
 
     ctx.fillStyle = "#00ffcc";
-    ctx.font = "16px monospace";
-    ctx.fillText(`Life ${Math.ceil(game.player.life)} / ${game.player.maxLife}`, 12, 24);
-    ctx.fillText(`Money ${game.money}`, 12, 44);
-    ctx.fillStyle = "rgba(0, 255, 204, 0.6)";
-    ctx.font = "12px monospace";
-    ctx.fillText("1: dmg 2: life 3: regen 4: speed", 12, h - 12);
+    ctx.font = "14px monospace";
+    ctx.fillText(`Life ${Math.ceil(game.player.life)}/${game.player.maxLife}`, vp.x + 8, vp.y + 20);
+    ctx.fillText(`$${game.money}`, vp.x + 8, vp.y + 36);
     if (game.state === GameState.GameOver) {
       ctx.fillStyle = "#ff3366";
-      ctx.font = "bold 32px monospace";
-      ctx.fillText("GAME OVER", cx - 80, cy);
+      ctx.font = "bold 24px monospace";
+      ctx.fillText("GAME OVER", cx - 60, cy);
     }
   };
 }

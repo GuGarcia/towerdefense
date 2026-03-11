@@ -89,7 +89,7 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 - [x] `player/src/index.ts` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
 - [x] UI minimale : vie, argent, raccourcis 1–4, boutons ou raccourcis pour acheter les 4 upgrades
-- [ ] Vérifier en test que la partie est déterministe (même seed + mêmes inputs → même déroulé)
+- [x] Vérifier le déterminisme : écran en 4 (2 parties même seed, 2 autres seeds) — même input → quadrants 1 et 2 identiques
 
 ---
 
