@@ -76,6 +76,7 @@ function main(): void {
   if (replayOverlayBtn) {
     replayOverlayBtn.addEventListener("click", () => {
       for (let i = 0; i < n; i++) {
+        seeds[i] = randomSeed();
         gameStates[i] = createGame(createGameParams({ seed: seeds[i] }));
         frameIndices[i] = 0;
       }
