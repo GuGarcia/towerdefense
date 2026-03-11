@@ -3,6 +3,7 @@
  */
 import { createGame, tick } from "./domain/game/Game";
 import { createGameParams } from "./domain/game/GameParams";
+import { GameState } from "./domain/game/GameState";
 import { getUpgradeLevel } from "./domain/player/Player";
 import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { createFixedClock } from "./infrastructure/clock/FixedClock";
@@ -66,6 +67,8 @@ function main(): void {
     barsContainer.querySelectorAll<HTMLElement>(".player-upgrade-bar").forEach((bar, i) => {
       const game = gameStates[i];
       if (i >= gameStates.length || !game) return;
+      const isGameOver = game.state === GameState.GameOver;
+      bar.classList.toggle("is-game-over", isGameOver);
       const money = game.money;
       const params = game.params;
       bar.querySelectorAll<HTMLButtonElement>("button[data-upgrade]").forEach((btn) => {
@@ -75,7 +78,7 @@ function main(): void {
         const cost = getUpgradeCost(raw, level, params);
         const canAfford = money >= cost;
         btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost})`;
-        btn.disabled = !canAfford;
+        btn.disabled = isGameOver || !canAfford;
       });
     });
   }
