@@ -51,4 +51,22 @@ describe("WaveSpawner", () => {
       expect(a[i].life).toBe(b[i].life);
     }
   });
+
+  it("spreadSpawnOverFrames spreads spawn over multiple frames", () => {
+    const allAtOnce = createGameParams({
+      seed: 999,
+      wave: { baseIntervalFrames: 60, spawnRadius: 500 },
+    });
+    const progressive = createGameParams({
+      seed: 999,
+      wave: { baseIntervalFrames: 60, spawnRadius: 500, spreadSpawnOverFrames: 60 },
+    });
+    const totalAtOnce = getEnemiesToSpawnThisFrame(1, allAtOnce).length;
+    let totalProgressive = 0;
+    for (let f = 1; f <= 60; f++) {
+      totalProgressive += getEnemiesToSpawnThisFrame(f, progressive).length;
+    }
+    expect(totalProgressive).toBe(totalAtOnce);
+    expect(getEnemiesToSpawnThisFrame(1, progressive).length).toBeLessThan(totalAtOnce);
+  });
 });

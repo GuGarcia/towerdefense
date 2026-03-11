@@ -57,6 +57,7 @@ Les **niveaux** d’upgrade (damage, life, regen, attackSpeed) sont gérés dans
 |-----------|------|
 | **wave.spawnRadius** | Rayon du cercle de spawn (distance fixe depuis le centre). Peut être hors écran. |
 | **wave.baseIntervalFrames** | Délai (en frames) entre le début de deux vagues, ou nombre de frames avant la première vague. |
+| **wave.spreadSpawnOverFrames** | Étaler le spawn de la vague sur ce nombre de frames (0 = tous les ennemis au début de la vague). Ex. 60 = spawn progressif sur 1 seconde. |
 | **wave.bossEveryNWaves** | Un boss tous les N vagues (ex. 10). |
 | **wave.difficultyScaling** | Facteur qui augmente la difficulté (vie, nombre, dégâts des ennemis) à chaque vague. Peut être un objet (vieFactor, countFactor, etc.). |
 
