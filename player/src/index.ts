@@ -139,7 +139,8 @@ function main(): void {
           : key === "regen"
             ? player.regen
             : player.attackSpeed;
-    return key === "regen" ? v.toFixed(1) : String(Math.round(v));
+    if (key === "regen" || key === "attackSpeed") return v.toFixed(1);
+    return String(Math.round(v));
   }
 
   function updateUpgradeBarsUI(): void {

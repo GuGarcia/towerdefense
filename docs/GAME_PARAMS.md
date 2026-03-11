@@ -35,7 +35,7 @@ Tous ces paramètres font partie du **GameParams** (Value Object du domaine) et 
 | **player.initialMaxLife** | Vie max initiale. |
 | **player.initialDamage** | Dégâts par projectile. |
 | **player.initialRegen** | Régénération par frame (ou par seconde, à définir). |
-| **player.initialAttackSpeed** | Délai entre deux tirs (en frames ou en “tirs par seconde”). |
+| **player.initialAttackSpeed** | Nombre de tirs par seconde (ex. 2 = 2 attaques/s). |
 
 ---
 

@@ -56,7 +56,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialMaxLife: 100,
       initialDamage: 10,
       initialRegen: 0.1,
-      initialAttackSpeed: 30,
+      initialAttackSpeed: 2,
     },
     economy: {
       upgradeCostBase: 10,

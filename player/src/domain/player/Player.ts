@@ -1,15 +1,19 @@
 /**
  * Player entity: life, stats, upgrade levels.
+ * attackSpeed is stored as attacks per second (APS); cooldown in frames is derived at 60 FPS.
  */
 import type { UpgradeTypeValue } from "./UpgradeType";
 import { UpgradeType } from "./UpgradeType";
 import type { GameParams } from "../game/GameParams";
+
+const FPS = 60;
 
 export interface Player {
   life: number;
   maxLife: number;
   damage: number;
   regen: number;
+  /** Attacks per second (APS). */
   attackSpeed: number;
   upgradeLevels: Record<UpgradeTypeValue, number>;
   framesSinceLastShot: number;
@@ -23,8 +27,15 @@ export interface PlayerInitial {
   attackSpeed: number;
 }
 
+/** Returns cooldown in frames between shots (60 FPS). Min 1 frame (max 60 APS). */
+export function getShotCooldownFrames(player: { attackSpeed: number }): number {
+  if (player.attackSpeed <= 0) return FPS;
+  return Math.max(1, Math.ceil(FPS / player.attackSpeed));
+}
+
 export function createPlayer(initial: PlayerInitial): Player {
   const { life, maxLife, damage, regen, attackSpeed } = initial;
+  const cooldown = getShotCooldownFrames(initial);
   return {
     life,
     maxLife,
@@ -37,7 +48,7 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.Regen]: 0,
       [UpgradeType.AttackSpeed]: 0,
     },
-    framesSinceLastShot: attackSpeed,
+    framesSinceLastShot: cooldown,
   };
 }
 
@@ -51,7 +62,7 @@ export function applyRegen(player: Player, _params?: GameParams): Player {
 }
 
 export function canShoot(player: Player): boolean {
-  return player.framesSinceLastShot >= player.attackSpeed;
+  return player.framesSinceLastShot >= getShotCooldownFrames(player);
 }
 
 export function consumeShotCooldown(player: Player): Player {
@@ -59,9 +70,10 @@ export function consumeShotCooldown(player: Player): Player {
 }
 
 export function advanceShotCooldown(player: Player): Player {
+  const cooldown = getShotCooldownFrames(player);
   return {
     ...player,
-    framesSinceLastShot: Math.min(player.attackSpeed, player.framesSinceLastShot + 1),
+    framesSinceLastShot: Math.min(cooldown, player.framesSinceLastShot + 1),
   };
 }
 
@@ -85,7 +97,8 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
       return { ...player, regen: player.regen + delta, upgradeLevels: levels };
     }
     case UpgradeType.AttackSpeed: {
-      const newSpeed = Math.max(5, Math.floor(player.attackSpeed * 0.92));
+      const delta = (params?.player?.initialAttackSpeed ?? 2) * 0.15;
+      const newSpeed = Math.min(60, player.attackSpeed + delta);
       return { ...player, attackSpeed: newSpeed, upgradeLevels: levels };
     }
     default:

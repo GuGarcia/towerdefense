@@ -1,6 +1,7 @@
 import { describe, it, expect } from "bun:test";
 import {
   createPlayer,
+  getShotCooldownFrames,
   takeDamage,
   applyRegen,
   canShoot,
@@ -13,13 +14,19 @@ import { UpgradeType } from "./UpgradeType";
 import { createGameParams } from "../game/GameParams";
 
 describe("Player", () => {
+  it("getShotCooldownFrames converts attacks per second to frames at 60 FPS", () => {
+    expect(getShotCooldownFrames({ attackSpeed: 2 })).toBe(30);
+    expect(getShotCooldownFrames({ attackSpeed: 20 })).toBe(3);
+    expect(getShotCooldownFrames({ attackSpeed: 60 })).toBe(1);
+  });
+
   it("createPlayer sets initial state and can shoot immediately", () => {
     const p = createPlayer({
       life: 100,
       maxLife: 100,
       damage: 10,
       regen: 0.5,
-      attackSpeed: 30,
+      attackSpeed: 2,
     });
     expect(p.life).toBe(100);
     expect(p.damage).toBe(10);
@@ -58,7 +65,7 @@ describe("Player", () => {
       maxLife: 100,
       damage: 10,
       regen: 0,
-      attackSpeed: 3,
+      attackSpeed: 20,
     });
     expect(canShoot(p)).toBe(true);
     const afterShot = consumeShotCooldown(p);
@@ -77,7 +84,7 @@ describe("Player", () => {
       maxLife: 100,
       damage: 10,
       regen: 0.1,
-      attackSpeed: 30,
+      attackSpeed: 2,
     });
     const afterDamage = applyUpgrade(p, UpgradeType.Damage, params);
     expect(afterDamage.damage).toBeGreaterThan(10);
@@ -90,6 +97,6 @@ describe("Player", () => {
     expect(afterRegen.regen).toBeGreaterThan(0.1);
 
     const afterSpeed = applyUpgrade(p, UpgradeType.AttackSpeed, params);
-    expect(afterSpeed.attackSpeed).toBeLessThan(30);
+    expect(afterSpeed.attackSpeed).toBeGreaterThan(2);
   });
 });
