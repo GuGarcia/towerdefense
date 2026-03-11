@@ -4,6 +4,7 @@
 import type { Game } from "../../domain/game/Game";
 import type { Enemy } from "../../domain/enemy/Enemy";
 import type { Projectile } from "../../domain/projectile/Projectile";
+import { getWaveNumberAtFrame, getWaveStartFrame } from "../../domain/wave/WaveSpawner";
 
 const NEON = {
   bg: "#0a0a0f",
@@ -98,5 +99,48 @@ export function createCanvasRenderer(
     drawPentagon(ctx, 40);
 
     ctx.restore();
+
+    drawWaveHud(ctx, game, vp);
   };
+}
+
+function drawWaveHud(
+  ctx: CanvasRenderingContext2D,
+  game: Game,
+  vp: { x: number; y: number; width: number; height: number }
+): void {
+  const params = game.params;
+  const frameIndex = game.frameIndex;
+  const interval = params.wave?.baseIntervalFrames ?? 300;
+  const waveNumber = getWaveNumberAtFrame(frameIndex, params);
+  const waveStart = getWaveStartFrame(waveNumber <= 0 ? 1 : waveNumber, params);
+  const progress =
+    waveNumber <= 0
+      ? 0
+      : Math.min(1, Math.max(0, (frameIndex - waveStart) / interval));
+
+  const centerX = vp.x + vp.width / 2;
+  const topY = vp.y + 20;
+  const barWidth = 120;
+  const barHeight = 8;
+  const barX = centerX - barWidth / 2;
+  const barY = topY + 18;
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  ctx.fillStyle = "rgba(0, 255, 204, 0.95)";
+  ctx.font = "14px monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(`Vague ${waveNumber <= 0 ? 1 : waveNumber}`, centerX, topY);
+
+  ctx.strokeStyle = "rgba(0, 255, 204, 0.5)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(barX, barY, barWidth, barHeight);
+  ctx.fillStyle = "rgba(0, 255, 204, 0.2)";
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+  ctx.fillStyle = "#00ffcc";
+  ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+
+  ctx.restore();
 }
