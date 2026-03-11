@@ -63,14 +63,50 @@
       .player-upgrade-bar {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 6px;
+        gap: 8px;
         flex: 1;
         min-width: 0;
         background: #1a1a2e;
-        padding: 0 6px;
+        padding: 0 8px;
+      }
+      .player-upgrade-bar .upgrade-buttons {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 0;
       }
       .player-upgrade-bar + .player-upgrade-bar { border-left: 1px solid rgba(0, 255, 204, 0.2); }
+      .player-upgrade-bar .life-bar {
+        width: 100px;
+        min-width: 100px;
+        height: 14px;
+        flex-shrink: 0;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 51, 102, 0.6);
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        align-items: stretch;
+      }
+      .player-upgrade-bar .life-bar-fill {
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        background: linear-gradient(90deg, #ff3366, #ff6699);
+        border-radius: 2px;
+        transition: width 0.1s ease-out;
+      }
+      .player-upgrade-bar .player-money {
+        font-family: monospace;
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffd700 !important;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        min-width: 4ch;
+        flex-shrink: 0;
+      }
       .player-upgrade-bar button {
         padding: 6px 10px;
         font-family: monospace;

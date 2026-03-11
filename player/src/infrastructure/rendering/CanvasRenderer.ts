@@ -98,10 +98,5 @@ export function createCanvasRenderer(
     drawPentagon(ctx, 40);
 
     ctx.restore();
-
-    ctx.fillStyle = "#00ffcc";
-    ctx.font = "14px monospace";
-    ctx.fillText(`Life ${Math.ceil(game.player.life)}/${game.player.maxLife}`, vp.x + 8, vp.y + 20);
-    ctx.fillText(`$${game.money}`, vp.x + 8, vp.y + 36);
   };
 }

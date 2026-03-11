@@ -87,6 +87,21 @@ function main(): void {
     const bar = document.createElement("div");
     bar.className = "player-upgrade-bar";
     bar.setAttribute("data-player", String(i + 1));
+
+    const lifeBarWrap = document.createElement("div");
+    lifeBarWrap.className = "life-bar";
+    lifeBarWrap.style.cssText =
+      "width:100px;min-width:100px;height:14px;flex-shrink:0;background:rgba(0,0,0,0.6);border:1px solid #ff3366;border-radius:4px;overflow:hidden;display:flex;align-items:stretch;box-sizing:border-box;";
+    const lifeBarFill = document.createElement("div");
+    lifeBarFill.className = "life-bar-fill";
+    lifeBarFill.style.cssText =
+      "height:100%;background:linear-gradient(90deg,#ff3366,#ff6699);border-radius:2px;transition:width 0.1s ease-out;";
+    lifeBarFill.style.width = "100%";
+    lifeBarWrap.appendChild(lifeBarFill);
+    bar.appendChild(lifeBarWrap);
+
+    const buttonsWrap = document.createElement("div");
+    buttonsWrap.className = "upgrade-buttons";
     for (const key of upgradeTypes) {
       const btn = document.createElement("button");
       btn.type = "button";
@@ -97,8 +112,17 @@ function main(): void {
         if (btn.disabled) return;
         pendingInputs[playerIndex] = { buyUpgrade: key };
       });
-      bar.appendChild(btn);
+      buttonsWrap.appendChild(btn);
     }
+    bar.appendChild(buttonsWrap);
+
+    const moneyEl = document.createElement("span");
+    moneyEl.className = "player-money";
+    moneyEl.style.cssText =
+      "font-family:monospace;font-size:15px;font-weight:700;color:#ffd700;text-shadow:0 0 10px rgba(255,215,0,0.6);min-width:4ch;flex-shrink:0;";
+    moneyEl.textContent = "$ 0";
+    bar.appendChild(moneyEl);
+
     barsContainer.appendChild(bar);
   }
 
@@ -129,6 +153,13 @@ function main(): void {
     barsContainer.querySelectorAll<HTMLElement>(".player-upgrade-bar").forEach((bar, i) => {
       const game = gameStates[i];
       if (i >= gameStates.length || !game) return;
+      const moneyEl = bar.querySelector<HTMLElement>(".player-money");
+      if (moneyEl) moneyEl.textContent = `$ ${game.money}`;
+      const lifeBarFill = bar.querySelector<HTMLElement>(".life-bar-fill");
+      if (lifeBarFill) {
+        const pct = game.player.maxLife > 0 ? (game.player.life / game.player.maxLife) * 100 : 0;
+        lifeBarFill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+      }
       bar.querySelectorAll<HTMLButtonElement>("button[data-upgrade]").forEach((btn) => {
         const raw = btn.getAttribute("data-upgrade");
         if (raw !== "damage" && raw !== "life" && raw !== "regen" && raw !== "attackSpeed") return;
