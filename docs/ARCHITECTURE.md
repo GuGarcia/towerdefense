@@ -12,8 +12,15 @@ Le **domaine** ne connaît pas Canvas, le replay ou le temps réel ; il reçoit 
 
 ## Structure des dossiers (cible)
 
+L’application vit dans **`player/`**. Le code source est sous **`player/src/`**.
+
 ```
-src/
+player/
+├── index.html
+├── package.json
+├── serve.js
+├── build.js
+└── src/
 ├── domain/                    # Cœur métier, zéro dépendance technique
 │   ├── game/
 │   │   ├── Game.js            # Agrégat racine : état global de la partie
@@ -54,6 +61,8 @@ src/
 │
 └── index.js                   # Point d’entrée : crée Game, Renderer, Clock, lance
 ```
+
+(Les dossiers `game/`, `player/`, `enemy/`, etc. dans `domain/` sont des sous-dossiers du domaine métier, pas le dossier racine `player/` du projet.)
 
 ## Flux
 

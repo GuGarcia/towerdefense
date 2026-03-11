@@ -2,14 +2,18 @@
 
 Utiliser ce fichier comme checklist : cocher les tâches au fur et à mesure (`[x]`).
 
+L’application vit dans le dossier **`player/`** ; le code source est sous **`player/src/`**.  
+**Lancer le jeu** : à la racine du projet, `make dev` (Docker + Bun) ou `cd player && bun run dev` (Bun en local).
+
 ---
 
 ## Phase 0 — Setup projet
 
-- [ ] Initialiser le projet (npm init, ou Vite si bundler souhaité)
-- [ ] Créer l’arborescence `src/` (domain, application, infrastructure)
-- [ ] Page HTML minimale + un canvas plein écran (ou zone de jeu fixe)
-- [ ] Point d’entrée JS qui affiche quelque chose dans le canvas (ex. un cercle) pour valider le pipeline
+- [x] Initialiser le projet (Bun : `package.json`, serveur de dev `serve.js`, build `build.js`)
+- [x] Créer l’arborescence `player/src/` (domain, application, infrastructure)
+- [x] Page HTML minimale + un canvas plein écran (ou zone de jeu fixe)
+- [x] Point d’entrée JS qui affiche quelque chose dans le canvas (ex. un cercle) pour valider le pipeline
+- [x] Makefile à la racine + Docker (`make dev`, `make build`, `make preview`) — validé
 
 ---
 
@@ -80,7 +84,7 @@ Utiliser ce fichier comme checklist : cocher les tâches au fur et à mesure (`[
 
 ## Phase 4 — Intégration & boucle de jeu
 
-- [ ] `index.js` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
+- [ ] `player/src/index.js` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
 - [ ] UI minimale : affichage vie, argent, boutons ou raccourcis pour acheter les 4 upgrades
 - [ ] Vérifier que la partie est déterministe (même seed + mêmes inputs → même déroulé)
 

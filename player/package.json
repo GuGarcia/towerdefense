@@ -1,0 +1,11 @@
+{
+  "name": "towerdefense-player",
+  "version": "0.1.0",
+  "description": "Tower defense — player (game + replay)",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot serve.js",
+    "build": "bun run build.js",
+    "preview": "bun run serve.js"
+  }
+}

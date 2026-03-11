@@ -1,0 +1,41 @@
+# Tower Defense — commandes via Docker (Bun)
+# Depuis la racine du projet : make dev, make build, make preview
+
+BUN_IMAGE := oven/bun:latest
+PLAYER_DIR := $(CURDIR)/player
+
+.PHONY: dev build preview shell
+
+# Serveur de dev (hot reload) — http://localhost:5173
+dev:
+	docker run --rm -it \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		-p 5173:5173 \
+		$(BUN_IMAGE) \
+		run dev
+
+# Build prod → player/dist/
+build:
+	docker run --rm \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		$(BUN_IMAGE) \
+		run build
+
+# Servir les fichiers (preview, après make build tu peux servir dist/ manuellement si besoin)
+preview:
+	docker run --rm -it \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		-p 5173:5173 \
+		$(BUN_IMAGE) \
+		run preview
+
+# Shell dans le conteneur avec le dossier player monté
+shell:
+	docker run --rm -it \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		$(BUN_IMAGE) \
+		/bin/sh
