@@ -67,4 +67,26 @@ describe("Game", () => {
     expect(game.money).toBe(0);
     expect(game.player.damage).toBe(damageBefore);
   });
+
+  it("tick when player life <= 0 sets state to GameOver", () => {
+    const params = createGameParams({
+      player: { initialLife: 0, initialMaxLife: 100, initialRegen: 0 },
+    });
+    let game = createGame(params);
+    expect(game.player.life).toBe(0);
+    game = tick(game, 1);
+    expect(game.state).toBe(GameState.GameOver);
+  });
+
+  it("tick when state is GameOver returns same game", () => {
+    const params = createGameParams({
+      player: { initialLife: 0, initialRegen: 0 },
+    });
+    let game = createGame(params);
+    game = tick(game, 1);
+    expect(game.state).toBe(GameState.GameOver);
+    const after = tick(game, 2);
+    expect(after.state).toBe(GameState.GameOver);
+    expect(after.frameIndex).toBe(1);
+  });
 });

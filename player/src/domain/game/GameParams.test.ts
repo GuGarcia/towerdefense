@@ -8,7 +8,7 @@ describe("GameParams", () => {
     expect(p.durationFrames).toBe(60 * 60 * 10);
     expect(p.player.initialLife).toBe(100);
     expect(p.player.initialAttackSpeed).toBe(30);
-    expect(p.economy.upgradeCostBase).toBe(50);
+    expect(p.economy.upgradeCostBase).toBe(10);
     expect(p.wave.spawnRadius).toBe(600);
     expect(p.wave.bossEveryNWaves).toBe(10);
     expect(p.enemies.base.life).toBe(20);

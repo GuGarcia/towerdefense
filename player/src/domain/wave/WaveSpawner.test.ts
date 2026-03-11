@@ -55,7 +55,7 @@ describe("WaveSpawner", () => {
   it("spreadSpawnOverFrames spreads spawn over multiple frames", () => {
     const allAtOnce = createGameParams({
       seed: 999,
-      wave: { baseIntervalFrames: 60, spawnRadius: 500 },
+      wave: { baseIntervalFrames: 60, spawnRadius: 500, spreadSpawnOverFrames: 0 },
     });
     const progressive = createGameParams({
       seed: 999,
