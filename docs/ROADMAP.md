@@ -61,9 +61,8 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ## Phase 2 — Application (use cases)
 
-- [ ] `GameLoop.js` — reçoit (frameIndex, input), appelle `Game.tick(frameIndex, input)`
-- [ ] `BuyUpgradeCommand.js` — (optionnel) encapsule l’achat d’un upgrade si tu veux une couche commande explicite
-- [ ] `GameRunner.js` — reçoit les dépendances (Game, source d’input, renderer, clock), connecte clock → récupérer input → GameLoop.tick → render
+- [x] `GameLoop.ts` — reçoit (game, frameIndex, input), appelle Game.tick
+- [x] `GameRunner.ts` — getGame/setGame, input, renderer, clock ; clock → input → tick → render
 
 ---
 
@@ -71,26 +70,26 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ### Horloge
 
-- [ ] `FixedClock.js` — émet un “tick” toutes les 1/60 s (setInterval ou requestAnimationFrame + throttle)
+- [x] `FixedClock.ts` — émet un “tick” toutes les 1/60 s (setInterval ou requestAnimationFrame + throttle)
 
 ### Rendu (Canvas 2D)
 
-- [ ] `CanvasRenderer.js` (ou interface + implémentation) — reçoit l’état du Game, dessine fond, pentagone au centre, ennemis, projectiles
-- [ ] Style neon/synthwave — couleurs, traits, effet glow (simple) dans un module dédié si besoin (ex. `neon/`)
+- [x] `CanvasRenderer.ts` (ou interface + implémentation) — reçoit l’état du Game, dessine fond, pentagone au centre, ennemis, projectiles
+- [x] Style neon/synthwave — couleurs, traits, effet glow (simple) dans un module dédié si besoin (ex. `neon/`)
 
 ### Replay
 
-- [ ] `GameRecording.js` — structure de données : seed, GameParams, liste d’inputs (frame + upgradeType)
-- [ ] `PlayerInputRecorder.js` — en direct : quand le joueur achète un upgrade, enregistre (frame, upgradeType)
-- [ ] `ReplayInputSource.js` — pour rejeu : à partir d’un GameRecording, retourne l’input pour une frame donnée
+- [x] `GameRecording.ts` — structure de données : seed, GameParams, liste d’inputs (frame + upgradeType)
+- [x] `PlayerInputRecorder.ts` — en direct : quand le joueur achète un upgrade, enregistre (frame, upgradeType)
+- [x] `ReplayInputSource.ts` — pour rejeu : à partir d’un GameRecording, retourne l’input pour une frame donnée
 
 ---
 
 ## Phase 4 — Intégration & boucle de jeu
 
-- [ ] `player/src/index.ts` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
-- [ ] UI minimale : affichage vie, argent, boutons ou raccourcis pour acheter les 4 upgrades
-- [ ] Vérifier que la partie est déterministe (même seed + mêmes inputs → même déroulé)
+- [x] `player/src/index.ts` — crée Game (avec GameParams par défaut), FixedClock, CanvasRenderer, source d’input (clavier/UI en direct), PlayerInputRecorder, GameRunner ; lance la boucle
+- [x] UI minimale : vie, argent, raccourcis 1–4, boutons ou raccourcis pour acheter les 4 upgrades
+- [ ] Vérifier en test que la partie est déterministe (même seed + mêmes inputs → même déroulé)
 
 ---
 
