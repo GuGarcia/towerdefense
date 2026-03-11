@@ -225,7 +225,6 @@ function main(): void {
     const anyGameOver = gameStates.some((g) => g.state === GameState.GameOver);
     if (upgradeBarsEl) {
       upgradeBarsEl.classList.toggle("is-game-over", anyGameOver);
-      upgradeBarsEl.classList.toggle("is-replay", isReplay);
     }
     if (gameOverlayEl) {
       gameOverlayEl.classList.toggle("visible", anyGameOver);
@@ -253,7 +252,7 @@ function main(): void {
         const canAfford = game.money >= cost;
         const value = getUpgradeValue(game.player, raw);
         btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost}) — ${value}`;
-        btn.disabled = !canAfford;
+        btn.disabled = isReplay || !canAfford;
       });
     });
   }
