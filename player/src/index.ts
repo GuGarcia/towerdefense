@@ -43,6 +43,45 @@ function main(): void {
   if (!upgradeBarsEl) return;
   const barsContainer = upgradeBarsEl;
 
+  let gameOverlayEl = document.getElementById("game-overlay");
+  let gameWrapperEl = document.getElementById("game-wrapper");
+  if (!gameWrapperEl && canvas.parentElement) {
+    gameWrapperEl = document.createElement("div");
+    gameWrapperEl.id = "game-wrapper";
+    gameWrapperEl.style.cssText = "position:relative;flex:1;min-height:0;display:flex;";
+    canvas.parentElement.insertBefore(gameWrapperEl, canvas);
+    gameWrapperEl.appendChild(canvas);
+  }
+  if (!gameOverlayEl && gameWrapperEl) {
+    gameOverlayEl = document.createElement("div");
+    gameOverlayEl.id = "game-overlay";
+    gameOverlayEl.style.cssText =
+      "position:absolute;left:0;top:0;right:0;bottom:0;z-index:10;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;background:rgba(0,0,0,0.6);";
+    const title = document.createElement("span");
+    title.className = "game-over-title";
+    title.style.cssText = "font:bold 56px monospace;color:#ff3366;";
+    title.textContent = "GAME OVER";
+    const replayBtn = document.createElement("button");
+    replayBtn.type = "button";
+    replayBtn.className = "btn-replay-overlay";
+    replayBtn.textContent = "Rejouer";
+    replayBtn.style.cssText =
+      "padding:12px 28px;font:600 18px monospace;color:#00ffcc;background:rgba(0,255,204,0.15);border:2px solid #00ffcc;border-radius:6px;cursor:pointer;";
+    gameOverlayEl.appendChild(title);
+    gameOverlayEl.appendChild(replayBtn);
+    gameWrapperEl.appendChild(gameOverlayEl);
+  }
+  const replayOverlayBtn = gameOverlayEl?.querySelector<HTMLButtonElement>(".btn-replay-overlay");
+
+  if (replayOverlayBtn) {
+    replayOverlayBtn.addEventListener("click", () => {
+      for (let i = 0; i < n; i++) {
+        gameStates[i] = createGame(createGameParams({ seed: seeds[i] }));
+        frameIndices[i] = 0;
+      }
+    });
+  }
+
   const upgradeTypes = ["damage", "life", "regen", "attackSpeed"] as const;
   for (let i = 0; i < n; i++) {
     const bar = document.createElement("div");
@@ -60,41 +99,53 @@ function main(): void {
       });
       bar.appendChild(btn);
     }
-    const replayBtn = document.createElement("button");
-    replayBtn.type = "button";
-    replayBtn.className = "btn-replay";
-    replayBtn.textContent = "Rejouer";
-    replayBtn.style.display = "none";
-    const playerIndex = i;
-    replayBtn.addEventListener("click", () => {
-      gameStates[playerIndex] = createGame(createGameParams({ seed: seeds[playerIndex] }));
-      frameIndices[playerIndex] = 0;
-    });
-    bar.appendChild(replayBtn);
     barsContainer.appendChild(bar);
   }
 
+  function getUpgradeValue(
+    player: { damage: number; maxLife: number; regen: number; attackSpeed: number },
+    key: "damage" | "life" | "regen" | "attackSpeed"
+  ): string {
+    const v =
+      key === "damage"
+        ? player.damage
+        : key === "life"
+          ? player.maxLife
+          : key === "regen"
+            ? player.regen
+            : player.attackSpeed;
+    return key === "regen" ? v.toFixed(1) : String(Math.round(v));
+  }
+
   function updateUpgradeBarsUI(): void {
+    const anyGameOver = gameStates.some((g) => g.state === GameState.GameOver);
+    if (upgradeBarsEl) {
+      upgradeBarsEl.classList.toggle("is-game-over", anyGameOver);
+    }
+    if (gameOverlayEl) {
+      gameOverlayEl.classList.toggle("visible", anyGameOver);
+      gameOverlayEl.style.display = anyGameOver ? "flex" : "none";
+    }
     barsContainer.querySelectorAll<HTMLElement>(".player-upgrade-bar").forEach((bar, i) => {
       const game = gameStates[i];
       if (i >= gameStates.length || !game) return;
-      const isGameOver = game.state === GameState.GameOver;
-      bar.classList.toggle("is-game-over", isGameOver);
-      const replayBtn = bar.querySelector<HTMLButtonElement>(".btn-replay");
-      if (replayBtn) {
-        replayBtn.style.display = isGameOver ? "block" : "none";
-      }
       bar.querySelectorAll<HTMLButtonElement>("button[data-upgrade]").forEach((btn) => {
         const raw = btn.getAttribute("data-upgrade");
         if (raw !== "damage" && raw !== "life" && raw !== "regen" && raw !== "attackSpeed") return;
-        btn.style.display = isGameOver ? "none" : "";
         const level = getUpgradeLevel(game.player, raw);
         const cost = getUpgradeCost(raw, level, game.params);
         const canAfford = game.money >= cost;
-        btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost})`;
-        btn.disabled = isGameOver || !canAfford;
+        const value = getUpgradeValue(game.player, raw);
+        btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost}) — ${value}`;
+        btn.disabled = !canAfford;
       });
     });
+  }
+
+  // Ensure overlay is hidden on init (in case HTML has it visible or CSS loads late)
+  if (gameOverlayEl) {
+    gameOverlayEl.style.display = "none";
+    gameOverlayEl.classList.remove("visible");
   }
 
   function resize(): void {

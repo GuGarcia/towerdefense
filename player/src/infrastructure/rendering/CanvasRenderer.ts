@@ -4,7 +4,6 @@
 import type { Game } from "../../domain/game/Game";
 import type { Enemy } from "../../domain/enemy/Enemy";
 import type { Projectile } from "../../domain/projectile/Projectile";
-import { GameState } from "../../domain/game/GameState";
 
 const NEON = {
   bg: "#0a0a0f",
@@ -104,10 +103,5 @@ export function createCanvasRenderer(
     ctx.font = "14px monospace";
     ctx.fillText(`Life ${Math.ceil(game.player.life)}/${game.player.maxLife}`, vp.x + 8, vp.y + 20);
     ctx.fillText(`$${game.money}`, vp.x + 8, vp.y + 36);
-    if (game.state === GameState.GameOver) {
-      ctx.fillStyle = "#ff3366";
-      ctx.font = "bold 24px monospace";
-      ctx.fillText("GAME OVER", cx - 60, cy);
-    }
   };
 }
