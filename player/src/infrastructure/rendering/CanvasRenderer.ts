@@ -46,6 +46,15 @@ function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy): void {
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.stroke();
+  if ((e.hitFlashFrames ?? 0) > 0) {
+    ctx.beginPath();
+    ctx.arc(e.x, -e.y, e.size, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.fill();
+    ctx.strokeStyle = NEON.projectile;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
 }
 
 function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile): void {

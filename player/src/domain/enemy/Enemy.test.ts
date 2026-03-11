@@ -52,7 +52,7 @@ describe("Enemy", () => {
     expect(m.y).toBe(0);
   });
 
-  it("takeDamage reduces life", () => {
+  it("takeDamage reduces life and sets hitFlashFrames", () => {
     const e = createEnemy({
       x: 0,
       y: 0,
@@ -63,6 +63,7 @@ describe("Enemy", () => {
     });
     const hit = takeDamage(e, 15);
     expect(hit.life).toBe(5);
+    expect(hit.hitFlashFrames).toBe(5);
     expect(takeDamage(hit, 10).life).toBe(0);
   });
 

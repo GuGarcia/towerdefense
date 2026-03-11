@@ -1,5 +1,6 @@
 /**
  * Entry point: 1 or N players side by side. Change PLAYER_COUNT to test determinism (e.g. 4).
+ * Records inputs for export; supports loading a recording for replay.
  */
 import { createGame, tick } from "./domain/game/Game";
 import { createGameParams } from "./domain/game/GameParams";
@@ -8,7 +9,10 @@ import { getUpgradeLevel } from "./domain/player/Player";
 import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { createFixedClock } from "./infrastructure/clock/FixedClock";
 import { createCanvasRenderer } from "./infrastructure/rendering/CanvasRenderer";
+import { createPlayerInputRecorder } from "./infrastructure/replay/PlayerInputRecorder";
+import { createReplayInputSource } from "./infrastructure/replay/ReplayInputSource";
 import type { GameInput } from "./domain/game/Game";
+import type { GameRecording } from "./infrastructure/replay/GameRecording";
 
 const PLAYER_COUNT = 1;
 
@@ -39,9 +43,77 @@ function main(): void {
   const pendingInputs: (GameInput | null)[] = Array(n).fill(null);
   const frameIndices = Array(n).fill(0);
 
+  const recorder = createPlayerInputRecorder();
+  let isReplay = false;
+  let replayGetInput: ((frame: number) => GameInput | null) | null = null;
+
+  function getInputForFrame(playerIndex: number, frame: number): GameInput | null {
+    if (isReplay && replayGetInput) return replayGetInput(frame);
+    const input = pendingInputs[playerIndex];
+    pendingInputs[playerIndex] = null;
+    return input ?? null;
+  }
+
   const upgradeBarsEl = document.getElementById("upgrade-bars");
   if (!upgradeBarsEl) return;
   const barsContainer = upgradeBarsEl;
+
+  const toolbarEl = document.getElementById("replay-toolbar");
+  if (toolbarEl) {
+    const btnExport = document.createElement("button");
+    btnExport.type = "button";
+    btnExport.textContent = "Exporter";
+    const labelReplay = document.createElement("label");
+    labelReplay.textContent = "Charger un replay";
+    const inputReplay = document.createElement("input");
+    inputReplay.type = "file";
+    inputReplay.accept = ".json";
+    inputReplay.id = "input-replay";
+    labelReplay.htmlFor = inputReplay.id;
+    toolbarEl.appendChild(btnExport);
+    toolbarEl.appendChild(labelReplay);
+    toolbarEl.appendChild(inputReplay);
+
+    btnExport.addEventListener("click", () => {
+      if (isReplay || gameStates.length === 0) return;
+      const recording: GameRecording = recorder.getRecording(seeds[0], gameStates[0].params);
+      const blob = new Blob([JSON.stringify(recording, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `replay-${recording.seed}-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    inputReplay.addEventListener("change", () => {
+      const file = inputReplay.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const raw = reader.result as string;
+          const recording = JSON.parse(raw) as GameRecording;
+          if (typeof recording.seed !== "number" || !recording.params || !Array.isArray(recording.inputs)) {
+            alert("Fichier replay invalide.");
+            return;
+          }
+          const params = createGameParams({ ...recording.params, seed: recording.seed });
+          gameStates.length = 0;
+          gameStates.push(createGame(params));
+          seeds.length = 0;
+          seeds.push(recording.seed);
+          frameIndices.length = 0;
+          frameIndices.push(0);
+          isReplay = true;
+          replayGetInput = createReplayInputSource(recording);
+          inputReplay.value = "";
+        } catch {
+          alert("Erreur lors du chargement du replay.");
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
 
   let gameOverlayEl = document.getElementById("game-overlay");
   let gameWrapperEl = document.getElementById("game-wrapper");
@@ -75,6 +147,11 @@ function main(): void {
 
   if (replayOverlayBtn) {
     replayOverlayBtn.addEventListener("click", () => {
+      if (isReplay) {
+        location.reload();
+        return;
+      }
+      recorder.clear();
       for (let i = 0; i < n; i++) {
         seeds[i] = randomSeed();
         gameStates[i] = createGame(createGameParams({ seed: seeds[i] }));
@@ -112,6 +189,7 @@ function main(): void {
       btn.addEventListener("click", () => {
         if (btn.disabled) return;
         pendingInputs[playerIndex] = { buyUpgrade: key };
+        if (!isReplay) recorder.record(frameIndices[playerIndex], key);
       });
       buttonsWrap.appendChild(btn);
     }
@@ -147,10 +225,15 @@ function main(): void {
     const anyGameOver = gameStates.some((g) => g.state === GameState.GameOver);
     if (upgradeBarsEl) {
       upgradeBarsEl.classList.toggle("is-game-over", anyGameOver);
+      upgradeBarsEl.classList.toggle("is-replay", isReplay);
     }
     if (gameOverlayEl) {
       gameOverlayEl.classList.toggle("visible", anyGameOver);
       gameOverlayEl.style.display = anyGameOver ? "flex" : "none";
+      const titleEl = gameOverlayEl.querySelector<HTMLElement>(".game-over-title");
+      const btnEl = gameOverlayEl.querySelector<HTMLButtonElement>(".btn-replay-overlay");
+      if (titleEl) titleEl.textContent = anyGameOver && isReplay ? "Replay terminé" : "GAME OVER";
+      if (btnEl) btnEl.textContent = isReplay ? "Nouvelle partie" : "Rejouer";
     }
     barsContainer.querySelectorAll<HTMLElement>(".player-upgrade-bar").forEach((bar, i) => {
       const game = gameStates[i];
@@ -194,9 +277,10 @@ function main(): void {
     const w = canvas.width;
     const h = canvas.height;
     const gap = 2;
-    const slotWidth = (w - (n - 1) * gap) / n;
+    const count = gameStates.length;
+    const slotWidth = (w - (count - 1) * gap) / count;
     const viewports: { x: number; y: number; width: number; height: number }[] = [];
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < count; i++) {
       viewports.push({
         x: i * (slotWidth + gap),
         y: 0,
@@ -223,16 +307,15 @@ function main(): void {
   }
 
   function step(): void {
-    for (let i = 0; i < n; i++) {
-      const input = pendingInputs[i];
-      pendingInputs[i] = null;
+    for (let i = 0; i < gameStates.length; i++) {
+      const input = getInputForFrame(i, frameIndices[i]);
       gameStates[i] = tick(gameStates[i], frameIndices[i], input ?? undefined);
       frameIndices[i] += 1;
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const viewports = getViewports();
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < gameStates.length; i++) {
       renderer(gameStates[i], viewports[i]);
       drawSeedTopRight(ctx, viewports[i], seeds[i]);
     }

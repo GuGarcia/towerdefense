@@ -14,6 +14,8 @@ export interface Enemy {
   damage: number;
   size: number;
   archetype: EnemyArchetypeValue;
+  /** Frames left to show hit flash (visual feedback). */
+  hitFlashFrames?: number;
 }
 
 let nextId = 0;
@@ -63,7 +65,9 @@ export function moveTowardCenter(enemy: Enemy): Enemy {
 }
 
 export function takeDamage(enemy: Enemy, amount: number): Enemy {
-  return { ...enemy, life: Math.max(0, enemy.life - amount) };
+  const life = Math.max(0, enemy.life - amount);
+  const hitFlashFrames = amount > 0 ? 5 : (enemy.hitFlashFrames ?? 0);
+  return { ...enemy, life, hitFlashFrames };
 }
 
 export function isDead(enemy: Enemy): boolean {

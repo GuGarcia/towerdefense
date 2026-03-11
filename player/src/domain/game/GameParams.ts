@@ -73,7 +73,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
     enemies: {
       base: { life: 20, speed: 2, damage: 5, size: 12, countPerWave: 5 },
       rapid: { life: 8, speed: 4, damage: 2, size: 6, countPerWave: 8 },
-      boss: { life: 100, speed: 0.8, damage: 25, size: 32, countPerWave: 1 },
+      boss: { life: 50, speed: 0.8, damage: 25, size: 32, countPerWave: 1 },
     },
   };
 

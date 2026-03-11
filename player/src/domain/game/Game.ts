@@ -139,6 +139,10 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   }
 
   next.enemies = next.enemies.filter((e) => !isDead(e));
+  next.enemies = next.enemies.map((e) => ({
+    ...e,
+    hitFlashFrames: Math.max(0, (e.hitFlashFrames ?? 0) - 1),
+  }));
   if (next.player.life <= 0) next.state = GameState.GameOver;
 
   return next;

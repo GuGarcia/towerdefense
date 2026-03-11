@@ -95,10 +95,10 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ## Phase 5 — Rejeu & polish
 
-- [ ] Écran ou mode “Replay” : charger un GameRecording, créer une partie avec les mêmes params + seed, alimenter GameRunner avec ReplayInputSource au lieu du clavier
-- [ ] Export / import d’une partie enregistrée (JSON ou binaire) pour partage ou vérification future
-- [ ] Ajuster balance (GAME_PARAMS) pour viser ~10 min de partie et feeling correct (2 balles base, 1 rapide, 5 boss)
-- [ ] Polish visuel synthwave (couleurs, feedback visuel des tirs et dégâts)
+- [x] Écran ou mode “Replay” : charger un GameRecording, créer une partie avec les mêmes params + seed, alimenter GameRunner avec ReplayInputSource au lieu du clavier
+- [x] Export / import d’une partie enregistrée (JSON ou binaire) pour partage ou vérification future
+- [x] Ajuster balance (GAME_PARAMS) pour viser ~10 min de partie et feeling correct (2 balles base, 1 rapide, 5 boss)
+- [x] Polish visuel synthwave (couleurs, feedback visuel des tirs et dégâts)
 
 ---
 
