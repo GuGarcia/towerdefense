@@ -60,6 +60,17 @@ function main(): void {
       });
       bar.appendChild(btn);
     }
+    const replayBtn = document.createElement("button");
+    replayBtn.type = "button";
+    replayBtn.className = "btn-replay";
+    replayBtn.textContent = "Rejouer";
+    replayBtn.style.display = "none";
+    const playerIndex = i;
+    replayBtn.addEventListener("click", () => {
+      gameStates[playerIndex] = createGame(createGameParams({ seed: seeds[playerIndex] }));
+      frameIndices[playerIndex] = 0;
+    });
+    bar.appendChild(replayBtn);
     barsContainer.appendChild(bar);
   }
 
@@ -69,14 +80,17 @@ function main(): void {
       if (i >= gameStates.length || !game) return;
       const isGameOver = game.state === GameState.GameOver;
       bar.classList.toggle("is-game-over", isGameOver);
-      const money = game.money;
-      const params = game.params;
+      const replayBtn = bar.querySelector<HTMLButtonElement>(".btn-replay");
+      if (replayBtn) {
+        replayBtn.style.display = isGameOver ? "block" : "none";
+      }
       bar.querySelectorAll<HTMLButtonElement>("button[data-upgrade]").forEach((btn) => {
         const raw = btn.getAttribute("data-upgrade");
         if (raw !== "damage" && raw !== "life" && raw !== "regen" && raw !== "attackSpeed") return;
+        btn.style.display = isGameOver ? "none" : "";
         const level = getUpgradeLevel(game.player, raw);
-        const cost = getUpgradeCost(raw, level, params);
-        const canAfford = money >= cost;
+        const cost = getUpgradeCost(raw, level, game.params);
+        const canAfford = game.money >= cost;
         btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost})`;
         btn.disabled = isGameOver || !canAfford;
       });

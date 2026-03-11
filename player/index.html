@@ -59,6 +59,25 @@
         opacity: 0.6;
         pointer-events: none;
       }
+      .player-upgrade-bar.is-game-over .btn-replay {
+        pointer-events: auto;
+      }
+      .player-upgrade-bar .btn-replay {
+        padding: 8px 20px;
+        font-family: monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #00ffcc;
+        background: rgba(0, 255, 204, 0.15);
+        border: 1px solid #00ffcc;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s;
+      }
+      .player-upgrade-bar .btn-replay:hover {
+        background: rgba(0, 255, 204, 0.25);
+        box-shadow: 0 0 12px rgba(0, 255, 204, 0.35);
+      }
     </style>
   </head>
   <body>
