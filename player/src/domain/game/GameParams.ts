@@ -59,7 +59,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialAttackSpeed: 30,
     },
     economy: {
-      upgradeCostBase: 50,
+      upgradeCostBase: 10,
       upgradeCostFactor: 1.5,
       currencyPerKill: { base: 10, rapid: 5, boss: 100 },
     },
