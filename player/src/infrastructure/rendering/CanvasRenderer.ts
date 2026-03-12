@@ -46,27 +46,36 @@ function drawRangeCircle(ctx: CanvasRenderingContext2D, range: number): void {
   ctx.setLineDash([]);
 }
 
+/** Angle so that one edge of the square faces center. Canvas: normal (0,-1) must align with (-e.x, e.y). */
+function angleTowardCenter(e: Enemy): number {
+  return Math.atan2(-e.x, -e.y);
+}
+
 function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy): void {
   const color =
     e.archetype === "boss" ? NEON.enemyBoss : e.archetype === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
-  ctx.beginPath();
-  ctx.arc(e.x, -e.y, e.size, 0, Math.PI * 2);
+  const cx = e.x;
+  const cy = -e.y;
+  const size = e.size;
+  const angle = angleTowardCenter(e);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angle);
   ctx.fillStyle = color;
   ctx.globalAlpha = 0.3 + (e.life / e.maxLife) * 0.7;
-  ctx.fill();
+  ctx.fillRect(-size / 2, -size / 2, size, size);
   ctx.globalAlpha = 1;
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.strokeRect(-size / 2, -size / 2, size, size);
   if ((e.hitFlashFrames ?? 0) > 0) {
-    ctx.beginPath();
-    ctx.arc(e.x, -e.y, e.size, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.fill();
+    ctx.fillRect(-size / 2, -size / 2, size, size);
     ctx.strokeStyle = NEON.projectile;
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.strokeRect(-size / 2, -size / 2, size, size);
   }
+  ctx.restore();
 }
 
 function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile): void {

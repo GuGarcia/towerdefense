@@ -70,9 +70,9 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 6 — Ennemis en carrés orientés vers le centre
 
-- [ ] **Domaine** : ajouter une notion d’**orientation** (angle vers le centre) pour les ennemis, ou la dériver de la position (direction vers le centre)
-- [ ] **Rendu** : dans `CanvasRenderer`, dessiner les ennemis en **carrés** (au lieu de cercles), **orientés vers le centre** du terrain
-- [ ] Garder les 3 archétypes (base, rapid, boss) et leurs couleurs / tailles
+- [x] **Domaine** : ajouter une notion d’**orientation** (angle vers le centre) pour les ennemis, ou la dériver de la position (direction vers le centre)
+- [x] **Rendu** : dans `CanvasRenderer`, dessiner les ennemis en **carrés** (au lieu de cercles), **orientés vers le centre** du terrain
+- [x] Garder les 3 archétypes (base, rapid, boss) et leurs couleurs / tailles
 
 ---
 
