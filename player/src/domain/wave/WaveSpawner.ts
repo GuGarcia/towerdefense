@@ -45,8 +45,11 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
 
   const radius = gameParams.wave.spawnRadius ?? 600;
   const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
-  const scale = (key: keyof typeof scaling, base: number, w: number) =>
-    base * Math.pow((scaling[key] as number) ?? 1, w - 1);
+  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
+  const scale = (key: keyof typeof scaling, base: number, w: number) => {
+    const value = base * Math.pow((scaling[key] as number) ?? 1, w - 1);
+    return w === 1 ? value * wave1Factor : value;
+  };
 
   const archetypes: EnemyArchetypeValue[] = [EnemyArchetype.Base, EnemyArchetype.Rapid];
   if (isBossWave(waveNumber, gameParams)) archetypes.push(EnemyArchetype.Boss);

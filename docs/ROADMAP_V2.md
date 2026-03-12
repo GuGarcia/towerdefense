@@ -62,9 +62,9 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 5 — Difficulté exponentielle
 
-- [ ] S’assurer que le **scaling** des vagues (nombre d’ennemis, vie, dégâts, vitesse) est bien **exponentiel** (déjà via `difficultyScaling` dans `GameParams`)
-- [ ] Ajuster pour que le **début** soit très facile (vague 1 très douce), puis montée nette vague après vague
-- [ ] Option : offset ou facteur de scaling qui ne s’applique qu’à partir de la vague 2 pour garder la vague 1 très simple
+- [x] S’assurer que le **scaling** des vagues (nombre d’ennemis, vie, dégâts, vitesse) est bien **exponentiel** (déjà via `difficultyScaling` dans `GameParams`)
+- [x] Ajuster pour que le **début** soit très facile (vague 1 très douce), puis montée nette vague après vague
+- [x] Option : offset ou facteur de scaling qui ne s’applique qu’à partir de la vague 2 pour garder la vague 1 très simple
 
 ---
 
