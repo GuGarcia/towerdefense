@@ -5,6 +5,7 @@
 import { createGame, tick } from "./domain/game/Game";
 import { createGameParams } from "./domain/game/GameParams";
 import { GameState } from "./domain/game/GameState";
+import { getWaveNumberAtFrame } from "./domain/wave/WaveSpawner";
 import { getUpgradeLevel } from "./domain/player/Player";
 import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { createFixedClock } from "./infrastructure/clock/FixedClock";
@@ -133,6 +134,9 @@ function main(): void {
     title.className = "game-over-title";
     title.style.cssText = "font:bold 56px monospace;color:#ff3366;";
     title.textContent = "GAME OVER";
+    const statsEl = document.createElement("span");
+    statsEl.className = "game-over-stats";
+    statsEl.style.cssText = "font:18px monospace;color:rgba(0,255,204,0.95);";
     const replayBtn = document.createElement("button");
     replayBtn.type = "button";
     replayBtn.className = "btn-replay-overlay";
@@ -140,6 +144,7 @@ function main(): void {
     replayBtn.style.cssText =
       "padding:12px 28px;font:600 18px monospace;color:#00ffcc;background:rgba(0,255,204,0.15);border:2px solid #00ffcc;border-radius:6px;cursor:pointer;";
     gameOverlayEl.appendChild(title);
+    gameOverlayEl.appendChild(statsEl);
     gameOverlayEl.appendChild(replayBtn);
     gameWrapperEl.appendChild(gameOverlayEl);
   }
@@ -226,12 +231,25 @@ function main(): void {
     if (upgradeBarsEl) {
       upgradeBarsEl.classList.toggle("is-game-over", anyGameOver);
     }
+    if (toolbarEl) {
+      toolbarEl.classList.toggle("is-game-over", anyGameOver);
+    }
     if (gameOverlayEl) {
       gameOverlayEl.classList.toggle("visible", anyGameOver);
       gameOverlayEl.style.display = anyGameOver ? "flex" : "none";
       const titleEl = gameOverlayEl.querySelector<HTMLElement>(".game-over-title");
+      const statsEl = gameOverlayEl.querySelector<HTMLElement>(".game-over-stats");
       const btnEl = gameOverlayEl.querySelector<HTMLButtonElement>(".btn-replay-overlay");
       if (titleEl) titleEl.textContent = anyGameOver && isReplay ? "Replay terminé" : "GAME OVER";
+      if (statsEl && anyGameOver) {
+        const game = gameStates.find((g) => g.state === GameState.GameOver) ?? gameStates[0];
+        const wave = getWaveNumberAtFrame(game.frameIndex, game.params);
+        const timeSec = game.frameIndex / 60;
+        const min = Math.floor(timeSec / 60);
+        const s = Math.floor(timeSec % 60);
+        const timeStr = min > 0 ? `${min} min ${s} s` : `${s} s`;
+        statsEl.textContent = `Vague ${wave} · Ennemis tués ${game.enemiesKilled} · Temps écoulé ${timeStr}`;
+      }
       if (btnEl) btnEl.textContent = isReplay ? "Nouvelle partie" : "Rejouer";
     }
     barsContainer.querySelectorAll<HTMLElement>(".player-upgrade-bar").forEach((bar, i) => {

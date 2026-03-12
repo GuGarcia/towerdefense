@@ -43,6 +43,8 @@ export interface Game {
   projectiles: Projectile[];
   money: number;
   frameIndex: number;
+  /** Total enemies killed this run (for game over stats). */
+  enemiesKilled: number;
 }
 
 export function createGame(gameParams: GameParams): Game {
@@ -62,6 +64,7 @@ export function createGame(gameParams: GameParams): Game {
     projectiles: [],
     money: 0,
     frameIndex: 0,
+    enemiesKilled: 0,
   };
 }
 
@@ -123,10 +126,15 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
 
   const currencyPerKill = game.params.economy.currencyPerKill;
   let earned = 0;
+  let killedThisFrame = 0;
   for (const e of next.enemies) {
-    if (isDead(e)) earned += currencyPerKill[e.archetype as keyof typeof currencyPerKill] ?? currencyPerKill.base;
+    if (isDead(e)) {
+      earned += currencyPerKill[e.archetype as keyof typeof currencyPerKill] ?? currencyPerKill.base;
+      killedThisFrame += 1;
+    }
   }
   next.money = next.money + earned;
+  next.enemiesKilled = game.enemiesKilled + killedThisFrame;
 
   let playerDamage = 0;
   for (const e of next.enemies) {
