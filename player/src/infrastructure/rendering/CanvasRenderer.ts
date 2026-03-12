@@ -5,7 +5,11 @@ import type { Game } from "../../domain/game/Game";
 import type { GameParams } from "../../domain/game/GameParams";
 import type { Enemy } from "../../domain/enemy/Enemy";
 import type { Projectile } from "../../domain/projectile/Projectile";
-import { getWaveNumberAtFrame, getWaveStartFrame } from "../../domain/wave/WaveSpawner";
+import {
+  getWaveNumberAtFrame,
+  getWaveStartFrame,
+  getWaveComposition,
+} from "../../domain/wave/WaveSpawner";
 
 const NEON = {
   bg: "#0a0a0f",
@@ -175,6 +179,20 @@ function drawWaveHud(
   ctx.fillRect(barX, barY, barWidth, barHeight);
   ctx.fillStyle = "#00ffcc";
   ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+
+  const nextWave = waveNumber <= 0 ? 1 : waveNumber + 1;
+  const comp = getWaveComposition(params, nextWave);
+  const nextParts: string[] = [];
+  if (comp.base > 0) nextParts.push(`${comp.base} base`);
+  if (comp.rapid > 0) nextParts.push(`${comp.rapid} rapid`);
+  if (comp.boss > 0) nextParts.push("1 boss");
+  ctx.fillStyle = "rgba(0, 255, 204, 0.8)";
+  ctx.font = "11px monospace";
+  ctx.fillText(
+    nextParts.length ? `Prochaine vague : ${nextParts.join(", ")}` : "",
+    centerX,
+    barY + barHeight + 16
+  );
 
   ctx.restore();
 }

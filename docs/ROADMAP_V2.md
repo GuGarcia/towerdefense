@@ -78,8 +78,8 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 7 — Indicateur « Prochaine vague »
 
-- [ ] Afficher dans l’UI (ex. en haut à gauche ou près du HUD de vague) : **« Prochaine vague : X base, Y rapid, [1 boss] »**
-- [ ] Utiliser le spawn déterministe (`WaveSpawner`) pour connaître la composition de la prochaine vague
+- [x] Afficher dans l’UI (ex. en haut à gauche ou près du HUD de vague) : **« Prochaine vague : X base, Y rapid, [1 boss] »**
+- [x] Utiliser le spawn déterministe (`WaveSpawner`) pour connaître la composition de la prochaine vague
 - [ ] Option : afficher seulement quand la vague en cours est proche de se terminer
 
 ---

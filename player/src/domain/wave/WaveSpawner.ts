@@ -36,6 +36,29 @@ export function getWaveStartFrame(waveNumber: number, gameParams?: GameParams): 
   return (waveNumber - 1) * interval + 1;
 }
 
+/** Returns the composition (count per archetype) for a given wave number (for UI: "Prochaine vague"). */
+export function getWaveComposition(
+  gameParams: GameParams,
+  waveNumber: number
+): { base: number; rapid: number; boss: number } {
+  if (waveNumber <= 0) return { base: 0, rapid: 0, boss: 0 };
+  const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
+  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
+  const scale = (key: keyof typeof scaling, base: number, w: number) => {
+    const value = base * Math.pow((scaling[key] as number) ?? 1, w - 1);
+    return w === 1 ? value * wave1Factor : value;
+  };
+  const baseConfig = gameParams.enemies.base;
+  const rapidConfig = gameParams.enemies.rapid;
+  const bossConfig = gameParams.enemies.boss;
+  const base = Math.floor(scale("count", baseConfig?.countPerWave ?? 0, waveNumber));
+  const rapid = Math.floor(scale("count", rapidConfig?.countPerWave ?? 0, waveNumber));
+  const boss = isBossWave(waveNumber, gameParams)
+    ? Math.min(1, Math.floor(scale("count", bossConfig?.countPerWave ?? 0, waveNumber)))
+    : 0;
+  return { base, rapid, boss };
+}
+
 export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameParams): Enemy[] {
   const waveNumber = getWaveNumberAtFrame(frameIndex, gameParams);
   if (waveNumber <= 0) return [];
