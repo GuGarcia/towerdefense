@@ -26,6 +26,8 @@ export interface GameParams {
     /** Spread wave spawn over this many frames (0 = all at wave start). */
     readonly spreadSpawnOverFrames: number;
     readonly bossEveryNWaves: number;
+    /** Frames between each damage tick from a stuck enemy (e.g. 60 = 1 hit per second). */
+    readonly stuckEnemyAttackIntervalFrames: number;
     readonly difficultyScaling: {
       readonly life: number;
       readonly speed: number;
@@ -73,6 +75,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       baseIntervalFrames: 60 * 5,
       spreadSpawnOverFrames: 300,
       bossEveryNWaves: 10,
+      stuckEnemyAttackIntervalFrames: 60,
       difficultyScaling: { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 },
     },
     enemies: {

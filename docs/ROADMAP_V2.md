@@ -42,12 +42,12 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 3 — Ennemis collés (stick) & dégâts toutes les X frames
 
-- [ ] **Comportement** : quand un ennemi atteint le centre (distance ≤ rayon hitbox joueur), il ne meurt plus ni ne disparaît ; il reste **collé** au joueur
-- [ ] Pas de hitbox bloquante : d’autres ennemis peuvent aussi se coller (plusieurs ennemis collés en même temps)
-- [ ] Chaque ennemi collé inflige **e.damage** au joueur **toutes les X frames** (ex. 60 frames = 1 coup par seconde). Paramètre X dans `GameParams` ou sur l’ennemi
-- [ ] Les ennemis collés restent ciblables par les projectiles (auto-aim sur le plus proche, donc souvent ceux sur le joueur)
-- [ ] Définir position / état « collé » pour le rendu (ex. position fixe sur le bord du pentagone) si besoin
-- [ ] Adapter le calcul des dégâts joueur : au lieu d’un seul coup au contact puis suppression, appliquer les coups périodiques pour chaque ennemi collé
+- [x] **Comportement** : quand un ennemi atteint le centre (distance ≤ rayon hitbox joueur), il ne meurt plus ni ne disparaît ; il reste **collé** au joueur
+- [x] Pas de hitbox bloquante : d’autres ennemis peuvent aussi se coller (plusieurs ennemis collés en même temps)
+- [x] Chaque ennemi collé inflige **e.damage** au joueur **toutes les X frames** (ex. 60 frames = 1 coup par seconde). Paramètre X dans `GameParams` ou sur l’ennemi
+- [x] Les ennemis collés restent ciblables par les projectiles (auto-aim sur le plus proche, donc souvent ceux sur le joueur)
+- [x] Définir position / état « collé » pour le rendu (ex. position fixe sur le bord du pentagone) si besoin
+- [x] Adapter le calcul des dégâts joueur : au lieu d’un seul coup au contact puis suppression, appliquer les coups périodiques pour chaque ennemi collé
 
 ---
 

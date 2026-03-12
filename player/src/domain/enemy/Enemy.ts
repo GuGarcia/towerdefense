@@ -16,6 +16,10 @@ export interface Enemy {
   archetype: EnemyArchetypeValue;
   /** Frames left to show hit flash (visual feedback). */
   hitFlashFrames?: number;
+  /** When true, enemy is stuck on player and no longer moves; deals damage every X frames. */
+  stuck?: boolean;
+  /** Last frame index when this stuck enemy dealt damage to the player. */
+  lastDamageFrame?: number;
 }
 
 let nextId = 0;
@@ -56,6 +60,7 @@ export function directionTowardCenter(x: number, y: number): { dx: number; dy: n
 }
 
 export function moveTowardCenter(enemy: Enemy): Enemy {
+  if (enemy.stuck) return enemy;
   const { dx, dy } = directionTowardCenter(enemy.x, enemy.y);
   return {
     ...enemy,
@@ -76,4 +81,10 @@ export function isDead(enemy: Enemy): boolean {
 
 export function distanceToCenter(enemy: Enemy): number {
   return Math.sqrt(enemy.x * enemy.x + enemy.y * enemy.y);
+}
+
+/** Place (x,y) on the circle of given radius, keeping the same angle from center. */
+export function clampToCircleRadius(x: number, y: number, radius: number): { x: number; y: number } {
+  const d = Math.sqrt(x * x + y * y) || 1;
+  return { x: (x / d) * radius, y: (y / d) * radius };
 }

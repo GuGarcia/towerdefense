@@ -19,6 +19,7 @@
     "baseIntervalFrames": 540,
     "spreadSpawnOverFrames": 300,
     "bossEveryNWaves": 10,
+    "stuckEnemyAttackIntervalFrames": 60,
     "difficultyScaling": { "life": 1.042, "speed": 1.012, "damage": 1.032, "count": 1.042 }
   },
   "enemies": {

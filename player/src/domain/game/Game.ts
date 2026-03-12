@@ -25,6 +25,7 @@ import {
   isDead,
   distanceToCenter,
   directionTowardCenter,
+  clampToCircleRadius,
 } from "../enemy/Enemy";
 import { createProjectile, updatePosition } from "../projectile/Projectile";
 import { getEnemiesToSpawnThisFrame, getWaveNumberAtFrame } from "../wave/WaveSpawner";
@@ -92,6 +93,18 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   const toSpawn = getEnemiesToSpawnThisFrame(frameIndex, game.params);
   next.enemies = [...game.enemies, ...toSpawn];
   next.enemies = next.enemies.map(moveTowardCenter);
+
+  // Mark enemies that reached the center as stuck (no hitbox: multiple can stick)
+  const interval = game.params.wave.stuckEnemyAttackIntervalFrames ?? 60;
+  next.enemies = next.enemies.map((e) => {
+    if (e.stuck) return e;
+    if (distanceToCenter(e) <= PLAYER_HITBOX_RADIUS) {
+      const { x, y } = clampToCircleRadius(e.x, e.y, PLAYER_HITBOX_RADIUS);
+      return { ...e, stuck: true, lastDamageFrame: frameIndex, x, y };
+    }
+    return e;
+  });
+
   next.player = applyRegen(next.player, game.params);
 
   const alive = next.enemies.filter((e) => !isDead(e));
@@ -144,14 +157,19 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   next.money = next.money + earned;
   next.enemiesKilled = game.enemiesKilled + killedThisFrame;
 
+  // Stuck enemies deal damage every X frames (discrete hits, not DoT)
   let playerDamage = 0;
-  for (const e of next.enemies) {
-    if (isDead(e)) continue;
-    if (distanceToCenter(e) < PLAYER_HITBOX_RADIUS) playerDamage += e.damage;
-  }
+  next.enemies = next.enemies.map((e) => {
+    if (!e.stuck || isDead(e)) return e;
+    const last = e.lastDamageFrame ?? frameIndex;
+    if (frameIndex - last >= interval) {
+      playerDamage += e.damage;
+      return { ...e, lastDamageFrame: frameIndex };
+    }
+    return e;
+  });
   if (playerDamage > 0) {
     next.player = playerTakeDamage(next.player, playerDamage);
-    next.enemies = next.enemies.filter((e) => distanceToCenter(e) >= PLAYER_HITBOX_RADIUS || isDead(e));
   }
 
   next.enemies = next.enemies.filter((e) => !isDead(e));
