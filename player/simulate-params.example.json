@@ -1,7 +1,7 @@
 {
   "economy": {
     "upgradeCostBase": 10,
-    "upgradeCostFactor": 1.5
+    "upgradeCostIncrement": 5
   },
   "player": {
     "initialLife": 100,

@@ -36,6 +36,59 @@ export function getWaveStartFrame(waveNumber: number, gameParams?: GameParams): 
   return (waveNumber - 1) * interval + 1;
 }
 
+/** Scaled stats for one archetype at a given wave (for UI). */
+function scaleWaveStats(
+  gameParams: GameParams,
+  waveNumber: number
+): (key: "life" | "speed" | "damage" | "count", base: number) => number {
+  const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
+  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
+  return (key, base) => {
+    const value = base * Math.pow((scaling[key] as number) ?? 1, waveNumber - 1);
+    return waveNumber === 1 ? value * wave1Factor : value;
+  };
+}
+
+/** Returns scaled enemy stats per archetype for a given wave (for HUD "Ennemis vague X"). */
+export function getWaveEnemyStats(
+  gameParams: GameParams,
+  waveNumber: number
+): {
+  base: { life: number; speed: number; damage: number; size: number; count: number };
+  rapid: { life: number; speed: number; damage: number; size: number; count: number };
+  boss: { life: number; speed: number; damage: number; size: number; count: number };
+} {
+  if (waveNumber <= 0) waveNumber = 1;
+  const scale = scaleWaveStats(gameParams, waveNumber);
+  const b = gameParams.enemies.base;
+  const r = gameParams.enemies.rapid;
+  const boss = gameParams.enemies.boss;
+  const bossCount = isBossWave(waveNumber, gameParams) ? Math.min(1, Math.floor(scale("count", boss?.countPerWave ?? 0))) : 0;
+  return {
+    base: {
+      life: scale("life", b?.life ?? 0),
+      speed: scale("speed", b?.speed ?? 0),
+      damage: scale("damage", b?.damage ?? 0),
+      size: b?.size ?? 12,
+      count: Math.floor(scale("count", b?.countPerWave ?? 0)),
+    },
+    rapid: {
+      life: scale("life", r?.life ?? 0),
+      speed: scale("speed", r?.speed ?? 0),
+      damage: scale("damage", r?.damage ?? 0),
+      size: r?.size ?? 6,
+      count: Math.floor(scale("count", r?.countPerWave ?? 0)),
+    },
+    boss: {
+      life: scale("life", boss?.life ?? 0),
+      speed: scale("speed", boss?.speed ?? 0),
+      damage: scale("damage", boss?.damage ?? 0),
+      size: boss?.size ?? 32,
+      count: bossCount,
+    },
+  };
+}
+
 /** Returns the composition (count per archetype) for a given wave number (for UI: "Prochaine vague"). */
 export function getWaveComposition(
   gameParams: GameParams,

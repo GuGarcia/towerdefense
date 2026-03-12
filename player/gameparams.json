@@ -1,16 +1,16 @@
 {
-  "_comment": "Équilibrage: run max 10 min, objectif moyenne ~8 min (courbe normale, sommet à 8 min). Modifier après analyse des rapports dans rapport/.",
+  "_comment": "Équilibrage: entre trop dur et trop facile. Vague 1 douce, montée progressive.",
   "player": {
-    "initialLife": 165,
-    "initialMaxLife": 165,
+    "initialLife": 180,
+    "initialMaxLife": 180,
     "initialDamage": 20,
-    "initialRegen": 0.28,
-    "initialAttackSpeed": 3.3,
-    "initialRange": 300
+    "initialRegen": 0.3,
+    "initialAttackSpeed": 3.5,
+    "initialRange": 380
   },
   "economy": {
     "upgradeCostBase": 4,
-    "upgradeCostFactor": 1.33,
+    "upgradeCostIncrement": 4,
     "currencyPerKill": { "base": 17, "rapid": 9, "boss": 170 },
     "waveBonusBase": 5,
     "waveBonusIncrement": 5
@@ -20,13 +20,13 @@
     "baseIntervalFrames": 540,
     "spreadSpawnOverFrames": 300,
     "bossEveryNWaves": 10,
-    "stuckEnemyAttackIntervalFrames": 60,
+    "stuckEnemyAttackIntervalFrames": 75,
     "wave1DifficultyFactor": 0.6,
-    "difficultyScaling": { "life": 1.042, "speed": 1.012, "damage": 1.032, "count": 1.042 }
+    "difficultyScaling": { "life": 1.04, "speed": 1.01, "damage": 1.03, "count": 1.04 }
   },
   "enemies": {
-    "base": { "life": 12, "speed": 2, "damage": 3, "size": 12, "countPerWave": 5 },
-    "rapid": { "life": 4, "speed": 4, "damage": 2, "size": 6, "countPerWave": 8 },
-    "boss": { "life": 26, "speed": 0.8, "damage": 15, "size": 32, "countPerWave": 1 }
+    "base": { "life": 12, "speed": 1.8, "damage": 2.5, "size": 12, "countPerWave": 5 },
+    "rapid": { "life": 4, "speed": 3.5, "damage": 2, "size": 6, "countPerWave": 8 },
+    "boss": { "life": 26, "speed": 0.75, "damage": 14, "size": 32, "countPerWave": 1 }
   }
 }

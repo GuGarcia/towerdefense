@@ -9,6 +9,7 @@ import {
   getWaveNumberAtFrame,
   getWaveStartFrame,
   getWaveComposition,
+  getWaveEnemyStats,
 } from "../../domain/wave/WaveSpawner";
 
 const NEON = {
@@ -138,7 +139,7 @@ export function createCanvasRenderer(
     ctx.restore();
 
     drawWaveHud(ctx, game, vp);
-    drawEnemyStatsHud(ctx, game.params, vp);
+    drawEnemyStatsHud(ctx, game, vp);
   };
 }
 
@@ -205,9 +206,13 @@ const ENEMY_TYPE_LABELS: Record<keyof GameParams["enemies"], string> = {
 
 function drawEnemyStatsHud(
   ctx: CanvasRenderingContext2D,
-  params: GameParams,
+  game: Game,
   vp: { x: number; y: number; width: number; height: number }
 ): void {
+  const params = game.params;
+  const waveNumber = Math.max(1, getWaveNumberAtFrame(game.frameIndex, params));
+  const stats = getWaveEnemyStats(params, waveNumber);
+
   const left = vp.x + 10;
   let top = vp.y + 10;
   const lineHeight = 14;
@@ -217,20 +222,22 @@ function drawEnemyStatsHud(
   ctx.fillStyle = "rgba(0, 255, 204, 0.95)";
   ctx.font = "bold 12px monospace";
   ctx.textAlign = "left";
-  ctx.fillText("Ennemis", left, top);
+  ctx.fillText(`Ennemis (vague ${waveNumber})`, left, top);
   top += lineHeight + 4;
 
-  const keys: (keyof GameParams["enemies"])[] = ["base", "rapid", "boss"];
+  const keys: (keyof typeof stats)[] = ["base", "rapid", "boss"];
   for (const key of keys) {
-    const config = params.enemies[key];
-    if (!config) continue;
+    const s = stats[key];
     ctx.fillStyle = key === "boss" ? NEON.enemyBoss : key === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
     ctx.font = "11px monospace";
     ctx.fillText(ENEMY_TYPE_LABELS[key], left, top);
     top += lineHeight;
     ctx.fillStyle = "rgba(0, 255, 204, 0.85)";
     ctx.font = "10px monospace";
-    ctx.fillText(`  PV: ${config.life}  Vit: ${config.speed}  Dég: ${config.damage}  Taille: ${config.size}  Nb/vague: ${config.countPerWave}`, left, top);
+    const lifeStr = Math.round(s.life).toString();
+    const speedStr = s.speed.toFixed(1);
+    const dmgStr = Math.round(s.damage).toString();
+    ctx.fillText(`  PV: ${lifeStr}  Vit: ${speedStr}  Dég: ${dmgStr}  Taille: ${s.size}  Nb/vague: ${s.count}`, left, top);
     top += lineHeight + 2;
   }
 

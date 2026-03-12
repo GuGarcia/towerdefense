@@ -23,6 +23,10 @@ async function buildOnce() {
   let html = await readFile(join(ROOT, "index.html"), "utf-8");
   html = html.replace(/src="\/src\/index\.js"/, 'src="index.js"');
   await writeFile(join(DIST, "index.html"), html);
+  try {
+    const buf = await readFile(join(ROOT, "gameparams.json"));
+    await writeFile(join(DIST, "gameparams.json"), buf);
+  } catch (_) {}
   console.log("Build OK → dist/");
 }
 

@@ -47,7 +47,7 @@ describe("Game", () => {
 
   it("buyUpgrade when enough money applies upgrade and deducts cost", () => {
     const params = createGameParams({
-      economy: { upgradeCostBase: 10, upgradeCostFactor: 1 },
+      economy: { upgradeCostBase: 10, upgradeCostIncrement: 0 },
     });
     let game = createGame(params);
     game = { ...game, money: 100 };

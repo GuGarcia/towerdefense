@@ -29,7 +29,20 @@ function randomSeed(): number {
   return Math.floor(Math.random() * 0x7fffffff);
 }
 
-function main(): void {
+async function loadGameParams(): Promise<Record<string, unknown>> {
+  try {
+    const res = await fetch("/gameparams.json");
+    if (res.ok) {
+      const json = (await res.json()) as Record<string, unknown>;
+      return json ?? {};
+    }
+  } catch {
+    // fallback: use defaults from createGameParams
+  }
+  return {};
+}
+
+async function main(): Promise<void> {
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
   if (!canvasEl) return;
   const canvas = canvasEl;
@@ -40,7 +53,10 @@ function main(): void {
   const n = PLAYER_COUNT;
   const seeds = Array.from({ length: n }, () => randomSeed());
 
-  const games = seeds.map((seed) => createGame(createGameParams({ seed })));
+  const paramsOverrides = await loadGameParams();
+  const games = seeds.map((seed) =>
+    createGame(createGameParams({ ...paramsOverrides, seed } as Parameters<typeof createGameParams>[0]))
+  );
   const gameStates = games.slice();
   const pendingInputs: (GameInput | null)[] = Array(n).fill(null);
   const frameIndices = Array(n).fill(0);
@@ -48,6 +64,7 @@ function main(): void {
   const recorder = createPlayerInputRecorder();
   let isReplay = false;
   let replayGetInput: ((frame: number) => GameInput | null) | null = null;
+  let speedMultiplier = 1;
 
   function getInputForFrame(playerIndex: number, frame: number): GameInput | null {
     if (isReplay && replayGetInput) return replayGetInput(frame);
@@ -62,6 +79,29 @@ function main(): void {
 
   const toolbarEl = document.getElementById("replay-toolbar");
   if (toolbarEl) {
+    const speedValues = [1, 2, 3] as const;
+    const speedContainer = document.createElement("div");
+    speedContainer.style.cssText = "display:flex;align-items:center;gap:4px;";
+    const speedLabel = document.createElement("span");
+    speedLabel.textContent = "Vitesse:";
+    speedLabel.style.cssText = "font-family:monospace;font-size:12px;color:rgba(0,255,204,0.9);margin-right:4px;";
+    speedContainer.appendChild(speedLabel);
+    speedValues.forEach((speed) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = `${speed}x`;
+      btn.style.cssText = "padding:4px 10px;font-family:monospace;font-size:12px;color:#00ffcc;background:rgba(0,255,204,0.1);border:1px solid #00ffcc;border-radius:4px;cursor:pointer;";
+      btn.addEventListener("click", () => {
+        speedMultiplier = speed;
+        speedContainer.querySelectorAll("button").forEach((b) => {
+          b.style.background = b === btn ? "rgba(0,255,204,0.3)" : "rgba(0,255,204,0.1)";
+        });
+      });
+      if (speed === 1) btn.style.background = "rgba(0,255,204,0.3)";
+      speedContainer.appendChild(btn);
+    });
+    toolbarEl.appendChild(speedContainer);
+
     const btnExport = document.createElement("button");
     btnExport.type = "button";
     btnExport.textContent = "Exporter";
@@ -160,7 +200,7 @@ function main(): void {
       recorder.clear();
       for (let i = 0; i < n; i++) {
         seeds[i] = randomSeed();
-        gameStates[i] = createGame(createGameParams({ seed: seeds[i] }));
+        gameStates[i] = createGame(createGameParams({ ...paramsOverrides, seed: seeds[i] } as Parameters<typeof createGameParams>[0]));
         frameIndices[i] = 0;
       }
     });
@@ -329,10 +369,12 @@ function main(): void {
   }
 
   function step(): void {
-    for (let i = 0; i < gameStates.length; i++) {
-      const input = getInputForFrame(i, frameIndices[i]);
-      gameStates[i] = tick(gameStates[i], frameIndices[i], input ?? undefined);
-      frameIndices[i] += 1;
+    for (let s = 0; s < speedMultiplier; s++) {
+      for (let i = 0; i < gameStates.length; i++) {
+        const input = getInputForFrame(i, frameIndices[i]);
+        gameStates[i] = tick(gameStates[i], frameIndices[i], input ?? undefined);
+        frameIndices[i] += 1;
+      }
     }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -15,8 +15,10 @@ export interface GameParams {
     readonly initialRange?: number;
   };
   readonly economy: {
+    /** Cost for first upgrade (level 0 → 1). */
     readonly upgradeCostBase: number;
-    readonly upgradeCostFactor: number;
+    /** Extra cost per level: cost(level) = base + level * increment (arithmetic). */
+    readonly upgradeCostIncrement: number;
     readonly currencyPerKill: { readonly base: number; readonly rapid: number; readonly boss: number };
     /** Bonus or at start of each wave: base + (waveNumber - 1) * increment (e.g. 5, 10, 15…). */
     readonly waveBonusBase: number;
@@ -70,7 +72,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
     },
     economy: {
       upgradeCostBase: 10,
-      upgradeCostFactor: 1.5,
+      upgradeCostIncrement: 5,
       currencyPerKill: { base: 10, rapid: 5, boss: 100 },
       waveBonusBase: 5,
       waveBonusIncrement: 5,
