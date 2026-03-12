@@ -53,10 +53,10 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 4 — Upgrade Range (portée)
 
-- [ ] Ajouter **range** (portée de tir) au **Player** : valeur initiale dans `GameParams.player` (ex. `initialRange`)
-- [ ] Ajouter **UpgradeType.Range** (ou équivalent) et formule de coût dans l’économie
-- [ ] Logique de tir : ne considérer que les ennemis à **distance ≤ range** pour choisir la cible ; ne tirer que s’il y a au moins un ennemi dans la portée
-- [ ] UI : nouveau bouton / raccourci pour acheter l’upgrade Range, affichage de la portée actuelle si pertinent
+- [x] Ajouter **range** (portée de tir) au **Player** : valeur initiale dans `GameParams.player` (ex. `initialRange`)
+- [x] Ajouter **UpgradeType.Range** (ou équivalent) et formule de coût dans l’économie
+- [x] Logique de tir : ne considérer que les ennemis à **distance ≤ range** pour choisir la cible ; ne tirer que s’il y a au moins un ennemi dans la portée
+- [x] UI : nouveau bouton / raccourci pour acheter l’upgrade Range, affichage de la portée actuelle si pertinent
 
 ---
 

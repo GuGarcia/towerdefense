@@ -56,6 +56,7 @@ export function createGame(gameParams: GameParams): Game {
     damage: p.initialDamage,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
+    range: p.initialRange ?? 300,
   });
   return {
     params: gameParams,
@@ -108,7 +109,10 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   next.player = applyRegen(next.player, game.params);
 
   const alive = next.enemies.filter((e) => !isDead(e));
-  const nearest = alive.length ? alive.reduce((a, b) => (distanceToCenter(a) < distanceToCenter(b) ? a : b)) : null;
+  const inRange = alive.filter((e) => distanceToCenter(e) <= next.player.range);
+  const nearest = inRange.length
+    ? inRange.reduce((a, b) => (distanceToCenter(a) < distanceToCenter(b) ? a : b))
+    : null;
 
   if (nearest && canShoot(next.player)) {
     const { dx, dy } = directionTowardCenter(nearest.x, nearest.y);

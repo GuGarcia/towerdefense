@@ -11,6 +11,8 @@ export interface GameParams {
     readonly initialDamage: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
+    /** Shooting range (distance from center); default 300 if omitted. */
+    readonly initialRange?: number;
   };
   readonly economy: {
     readonly upgradeCostBase: number;
@@ -62,6 +64,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialDamage: 10,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
+      initialRange: 300,
     },
     economy: {
       upgradeCostBase: 10,

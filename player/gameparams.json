@@ -5,7 +5,8 @@
     "initialMaxLife": 165,
     "initialDamage": 20,
     "initialRegen": 0.28,
-    "initialAttackSpeed": 3.3
+    "initialAttackSpeed": 3.3,
+    "initialRange": 300
   },
   "economy": {
     "upgradeCostBase": 4,

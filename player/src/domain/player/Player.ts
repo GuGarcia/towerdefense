@@ -15,6 +15,8 @@ export interface Player {
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
+  /** Shooting range (distance from center); only enemies within this range can be targeted. */
+  range: number;
   upgradeLevels: Record<UpgradeTypeValue, number>;
   framesSinceLastShot: number;
 }
@@ -25,6 +27,8 @@ export interface PlayerInitial {
   damage: number;
   regen: number;
   attackSpeed: number;
+  /** Shooting range; default 300 if omitted. */
+  range?: number;
 }
 
 /** Returns cooldown in frames between shots (60 FPS). Min 1 frame (max 60 APS). */
@@ -34,7 +38,7 @@ export function getShotCooldownFrames(player: { attackSpeed: number }): number {
 }
 
 export function createPlayer(initial: PlayerInitial): Player {
-  const { life, maxLife, damage, regen, attackSpeed } = initial;
+  const { life, maxLife, damage, regen, attackSpeed, range = 300 } = initial;
   const cooldown = getShotCooldownFrames(initial);
   return {
     life,
@@ -42,11 +46,13 @@ export function createPlayer(initial: PlayerInitial): Player {
     damage,
     regen,
     attackSpeed,
+    range,
     upgradeLevels: {
       [UpgradeType.Damage]: 0,
       [UpgradeType.Life]: 0,
       [UpgradeType.Regen]: 0,
       [UpgradeType.AttackSpeed]: 0,
+      [UpgradeType.Range]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -100,6 +106,10 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
       const delta = (params?.player?.initialAttackSpeed ?? 2) * 0.15;
       const newSpeed = Math.min(60, player.attackSpeed + delta);
       return { ...player, attackSpeed: newSpeed, upgradeLevels: levels };
+    }
+    case UpgradeType.Range: {
+      const delta = (params?.player?.initialRange ?? 300) * 0.15;
+      return { ...player, range: player.range + delta, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };

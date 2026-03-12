@@ -9,7 +9,7 @@
  *   paramsFile JSON with partial GameParams (default: gameparams.json). C’est ce fichier qu’on édite après analyse des rapports.
  *
  * Profiles:
- *   full — upgrades all 4 stats (random choice when buying)
+ *   full — upgrades all 5 stats (random choice when buying)
  *   two  — upgrades at most 2 stats (2 chosen at random at run start)
  *   one  — upgrades only 1 stat  (1 chosen at random at run start)
  *
@@ -27,7 +27,7 @@ import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { getWaveNumberAtFrame } from "./domain/wave/WaveSpawner";
 import type { GameRecording, RecordedInput } from "./infrastructure/replay/GameRecording";
 
-const UPGRADE_TYPES = ["damage", "life", "regen", "attackSpeed"] as const;
+const UPGRADE_TYPES = ["damage", "life", "regen", "attackSpeed", "range"] as const;
 type UpgradeType = (typeof UPGRADE_TYPES)[number];
 
 export type ProfileKind = "full" | "two" | "one";

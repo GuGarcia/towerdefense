@@ -35,6 +35,17 @@ function drawPentagon(ctx: CanvasRenderingContext2D, radius: number): void {
   ctx.stroke();
 }
 
+function drawRangeCircle(ctx: CanvasRenderingContext2D, range: number): void {
+  if (range <= 0) return;
+  ctx.beginPath();
+  ctx.arc(0, 0, range, 0, Math.PI * 2);
+  ctx.strokeStyle = "rgba(0, 255, 204, 0.5)";
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 6]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+}
+
 function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy): void {
   const color =
     e.archetype === "boss" ? NEON.enemyBoss : e.archetype === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
@@ -104,6 +115,9 @@ export function createCanvasRenderer(
     ctx.translate(cx, cy);
     ctx.scale(scale, scale);
 
+    // Range circle (portée de tir du joueur)
+    drawRangeCircle(ctx, game.player.range);
+
     for (const e of game.enemies) drawEnemy(ctx, e);
     for (const p of game.projectiles) drawProjectile(ctx, p);
     drawPentagon(ctx, 40);
@@ -170,8 +184,6 @@ function drawEnemyStatsHud(
   const left = vp.x + 10;
   let top = vp.y + 10;
   const lineHeight = 14;
-  const colGap = 8;
-
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 

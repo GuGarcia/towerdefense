@@ -22,6 +22,7 @@ const UPGRADE_LABELS: Record<string, string> = {
   life: "Life",
   regen: "Regen",
   attackSpeed: "Spd",
+  range: "Portée",
 };
 
 function randomSeed(): number {
@@ -165,7 +166,7 @@ function main(): void {
     });
   }
 
-  const upgradeTypes = ["damage", "life", "regen", "attackSpeed"] as const;
+  const upgradeTypes = ["damage", "life", "regen", "attackSpeed", "range"] as const;
   for (let i = 0; i < n; i++) {
     const bar = document.createElement("div");
     bar.className = "player-upgrade-bar";
@@ -211,8 +212,8 @@ function main(): void {
   }
 
   function getUpgradeValue(
-    player: { damage: number; maxLife: number; regen: number; attackSpeed: number },
-    key: "damage" | "life" | "regen" | "attackSpeed"
+    player: { damage: number; maxLife: number; regen: number; attackSpeed: number; range: number },
+    key: "damage" | "life" | "regen" | "attackSpeed" | "range"
   ): string {
     const v =
       key === "damage"
@@ -221,7 +222,9 @@ function main(): void {
           ? player.maxLife
           : key === "regen"
             ? player.regen
-            : player.attackSpeed;
+            : key === "attackSpeed"
+              ? player.attackSpeed
+              : player.range;
     if (key === "regen" || key === "attackSpeed") return v.toFixed(1);
     return String(Math.round(v));
   }
@@ -264,12 +267,14 @@ function main(): void {
       }
       bar.querySelectorAll<HTMLButtonElement>("button[data-upgrade]").forEach((btn) => {
         const raw = btn.getAttribute("data-upgrade");
-        if (raw !== "damage" && raw !== "life" && raw !== "regen" && raw !== "attackSpeed") return;
-        const level = getUpgradeLevel(game.player, raw);
-        const cost = getUpgradeCost(raw, level, game.params);
+        const validKeys = ["damage", "life", "regen", "attackSpeed", "range"] as const;
+        const key = validKeys.find((k) => k === raw);
+        if (!key) return;
+        const level = getUpgradeLevel(game.player, key);
+        const cost = getUpgradeCost(key, level, game.params);
         const canAfford = game.money >= cost;
-        const value = getUpgradeValue(game.player, raw);
-        btn.textContent = `${UPGRADE_LABELS[raw] ?? raw} ($${cost}) — ${value}`;
+        const value = getUpgradeValue(game.player, key);
+        btn.textContent = `${UPGRADE_LABELS[key] ?? key} ($${cost}) — ${value}`;
         btn.disabled = isReplay || !canAfford;
       });
     });
