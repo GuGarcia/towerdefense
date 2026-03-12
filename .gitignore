@@ -6,3 +6,6 @@ player/dist/
 
 # Lockfiles: keep bun.lock for reproducible installs (uncomment to ignore)
 # player/bun.lock
+
+# Simulation reports (player/rapport/)
+player/rapport/

@@ -4,7 +4,12 @@
 BUN_IMAGE := oven/bun:latest
 PLAYER_DIR := $(CURDIR)/player
 
-.PHONY: dev build preview shell ci
+.PHONY: dev build preview shell ci simulate
+
+RUNS ?= 100
+SIMOUT ?= .
+# Fichier de paramètres chargé par la simulation (éditer après analyse des rapports)
+PARAMS ?= gameparams.json
 
 # CI : install deps puis typage, tests, lint
 ci:
@@ -47,3 +52,13 @@ shell:
 		-w /app \
 		$(BUN_IMAGE) \
 		/bin/sh
+
+# Simulation headless (équilibrage) : 3 profils (full, two, one), stats par profil, replay meilleure run chacun
+# make simulate RUNS=50
+# make simulate RUNS=100 SIMOUT=./out PARAMS=simulate-params.json
+simulate:
+	docker run --rm \
+		-v "$(PLAYER_DIR):/app" \
+		-w /app \
+		$(BUN_IMAGE) \
+		bun run src/simulate.ts $(RUNS) $(SIMOUT) $(PARAMS)

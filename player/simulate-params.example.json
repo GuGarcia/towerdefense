@@ -1,0 +1,13 @@
+{
+  "economy": {
+    "upgradeCostBase": 10,
+    "upgradeCostFactor": 1.5
+  },
+  "player": {
+    "initialLife": 100,
+    "initialMaxLife": 100,
+    "initialDamage": 10,
+    "initialRegen": 0.1,
+    "initialAttackSpeed": 2
+  }
+}

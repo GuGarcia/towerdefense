@@ -102,6 +102,12 @@ L’application vit dans le dossier **`player/`** ; le code source est sous **`p
 
 ---
 
+## Simulation headless (équilibrage)
+
+- [x] Script `player/src/simulate.ts` : 3 profils (full / two / one), stats par profil, replay meilleure run chacun.
+- [x] Profils : **full** (toutes les stats), **two** (max 2 stats par run), **one** (1 seule stat par run).
+- [x] Fichier de paramètres optionnel pour modifier la partie (ex. `PARAMS=simulate-params.json`) et viser ~10 min pour les 3 profils.
+
 ## Plus tard (hors proto)
 
 - [ ] Vérification serveur : envoi seed + params + inputs, rejeu côté serveur, comparaison résultat
