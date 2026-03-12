@@ -2,6 +2,7 @@
  * Draws game state on a canvas (background, player pentagon, enemies, projectiles). Neon/synthwave style.
  */
 import type { Game } from "../../domain/game/Game";
+import type { GameParams } from "../../domain/game/GameParams";
 import type { Enemy } from "../../domain/enemy/Enemy";
 import type { Projectile } from "../../domain/projectile/Projectile";
 import { getWaveNumberAtFrame, getWaveStartFrame } from "../../domain/wave/WaveSpawner";
@@ -110,6 +111,7 @@ export function createCanvasRenderer(
     ctx.restore();
 
     drawWaveHud(ctx, game, vp);
+    drawEnemyStatsHud(ctx, game.params, vp);
   };
 }
 
@@ -150,6 +152,48 @@ function drawWaveHud(
   ctx.fillRect(barX, barY, barWidth, barHeight);
   ctx.fillStyle = "#00ffcc";
   ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+
+  ctx.restore();
+}
+
+const ENEMY_TYPE_LABELS: Record<keyof GameParams["enemies"], string> = {
+  base: "Base",
+  rapid: "Rapide",
+  boss: "Boss",
+};
+
+function drawEnemyStatsHud(
+  ctx: CanvasRenderingContext2D,
+  params: GameParams,
+  vp: { x: number; y: number; width: number; height: number }
+): void {
+  const left = vp.x + 10;
+  let top = vp.y + 10;
+  const lineHeight = 14;
+  const colGap = 8;
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  ctx.fillStyle = "rgba(0, 255, 204, 0.95)";
+  ctx.font = "bold 12px monospace";
+  ctx.textAlign = "left";
+  ctx.fillText("Ennemis", left, top);
+  top += lineHeight + 4;
+
+  const keys: (keyof GameParams["enemies"])[] = ["base", "rapid", "boss"];
+  for (const key of keys) {
+    const config = params.enemies[key];
+    if (!config) continue;
+    ctx.fillStyle = key === "boss" ? NEON.enemyBoss : key === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
+    ctx.font = "11px monospace";
+    ctx.fillText(ENEMY_TYPE_LABELS[key], left, top);
+    top += lineHeight;
+    ctx.fillStyle = "rgba(0, 255, 204, 0.85)";
+    ctx.font = "10px monospace";
+    ctx.fillText(`  PV: ${config.life}  Vit: ${config.speed}  Dég: ${config.damage}  Taille: ${config.size}  Nb/vague: ${config.countPerWave}`, left, top);
+    top += lineHeight + 2;
+  }
 
   ctx.restore();
 }
