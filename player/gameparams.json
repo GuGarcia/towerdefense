@@ -10,7 +10,9 @@
   "economy": {
     "upgradeCostBase": 4,
     "upgradeCostFactor": 1.33,
-    "currencyPerKill": { "base": 17, "rapid": 9, "boss": 170 }
+    "currencyPerKill": { "base": 17, "rapid": 9, "boss": 170 },
+    "waveBonusBase": 5,
+    "waveBonusIncrement": 5
   },
   "wave": {
     "spawnRadius": 600,

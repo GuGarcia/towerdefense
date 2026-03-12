@@ -16,6 +16,9 @@ export interface GameParams {
     readonly upgradeCostBase: number;
     readonly upgradeCostFactor: number;
     readonly currencyPerKill: { readonly base: number; readonly rapid: number; readonly boss: number };
+    /** Bonus or at start of each wave: base + (waveNumber - 1) * increment (e.g. 5, 10, 15…). */
+    readonly waveBonusBase: number;
+    readonly waveBonusIncrement: number;
   };
   readonly wave: {
     readonly spawnRadius: number;
@@ -62,6 +65,8 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       upgradeCostBase: 10,
       upgradeCostFactor: 1.5,
       currencyPerKill: { base: 10, rapid: 5, boss: 100 },
+      waveBonusBase: 5,
+      waveBonusIncrement: 5,
     },
     wave: {
       spawnRadius: 600,

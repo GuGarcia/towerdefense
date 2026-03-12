@@ -34,9 +34,9 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 2 — Bonus or par vague
 
-- [ ] Ajouter dans `GameParams` (ou logique de vague) : **bonus or par vague** (formule : 5 + (waveNumber - 1) × 5, ou équivalent)
-- [ ] À chaque **début de nouvelle vague** (ou fin de vague précédente), créditer le joueur du bonus
-- [ ] Déterministe : même seed + même frame = même bonus
+- [x] Ajouter dans `GameParams` (ou logique de vague) : **bonus or par vague** (formule : 5 + (waveNumber - 1) × 5, ou équivalent)
+- [x] À chaque **début de nouvelle vague** (ou fin de vague précédente), créditer le joueur du bonus
+- [x] Déterministe : même seed + même frame = même bonus
 
 ---
 

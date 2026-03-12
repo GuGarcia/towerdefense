@@ -27,7 +27,7 @@ import {
   directionTowardCenter,
 } from "../enemy/Enemy";
 import { createProjectile, updatePosition } from "../projectile/Projectile";
-import { getEnemiesToSpawnThisFrame } from "../wave/WaveSpawner";
+import { getEnemiesToSpawnThisFrame, getWaveNumberAtFrame } from "../wave/WaveSpawner";
 
 const PLAYER_HITBOX_RADIUS = 40;
 
@@ -72,6 +72,14 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   if (game.state === GameState.GameOver) return game;
 
   const next: Game = { ...game, frameIndex };
+
+  const waveNumber = getWaveNumberAtFrame(frameIndex, game.params);
+  const prevWaveNumber = frameIndex > 0 ? getWaveNumberAtFrame(frameIndex - 1, game.params) : 0;
+  if (waveNumber >= 1 && waveNumber > prevWaveNumber) {
+    const base = game.params.economy.waveBonusBase ?? 5;
+    const inc = game.params.economy.waveBonusIncrement ?? 5;
+    next.money = next.money + base + (waveNumber - 1) * inc;
+  }
 
   if (input?.buyUpgrade) {
     const cost = getUpgradeCost(input.buyUpgrade, getUpgradeLevel(game.player, input.buyUpgrade), game.params);
