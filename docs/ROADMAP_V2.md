@@ -24,10 +24,10 @@ L’application vit dans le dossier `**player/**` ; le code source est sous `**p
 
 ## 1 — Game Over & UI
 
-- [ ] Au game over : **cacher le reste de l’UI** (barres d’upgrade, etc.)
-- [ ] Afficher en **gros** le titre « GAME OVER »
-- [ ] En dessous : **Vague X · Ennemis tués X · Temps écoulé** (stats de la partie)
-- [ ] En dessous : bouton **Rejouer**
+- [x] Au game over : **cacher le reste de l’UI** (barres d’upgrade, etc.)
+- [x] Afficher en **gros** le titre « GAME OVER »
+- [x] En dessous : **Vague X · Ennemis tués X · Temps écoulé** (stats de la partie)
+- [x] En dessous : bouton **Rejouer**
 - [ ] (Optionnel) Persister / afficher le meilleur score (vague ou temps)
 
 ---
