@@ -2,6 +2,7 @@
  * Main menu: Jouer, Partie personnalisée, Charger un replay, Paramètres.
  */
 import { Link } from "react-router-dom";
+import { useI18n } from "../i18n/context";
 
 const menuStyles: React.CSSProperties = {
   minHeight: "100vh",
@@ -35,21 +36,22 @@ const linkStyles: React.CSSProperties = {
 };
 
 export function MenuPage() {
+  const { t } = useI18n();
   return (
     <div style={menuStyles}>
-      <h1 style={titleStyles}>Tower Defense</h1>
+      <h1 style={titleStyles}>{t("menu.title")}</h1>
       <nav style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         <Link to="/play" style={linkStyles}>
-          Jouer
+          {t("menu.play")}
         </Link>
         <Link to="/custom" style={linkStyles}>
-          Partie personnalisée
+          {t("menu.customGame")}
         </Link>
         <Link to="/replay" style={linkStyles}>
-          Charger un replay
+          {t("menu.loadReplay")}
         </Link>
         <Link to="/settings" style={linkStyles}>
-          Paramètres
+          {t("menu.settings")}
         </Link>
       </nav>
     </div>

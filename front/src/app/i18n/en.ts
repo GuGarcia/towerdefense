@@ -1,0 +1,28 @@
+import type { TranslationKeys } from "./translations";
+
+export const en: TranslationKeys = {
+  "menu.title": "Tower Defense",
+  "menu.play": "Play",
+  "menu.customGame": "Custom game",
+  "menu.loadReplay": "Load replay",
+  "menu.settings": "Settings",
+  "common.backToMenu": "Back to menu",
+  "settings.title": "Settings",
+  "settings.language": "Language",
+  "settings.volume": "Volume",
+  "settings.volumePlaceholder": "Volume (coming soon)",
+  "custom.title": "Custom game",
+  "custom.placeholder": "Form coming soon (Player, Economy, Waves, Enemies sliders).",
+  "replay.title": "Load replay",
+  "replay.placeholder": "Saved games list and sharing coming soon.",
+  "pause.title": "Pause",
+  "pause.resume": "Resume",
+  "pause.export": "Export",
+  "pause.loadReplay": "Load replay",
+  "pause.settings": "Settings",
+  "pause.quit": "Quit",
+  "pause.speed": "Speed",
+  "gameOver.title": "GAME OVER",
+  "gameOver.replay": "Replay",
+  "gameOver.backToMenu": "Back to menu",
+};

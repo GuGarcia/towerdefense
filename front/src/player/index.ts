@@ -13,7 +13,6 @@ import { createCanvasRenderer } from "./infrastructure/rendering/CanvasRenderer"
 import { createPlayerInputRecorder } from "./infrastructure/replay/PlayerInputRecorder";
 import { createReplayInputSource } from "./infrastructure/replay/ReplayInputSource";
 import type { GameRecording } from "./infrastructure/replay/GameRecording";
-import { setupReplayToolbar } from "./infrastructure/ui/setupReplayToolbar";
 import {
   setupUpgradeBars,
   UPGRADE_LABELS,
@@ -65,18 +64,36 @@ export interface RunPlayerOptions {
   onBackToMenu?: () => void;
 }
 
+export type RunPlayerControls = {
+  stop: () => void;
+  pause: () => void;
+  resume: () => void;
+  setSpeedMultiplier: (n: number) => void;
+  exportRecording: () => void;
+  loadReplay: (recording: GameRecording) => void;
+};
+
 /**
- * Starts the game. Expects DOM elements #game, #upgrade-bars, #replay-toolbar, #game-overlay to exist.
- * Returns a promise that resolves with a stop() function to tear down the game loop and listeners.
+ * Starts the game. Expects DOM elements #game, #upgrade-bars, #game-overlay to exist.
+ * Returns a promise that resolves with stop(), pause(), resume(), setSpeedMultiplier(), exportRecording(), loadReplay().
+ * Toolbar (speed, export, load) is not rendered by the player; the app places them in the pause bar and pause menu.
  */
-export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop: () => void }> {
+export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlayerControls> {
   const { paramsOverrides: optionsOverrides = {}, onBackToMenu } = options;
 
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
-  if (!canvasEl) return Promise.resolve({ stop: () => {} });
+  const noopControls: RunPlayerControls = {
+    stop: () => {},
+    pause: () => {},
+    resume: () => {},
+    setSpeedMultiplier: () => {},
+    exportRecording: () => {},
+    loadReplay: () => {},
+  };
+  if (!canvasEl) return Promise.resolve(noopControls);
   const canvas = canvasEl;
   const ctxOrNull = canvas.getContext("2d");
-  if (!ctxOrNull) return Promise.resolve({ stop: () => {} });
+  if (!ctxOrNull) return Promise.resolve(noopControls);
   const ctx = ctxOrNull;
 
   const n = PLAYER_COUNT;
@@ -104,37 +121,30 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop:
   }
 
   const upgradeBarsEl = document.getElementById("upgrade-bars");
-  if (!upgradeBarsEl) return Promise.resolve({ stop: () => {} });
+  if (!upgradeBarsEl) return Promise.resolve(noopControls);
   const barsContainer = upgradeBarsEl;
 
-  const toolbarEl = document.getElementById("replay-toolbar");
-  if (toolbarEl) {
-    setupReplayToolbar(toolbarEl, {
-      setSpeedMultiplier: (s) => {
-        speedMultiplier = s;
-      },
-      onExport: () => {
-        if (isReplay || gameStates.length === 0) return;
-        const recording: GameRecording = recorder.getRecording(seeds[0], gameStates[0].params);
-        const blob = new Blob([JSON.stringify(recording, null, 2)], { type: "application/json" });
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `replay-${recording.seed}-${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      },
-      onLoadReplay: (recording) => {
-        const params = createGameParams({ ...recording.params, seed: recording.seed });
-        gameStates.length = 0;
-        gameStates.push(createGame(params));
-        seeds.length = 0;
-        seeds.push(recording.seed);
-        frameIndices.length = 0;
-        frameIndices.push(0);
-        isReplay = true;
-        replayGetInput = createReplayInputSource(recording);
-      },
-    });
+  function doExport(): void {
+    if (isReplay || gameStates.length === 0) return;
+    const recording: GameRecording = recorder.getRecording(seeds[0], gameStates[0].params);
+    const blob = new Blob([JSON.stringify(recording, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `replay-${recording.seed}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function doLoadReplay(recording: GameRecording): void {
+    const params = createGameParams({ ...recording.params, seed: recording.seed });
+    gameStates.length = 0;
+    gameStates.push(createGame(params));
+    seeds.length = 0;
+    seeds.push(recording.seed);
+    frameIndices.length = 0;
+    frameIndices.push(0);
+    isReplay = true;
+    replayGetInput = createReplayInputSource(recording);
   }
 
   const gameOverlayEl = setupGameOverlay(canvas, document.getElementById("game-overlay"), {
@@ -165,7 +175,6 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop:
   function updateUpgradeBarsUI(): void {
     const anyGameOver = gameStates.some((g) => g.state === GameState.GameOver);
     if (upgradeBarsEl) upgradeBarsEl.classList.toggle("is-game-over", anyGameOver);
-    if (toolbarEl) toolbarEl.classList.toggle("is-game-over", anyGameOver);
     if (gameOverlayEl) {
       gameOverlayEl.classList.toggle("visible", anyGameOver);
       gameOverlayEl.style.display = anyGameOver ? "flex" : "none";
@@ -216,7 +225,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop:
   resize();
 
   const renderer = createCanvasRenderer(canvas, () => 1);
-  const stopClock = createRafClock(step);
+  let currentStopClock: () => void = createRafClock(step);
 
   function getViewports(): { x: number; y: number; width: number; height: number }[] {
     const w = canvas.width;
@@ -274,7 +283,18 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop:
   return {
     stop: () => {
       window.removeEventListener("resize", resize);
-      stopClock();
+      currentStopClock();
     },
+    pause: () => {
+      currentStopClock();
+    },
+    resume: () => {
+      currentStopClock = createRafClock(step);
+    },
+    setSpeedMultiplier: (s) => {
+      speedMultiplier = s;
+    },
+    exportRecording: doExport,
+    loadReplay: doLoadReplay,
   };
 }

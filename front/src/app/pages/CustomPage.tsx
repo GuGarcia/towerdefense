@@ -2,6 +2,7 @@
  * Placeholder: Partie personnalisée form (ROADMAP_V4_MENU §4).
  */
 import { Link } from "react-router-dom";
+import { useI18n } from "../i18n/context";
 
 const pageStyles: React.CSSProperties = {
   minHeight: "100vh",
@@ -16,12 +17,13 @@ const pageStyles: React.CSSProperties = {
 };
 
 export function CustomPage() {
+  const { t } = useI18n();
   return (
     <div style={pageStyles}>
-      <h1 style={{ fontSize: "28px" }}>Partie personnalisée</h1>
-      <p style={{ color: "rgba(0, 255, 204, 0.8)" }}>Formulaire à venir (sliders Joueur, Économie, Vagues, Ennemis).</p>
+      <h1 style={{ fontSize: "28px" }}>{t("custom.title")}</h1>
+      <p style={{ color: "rgba(0, 255, 204, 0.8)" }}>{t("custom.placeholder")}</p>
       <Link to="/" style={{ color: "#00ffcc", padding: "8px 16px", border: "1px solid #00ffcc", borderRadius: "6px" }}>
-        Retour au menu
+        {t("common.backToMenu")}
       </Link>
     </div>
   );

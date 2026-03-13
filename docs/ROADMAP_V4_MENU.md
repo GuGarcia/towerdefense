@@ -24,34 +24,34 @@ Ce document décrit la roadmap pour une interface complète : menu principal, pa
 
 ## 1 — Structure des écrans et routes
 
-- [ ] **1.1** Définir les routes (ou écrans) :
+- [x] **1.1** Définir les routes (ou écrans) :
   - `/` — Menu principal
   - `/custom` — Formulaire « Partie personnalisée »
   - `/play` — En jeu (canvas + HUD)
   - `/replay` — Liste des parties enregistrées
   - `/settings` — Paramètres applicatifs (volume, langue)
-- [ ] **1.2** Menu principal : titre, boutons **Jouer**, **Partie personnalisée**, **Charger un replay**, **Paramètres**, (optionnel) **Quitter**.
-- [ ] **1.3** Depuis « Jouer » : lancement direct d’une partie avec params par défaut (seed aléatoire).
-- [ ] **1.4** Depuis « Partie personnalisée » : navigation vers formulaire ; en fin de formulaire, « Lancer la partie » → `/play` avec params du formulaire.
-- [ ] **1.5** Pause en jeu (ESC) : overlay plein écran avec **Reprendre**, **Paramètres**, **Quitter** (retour au menu).
-- [ ] **1.6** Game Over : overlay avec stats (vague, temps, ennemis tués) + **Rejouer** + **Retour au menu**.
+- [x] **1.2** Menu principal : titre, boutons **Jouer**, **Partie personnalisée**, **Charger un replay**, **Paramètres**, (optionnel) **Quitter**.
+- [x] **1.3** Depuis « Jouer » : lancement direct d’une partie avec params par défaut (seed aléatoire).
+- [x] **1.4** Depuis « Partie personnalisée » : navigation vers formulaire ; en fin de formulaire, « Lancer la partie » → `/play` avec params du formulaire.
+- [x] **1.5** Pause en jeu (ESC) : overlay plein écran avec **Reprendre**, **Paramètres**, **Quitter** (retour au menu).
+- [x] **1.6** Game Over : overlay avec stats (vague, temps, ennemis tués) + **Rejouer** + **Retour au menu**.
 
 ---
 
 ## 2 — i18n (FR / EN)
 
-- [ ] **2.1** Mettre en place un mécanisme de traduction (contexte React + clés, ou lib type react-i18next).
-- [ ] **2.2** Fichiers de traduction (ex. `src/i18n/fr.json`, `src/i18n/en.json`) avec clés pour : menu, formulaire partie, paramètres app, pause, game over, liste replays.
-- [ ] **2.3** Tous les textes visibles passent par les clés (aucune chaîne en dur pour l’UI).
-- [ ] **2.4** Choix de langue stocké dans les settings et appliqué au chargement.
+- [x] **2.1** Mettre en place un mécanisme de traduction (contexte React + clés, ou lib type react-i18next).
+- [x] **2.2** Fichiers de traduction (ex. `src/i18n/fr.json`, `src/i18n/en.json`) avec clés pour : menu, formulaire partie, paramètres app, pause, game over, liste replays.
+- [x] **2.3** Tous les textes visibles passent par les clés (aucune chaîne en dur pour l’UI).
+- [x] **2.4** Choix de langue stocké dans les settings et appliqué au chargement.
 
 ---
 
 ## 3 — Paramètres applicatifs (écran Settings)
 
-- [ ] **3.1** Écran `/settings` : langue (FR / EN), volume (slider ou placeholder pour plus tard).
-- [ ] **3.2** Sauvegarde des réglages en quittant l’écran ou au changement (localStorage, ex. clé `towerdefense_settings`).
-- [ ] **3.3** Au démarrage de l’app, charger les settings et appliquer la langue (et le volume quand implémenté).
+- [x] **3.1** Écran `/settings` : langue (FR / EN), volume (slider ou placeholder pour plus tard).
+- [x] **3.2** Sauvegarde des réglages en quittant l’écran ou au changement (localStorage, ex. clé `towerdefense_settings`).
+- [x] **3.3** Au démarrage de l’app, charger les settings et appliquer la langue (et le volume quand implémenté).
 
 ---
 
@@ -86,8 +86,8 @@ Ce document décrit la roadmap pour une interface complète : menu principal, pa
 
 ## 7 — Intégration technique
 
-- [ ] **7.1** Si React : ajouter React + React Router, point d’entrée qui monte l’app dans un `#root` ; composant « Game » qui encapsule le canvas et la logique actuelle de `index.ts`.
-- [ ] **7.2** Réutiliser le domaine et l’infra existants (`createGame`, `createGameParams`, `tick`, rendu, replay) sans les dupliquer ; le jeu reste déterministe (seed + params + inputs).
+- [x] **7.1** Si React : ajouter React + React Router, point d’entrée qui monte l’app dans un `#root` ; composant « Game » qui encapsule le canvas et la logique actuelle de `index.ts`.
+- [x] **7.2** Réutiliser le domaine et l’infra existants (`createGame`, `createGameParams`, `tick`, rendu, replay) sans les dupliquer ; le jeu reste déterministe (seed + params + inputs).
 - [ ] **7.3** Gestion de la durée de partie : soit `durationFrames` très grand (ex. 1 an en frames), soit logique « pas de limite » dans la boucle (jouer jusqu’à Game Over uniquement).
 
 ---
