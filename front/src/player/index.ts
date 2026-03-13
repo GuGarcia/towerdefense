@@ -62,6 +62,8 @@ export interface RunPlayerOptions {
   paramsOverrides?: Record<string, unknown>;
   /** Called when user clicks "Retour au menu" on game over (e.g. navigate to /). */
   onBackToMenu?: () => void;
+  /** When true, automatically buy the cheapest affordable upgrade each frame. */
+  initialAutoMode?: boolean;
 }
 
 export type RunPlayerControls = {
@@ -69,6 +71,7 @@ export type RunPlayerControls = {
   pause: () => void;
   resume: () => void;
   setSpeedMultiplier: (n: number) => void;
+  setAutoMode: (on: boolean) => void;
   exportRecording: () => void;
   loadReplay: (recording: GameRecording) => void;
 };
@@ -79,7 +82,8 @@ export type RunPlayerControls = {
  * Toolbar (speed, export, load) is not rendered by the player; the app places them in the pause bar and pause menu.
  */
 export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlayerControls> {
-  const { paramsOverrides: optionsOverrides = {}, onBackToMenu } = options;
+  const { paramsOverrides: optionsOverrides = {}, onBackToMenu, initialAutoMode = false } = options;
+  let autoMode = initialAutoMode;
 
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
   const noopControls: RunPlayerControls = {
@@ -87,6 +91,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     pause: () => {},
     resume: () => {},
     setSpeedMultiplier: () => {},
+    setAutoMode: () => {},
     exportRecording: () => {},
     loadReplay: () => {},
   };
@@ -113,8 +118,27 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
   let replayGetInput: ((frame: number) => GameInput | null) | null = null;
   let speedMultiplier = 1;
 
+  /** Returns the cheapest affordable upgrade, or null. Used when autoMode is on. */
+  function getAutoUpgrade(game: Game): GameInput | null {
+    let best: { key: (typeof UPGRADE_TYPES)[number]; cost: number } | null = null;
+    for (const key of UPGRADE_TYPES) {
+      const level = getUpgradeLevel(game.player, key);
+      const cost = getUpgradeCost(key, level, game.params);
+      if (game.money >= cost && (!best || cost < best.cost)) best = { key, cost };
+    }
+    return best ? { buyUpgrade: best.key } : null;
+  }
+
   function getInputForFrame(playerIndex: number, frame: number): GameInput | null {
     if (isReplay && replayGetInput) return replayGetInput(frame);
+    if (autoMode && !pendingInputs[playerIndex]) {
+      const game = gameStates[playerIndex];
+      const autoInput = getAutoUpgrade(game);
+      if (autoInput?.buyUpgrade) {
+        pendingInputs[playerIndex] = autoInput;
+        if (!isReplay) recorder.record(frameIndices[playerIndex], autoInput.buyUpgrade);
+      }
+    }
     const input = pendingInputs[playerIndex];
     pendingInputs[playerIndex] = null;
     return input ?? null;
@@ -293,6 +317,9 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     },
     setSpeedMultiplier: (s) => {
       speedMultiplier = s;
+    },
+    setAutoMode: (on) => {
+      autoMode = on;
     },
     exportRecording: doExport,
     loadReplay: doLoadReplay,

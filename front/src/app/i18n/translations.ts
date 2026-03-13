@@ -31,6 +31,7 @@ export type TranslationKeys = {
   "custom.configNamePlaceholder": string;
   "custom.loadConfig": string;
   "custom.deleteConfig": string;
+  "custom.exportJson": string;
   "custom.playerLife": string;
   "custom.playerMaxLife": string;
   "custom.playerDamage": string;
@@ -67,6 +68,7 @@ export type TranslationKeys = {
   "pause.settings": string;
   "pause.quit": string;
   "pause.speed": string;
+  "pause.auto": string;
   "gameOver.title": string;
   "gameOver.replay": string;
   "gameOver.backToMenu": string;

@@ -129,7 +129,7 @@ function SliderRow({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ flex: 1, maxWidth: "200px" }}
+        style={{ flex: 1, minWidth: "180px", maxWidth: "420px" }}
       />
       <span style={{ minWidth: "48px", fontSize: "13px" }}>{value}</span>
     </div>
@@ -245,6 +245,15 @@ export function CustomPage() {
     setSavedListVersion((v) => v + 1);
   }, []);
 
+  const handleExportJson = useCallback(() => {
+    const blob = new Blob([JSON.stringify(form, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `config-partie-${form.seed}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, [form]);
+
   return (
     <div style={pageStyles}>
       <h1 style={{ marginBottom: "16px", fontSize: "24px" }}>{t("custom.title")}</h1>
@@ -261,6 +270,9 @@ export function CustomPage() {
           />
           <button type="button" style={{ ...inputStyles, cursor: "pointer" }} onClick={handleSaveConfig}>
             {t("custom.saveConfig")}
+          </button>
+          <button type="button" style={{ ...inputStyles, cursor: "pointer" }} onClick={handleExportJson}>
+            {t("custom.exportJson")}
           </button>
         </div>
         {savedConfigs.length > 0 && (
@@ -298,54 +310,54 @@ export function CustomPage() {
 
       <div style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionPlayer")}</h2>
-        <SliderRow label={t("custom.playerLife")} value={form.player.initialLife} min={50} max={200} step={5} onChange={(v) => updateNested("player", "initialLife", v)} />
-        <SliderRow label={t("custom.playerMaxLife")} value={form.player.initialMaxLife} min={50} max={200} step={5} onChange={(v) => updateNested("player", "initialMaxLife", v)} />
-        <SliderRow label={t("custom.playerDamage")} value={form.player.initialDamage} min={5} max={30} step={1} onChange={(v) => updateNested("player", "initialDamage", v)} />
-        <SliderRow label={t("custom.playerRegen")} value={form.player.initialRegen} min={0} max={0.5} step={0.05} onChange={(v) => updateNested("player", "initialRegen", v)} />
-        <SliderRow label={t("custom.playerAttackSpeed")} value={form.player.initialAttackSpeed} min={0.5} max={5} step={0.25} onChange={(v) => updateNested("player", "initialAttackSpeed", v)} />
-        <SliderRow label={t("custom.playerRange")} value={form.player.initialRange ?? 300} min={150} max={500} step={25} onChange={(v) => updateNested("player", "initialRange", v)} />
+        <SliderRow label={t("custom.playerLife")} value={form.player.initialLife} min={20} max={500} step={5} onChange={(v) => updateNested("player", "initialLife", v)} />
+        <SliderRow label={t("custom.playerMaxLife")} value={form.player.initialMaxLife} min={20} max={500} step={5} onChange={(v) => updateNested("player", "initialMaxLife", v)} />
+        <SliderRow label={t("custom.playerDamage")} value={form.player.initialDamage} min={1} max={80} step={1} onChange={(v) => updateNested("player", "initialDamage", v)} />
+        <SliderRow label={t("custom.playerRegen")} value={form.player.initialRegen} min={0} max={2} step={0.05} onChange={(v) => updateNested("player", "initialRegen", v)} />
+        <SliderRow label={t("custom.playerAttackSpeed")} value={form.player.initialAttackSpeed} min={0.25} max={10} step={0.25} onChange={(v) => updateNested("player", "initialAttackSpeed", v)} />
+        <SliderRow label={t("custom.playerRange")} value={form.player.initialRange ?? 300} min={100} max={800} step={25} onChange={(v) => updateNested("player", "initialRange", v)} />
       </div>
 
       <div style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionEconomy")}</h2>
-        <SliderRow label={t("custom.costBase")} value={form.economy.upgradeCostBase} min={5} max={30} step={1} onChange={(v) => updateNested("economy", "upgradeCostBase", v)} />
-        <SliderRow label={t("custom.costIncrement")} value={form.economy.upgradeCostIncrement} min={0} max={20} step={1} onChange={(v) => updateNested("economy", "upgradeCostIncrement", v)} />
-        <SliderRow label={t("custom.goldBase")} value={form.economy.currencyPerKill.base} min={5} max={25} step={1} onChange={(v) => updateDeep("economy", "currencyPerKill", "base", v)} />
-        <SliderRow label={t("custom.goldRapid")} value={form.economy.currencyPerKill.rapid} min={2} max={15} step={1} onChange={(v) => updateDeep("economy", "currencyPerKill", "rapid", v)} />
-        <SliderRow label={t("custom.goldBoss")} value={form.economy.currencyPerKill.boss} min={50} max={200} step={10} onChange={(v) => updateDeep("economy", "currencyPerKill", "boss", v)} />
-        <SliderRow label={t("custom.waveBonusBase")} value={form.economy.waveBonusBase} min={0} max={15} step={1} onChange={(v) => updateNested("economy", "waveBonusBase", v)} />
-        <SliderRow label={t("custom.waveBonusIncrement")} value={form.economy.waveBonusIncrement} min={0} max={15} step={1} onChange={(v) => updateNested("economy", "waveBonusIncrement", v)} />
+        <SliderRow label={t("custom.costBase")} value={form.economy.upgradeCostBase} min={1} max={100} step={1} onChange={(v) => updateNested("economy", "upgradeCostBase", v)} />
+        <SliderRow label={t("custom.costIncrement")} value={form.economy.upgradeCostIncrement} min={0} max={50} step={1} onChange={(v) => updateNested("economy", "upgradeCostIncrement", v)} />
+        <SliderRow label={t("custom.goldBase")} value={form.economy.currencyPerKill.base} min={1} max={100} step={1} onChange={(v) => updateDeep("economy", "currencyPerKill", "base", v)} />
+        <SliderRow label={t("custom.goldRapid")} value={form.economy.currencyPerKill.rapid} min={1} max={50} step={1} onChange={(v) => updateDeep("economy", "currencyPerKill", "rapid", v)} />
+        <SliderRow label={t("custom.goldBoss")} value={form.economy.currencyPerKill.boss} min={10} max={500} step={10} onChange={(v) => updateDeep("economy", "currencyPerKill", "boss", v)} />
+        <SliderRow label={t("custom.waveBonusBase")} value={form.economy.waveBonusBase} min={0} max={50} step={1} onChange={(v) => updateNested("economy", "waveBonusBase", v)} />
+        <SliderRow label={t("custom.waveBonusIncrement")} value={form.economy.waveBonusIncrement} min={0} max={50} step={1} onChange={(v) => updateNested("economy", "waveBonusIncrement", v)} />
       </div>
 
       <div style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionWaves")}</h2>
-        <SliderRow label={t("custom.wave1Factor")} value={form.wave.wave1DifficultyFactor} min={0.3} max={1} step={0.1} onChange={(v) => updateNested("wave", "wave1DifficultyFactor", v)} />
-        <SliderRow label={t("custom.scalingLife")} value={form.wave.difficultyScaling.life} min={1} max={1.25} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "life", v)} />
-        <SliderRow label={t("custom.scalingSpeed")} value={form.wave.difficultyScaling.speed} min={1} max={1.1} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "speed", v)} />
-        <SliderRow label={t("custom.scalingDamage")} value={form.wave.difficultyScaling.damage} min={1} max={1.15} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "damage", v)} />
-        <SliderRow label={t("custom.scalingCount")} value={form.wave.difficultyScaling.count} min={1} max={1.3} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "count", v)} />
-        <NumberInput label={t("custom.bossEvery")} value={form.wave.bossEveryNWaves} min={5} max={20} onChange={(v) => updateNested("wave", "bossEveryNWaves", v)} />
+        <SliderRow label={t("custom.wave1Factor")} value={form.wave.wave1DifficultyFactor} min={0.1} max={1.5} step={0.1} onChange={(v) => updateNested("wave", "wave1DifficultyFactor", v)} />
+        <SliderRow label={t("custom.scalingLife")} value={form.wave.difficultyScaling.life} min={1} max={1.5} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "life", v)} />
+        <SliderRow label={t("custom.scalingSpeed")} value={form.wave.difficultyScaling.speed} min={1} max={1.3} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "speed", v)} />
+        <SliderRow label={t("custom.scalingDamage")} value={form.wave.difficultyScaling.damage} min={1} max={1.5} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "damage", v)} />
+        <SliderRow label={t("custom.scalingCount")} value={form.wave.difficultyScaling.count} min={1} max={1.6} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "count", v)} />
+        <NumberInput label={t("custom.bossEvery")} value={form.wave.bossEveryNWaves} min={1} max={30} onChange={(v) => updateNested("wave", "bossEveryNWaves", v)} />
       </div>
 
       <div style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionEnemies")}</h2>
         <h3 style={{ fontSize: "14px", marginBottom: "8px" }}>{t("custom.enemyBase")}</h3>
-        <SliderRow label={t("custom.enemyLife")} value={form.enemies.base.life} min={10} max={40} step={1} onChange={(v) => updateDeep("enemies", "base", "life", v)} />
-        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.base.speed} min={1} max={4} step={0.5} onChange={(v) => updateDeep("enemies", "base", "speed", v)} />
-        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.base.damage} min={2} max={10} step={1} onChange={(v) => updateDeep("enemies", "base", "damage", v)} />
-        <SliderRow label={t("custom.enemySize")} value={form.enemies.base.size} min={8} max={20} step={1} onChange={(v) => updateDeep("enemies", "base", "size", v)} />
-        <SliderRow label={t("custom.enemyCount")} value={form.enemies.base.countPerWave} min={2} max={10} step={1} onChange={(v) => updateDeep("enemies", "base", "countPerWave", v)} />
+        <SliderRow label={t("custom.enemyLife")} value={form.enemies.base.life} min={5} max={100} step={1} onChange={(v) => updateDeep("enemies", "base", "life", v)} />
+        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.base.speed} min={0.5} max={8} step={0.5} onChange={(v) => updateDeep("enemies", "base", "speed", v)} />
+        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.base.damage} min={1} max={30} step={1} onChange={(v) => updateDeep("enemies", "base", "damage", v)} />
+        <SliderRow label={t("custom.enemySize")} value={form.enemies.base.size} min={4} max={40} step={1} onChange={(v) => updateDeep("enemies", "base", "size", v)} />
+        <SliderRow label={t("custom.enemyCount")} value={form.enemies.base.countPerWave} min={1} max={25} step={1} onChange={(v) => updateDeep("enemies", "base", "countPerWave", v)} />
         <h3 style={{ fontSize: "14px", marginBottom: "8px", marginTop: "12px" }}>{t("custom.enemyRapid")}</h3>
-        <SliderRow label={t("custom.enemyLife")} value={form.enemies.rapid.life} min={4} max={15} step={1} onChange={(v) => updateDeep("enemies", "rapid", "life", v)} />
-        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.rapid.speed} min={2} max={6} step={0.5} onChange={(v) => updateDeep("enemies", "rapid", "speed", v)} />
-        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.rapid.damage} min={1} max={5} step={1} onChange={(v) => updateDeep("enemies", "rapid", "damage", v)} />
-        <SliderRow label={t("custom.enemySize")} value={form.enemies.rapid.size} min={4} max={10} step={1} onChange={(v) => updateDeep("enemies", "rapid", "size", v)} />
-        <SliderRow label={t("custom.enemyCount")} value={form.enemies.rapid.countPerWave} min={4} max={15} step={1} onChange={(v) => updateDeep("enemies", "rapid", "countPerWave", v)} />
+        <SliderRow label={t("custom.enemyLife")} value={form.enemies.rapid.life} min={2} max={50} step={1} onChange={(v) => updateDeep("enemies", "rapid", "life", v)} />
+        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.rapid.speed} min={1} max={10} step={0.5} onChange={(v) => updateDeep("enemies", "rapid", "speed", v)} />
+        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.rapid.damage} min={1} max={15} step={1} onChange={(v) => updateDeep("enemies", "rapid", "damage", v)} />
+        <SliderRow label={t("custom.enemySize")} value={form.enemies.rapid.size} min={2} max={20} step={1} onChange={(v) => updateDeep("enemies", "rapid", "size", v)} />
+        <SliderRow label={t("custom.enemyCount")} value={form.enemies.rapid.countPerWave} min={2} max={30} step={1} onChange={(v) => updateDeep("enemies", "rapid", "countPerWave", v)} />
         <h3 style={{ fontSize: "14px", marginBottom: "8px", marginTop: "12px" }}>{t("custom.enemyBoss")}</h3>
-        <SliderRow label={t("custom.enemyLife")} value={form.enemies.boss.life} min={30} max={100} step={5} onChange={(v) => updateDeep("enemies", "boss", "life", v)} />
-        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.boss.speed} min={0.5} max={1.5} step={0.1} onChange={(v) => updateDeep("enemies", "boss", "speed", v)} />
-        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.boss.damage} min={15} max={40} step={1} onChange={(v) => updateDeep("enemies", "boss", "damage", v)} />
-        <SliderRow label={t("custom.enemySize")} value={form.enemies.boss.size} min={24} max={48} step={2} onChange={(v) => updateDeep("enemies", "boss", "size", v)} />
+        <SliderRow label={t("custom.enemyLife")} value={form.enemies.boss.life} min={20} max={300} step={5} onChange={(v) => updateDeep("enemies", "boss", "life", v)} />
+        <SliderRow label={t("custom.enemySpeed")} value={form.enemies.boss.speed} min={0.2} max={3} step={0.1} onChange={(v) => updateDeep("enemies", "boss", "speed", v)} />
+        <SliderRow label={t("custom.enemyDamage")} value={form.enemies.boss.damage} min={10} max={80} step={1} onChange={(v) => updateDeep("enemies", "boss", "damage", v)} />
+        <SliderRow label={t("custom.enemySize")} value={form.enemies.boss.size} min={16} max={80} step={2} onChange={(v) => updateDeep("enemies", "boss", "size", v)} />
       </div>
 
       <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>

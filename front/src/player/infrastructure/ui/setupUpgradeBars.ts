@@ -36,11 +36,14 @@ export function setupUpgradeBars(
     bar.setAttribute("data-player", String(i + 1));
 
     const lifeBarWrap = document.createElement("div");
-    lifeBarWrap.className = "life-bar";
+    lifeBarWrap.className = "life-bar-wrap";
+    const lifeBar = document.createElement("div");
+    lifeBar.className = "life-bar";
     const lifeBarFill = document.createElement("div");
     lifeBarFill.className = "life-bar-fill";
     lifeBarFill.style.width = "100%";
-    lifeBarWrap.appendChild(lifeBarFill);
+    lifeBar.appendChild(lifeBarFill);
+    lifeBarWrap.appendChild(lifeBar);
     bar.appendChild(lifeBarWrap);
 
     const buttonsWrap = document.createElement("div");

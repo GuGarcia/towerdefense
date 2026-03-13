@@ -81,6 +81,7 @@ export function PlayPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
+  const [autoMode, setAutoMode] = useState(false);
 
   const paramsOverrides = (location.state as PlayLocationState)?.paramsOverrides;
 
@@ -167,9 +168,24 @@ export function PlayPage() {
   return (
     <div style={containerStyles}>
       <div style={pauseBarStyles}>
-        <button type="button" style={pauseButtonStyles} onClick={openPause}>
-          {t("pause.title")}
-        </button>
+        <div style={speedGroupStyles}>
+          <button type="button" style={pauseButtonStyles} onClick={openPause}>
+            {t("pause.title")}
+          </button>
+          <button
+            type="button"
+            style={speedBtnStyles(autoMode)}
+            onClick={() => {
+              setAutoMode((prev) => {
+                const next = !prev;
+                controlsRef.current?.setAutoMode(next);
+                return next;
+              });
+            }}
+          >
+            {t("pause.auto")}
+          </button>
+        </div>
         <div style={speedGroupStyles}>
           <span style={{ fontSize: "12px", marginRight: "4px", color: "rgba(0,255,204,0.9)" }}>
             {t("pause.speed")}:
