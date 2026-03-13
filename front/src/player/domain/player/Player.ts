@@ -88,27 +88,36 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
   const nextLevel = level + 1;
   const levels = { ...player.upgradeLevels, [upgradeType]: nextLevel };
 
+  const p = params?.player;
+  const f = {
+    damage: p?.upgradeFactorDamage ?? 0.15,
+    life: p?.upgradeFactorLife ?? 0.1,
+    regen: p?.upgradeFactorRegen ?? 0.5,
+    attackSpeed: p?.upgradeFactorAttackSpeed ?? 0.15,
+    range: p?.upgradeFactorRange ?? 0.15,
+  };
+
   switch (upgradeType) {
     case UpgradeType.Damage: {
-      const delta = (params?.player?.initialDamage ?? 10) * 0.15;
+      const delta = (p?.initialDamage ?? 10) * f.damage;
       return { ...player, damage: player.damage + delta, upgradeLevels: levels };
     }
     case UpgradeType.Life: {
-      const delta = (params?.player?.initialMaxLife ?? 100) * 0.1;
+      const delta = (p?.initialMaxLife ?? 100) * f.life;
       const newMax = player.maxLife + delta;
       return { ...player, maxLife: newMax, life: Math.min(player.life + delta, newMax), upgradeLevels: levels };
     }
     case UpgradeType.Regen: {
-      const delta = (params?.player?.initialRegen ?? 0.1) * 0.5;
+      const delta = (p?.initialRegen ?? 0.1) * f.regen;
       return { ...player, regen: player.regen + delta, upgradeLevels: levels };
     }
     case UpgradeType.AttackSpeed: {
-      const delta = (params?.player?.initialAttackSpeed ?? 2) * 0.15;
+      const delta = (p?.initialAttackSpeed ?? 2) * f.attackSpeed;
       const newSpeed = Math.min(60, player.attackSpeed + delta);
       return { ...player, attackSpeed: newSpeed, upgradeLevels: levels };
     }
     case UpgradeType.Range: {
-      const delta = (params?.player?.initialRange ?? 300) * 0.15;
+      const delta = (p?.initialRange ?? 300) * f.range;
       return { ...player, range: player.range + delta, upgradeLevels: levels };
     }
     default:

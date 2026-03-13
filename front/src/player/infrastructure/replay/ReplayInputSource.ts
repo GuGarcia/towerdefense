@@ -7,7 +7,7 @@ import type { GameRecording } from "./GameRecording";
 export function createReplayInputSource(recording: GameRecording): (frameIndex: number) => GameInput | null {
   const byFrame = new Map<number, GameInput>();
   for (const { frame, upgradeType } of recording.inputs) {
-    byFrame.set(frame, { buyUpgrade: upgradeType as GameInput["buyUpgrade"] });
+    byFrame.set(frame, { buyUpgrade: upgradeType });
   }
   return (frameIndex: number) => byFrame.get(frameIndex) ?? null;
 }

@@ -5,6 +5,7 @@ import type { Enemy } from "../enemy/Enemy";
 import type { GameParams } from "../game/GameParams";
 import { EnemyArchetype, type EnemyArchetypeValue } from "../enemy/EnemyArchetype";
 import { createEnemy, nextEnemyId } from "../enemy/Enemy";
+import { scaleWaveStat } from "./WaveScaling";
 import { isBossWave } from "./Wave";
 
 function createRng(seed: number): () => number {
@@ -36,19 +37,6 @@ export function getWaveStartFrame(waveNumber: number, gameParams?: GameParams): 
   return (waveNumber - 1) * interval + 1;
 }
 
-/** Scaled stats for one archetype at a given wave (for UI). */
-function scaleWaveStats(
-  gameParams: GameParams,
-  waveNumber: number
-): (key: "life" | "speed" | "damage" | "count", base: number) => number {
-  const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
-  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
-  return (key, base) => {
-    const value = base * Math.pow((scaling[key] as number) ?? 1, waveNumber - 1);
-    return waveNumber === 1 ? value * wave1Factor : value;
-  };
-}
-
 /** Returns scaled enemy stats per archetype for a given wave (for HUD "Ennemis vague X"). */
 export function getWaveEnemyStats(
   gameParams: GameParams,
@@ -59,7 +47,8 @@ export function getWaveEnemyStats(
   boss: { life: number; speed: number; damage: number; size: number; count: number };
 } {
   if (waveNumber <= 0) waveNumber = 1;
-  const scale = scaleWaveStats(gameParams, waveNumber);
+  const scale = (key: "life" | "speed" | "damage" | "count", base: number) =>
+    scaleWaveStat(gameParams, waveNumber, key, base);
   const b = gameParams.enemies.base;
   const r = gameParams.enemies.rapid;
   const boss = gameParams.enemies.boss;
@@ -95,19 +84,13 @@ export function getWaveComposition(
   waveNumber: number
 ): { base: number; rapid: number; boss: number } {
   if (waveNumber <= 0) return { base: 0, rapid: 0, boss: 0 };
-  const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
-  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
-  const scale = (key: keyof typeof scaling, base: number, w: number) => {
-    const value = base * Math.pow((scaling[key] as number) ?? 1, w - 1);
-    return w === 1 ? value * wave1Factor : value;
-  };
   const baseConfig = gameParams.enemies.base;
   const rapidConfig = gameParams.enemies.rapid;
   const bossConfig = gameParams.enemies.boss;
-  const base = Math.floor(scale("count", baseConfig?.countPerWave ?? 0, waveNumber));
-  const rapid = Math.floor(scale("count", rapidConfig?.countPerWave ?? 0, waveNumber));
+  const base = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", baseConfig?.countPerWave ?? 0));
+  const rapid = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", rapidConfig?.countPerWave ?? 0));
   const boss = isBossWave(waveNumber, gameParams)
-    ? Math.min(1, Math.floor(scale("count", bossConfig?.countPerWave ?? 0, waveNumber)))
+    ? Math.min(1, Math.floor(scaleWaveStat(gameParams, waveNumber, "count", bossConfig?.countPerWave ?? 0)))
     : 0;
   return { base, rapid, boss };
 }
@@ -120,12 +103,6 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
   const spreadFrames = gameParams.wave.spreadSpawnOverFrames ?? 0;
 
   const radius = gameParams.wave.spawnRadius ?? 600;
-  const scaling = gameParams.wave.difficultyScaling ?? { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 };
-  const wave1Factor = gameParams.wave.wave1DifficultyFactor ?? 1;
-  const scale = (key: keyof typeof scaling, base: number, w: number) => {
-    const value = base * Math.pow((scaling[key] as number) ?? 1, w - 1);
-    return w === 1 ? value * wave1Factor : value;
-  };
 
   const archetypes: EnemyArchetypeValue[] = [EnemyArchetype.Base, EnemyArchetype.Rapid];
   if (isBossWave(waveNumber, gameParams)) archetypes.push(EnemyArchetype.Boss);
@@ -137,7 +114,7 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
       counts.push(0);
       continue;
     }
-    let count = Math.floor(scale("count", config.countPerWave ?? 1, waveNumber));
+    let count = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", config.countPerWave ?? 1));
     if (archetype === EnemyArchetype.Boss) count = Math.min(1, count);
     counts.push(count);
   }
@@ -172,9 +149,9 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
       const angle = getKthRandom(gameParams.seed + waveStart * 7919, slotIndex) * Math.PI * 2;
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
-      const life = scale("life", config.life, waveNumber);
-      const speed = scale("speed", config.speed, waveNumber);
-      const damage = scale("damage", config.damage, waveNumber);
+      const life = scaleWaveStat(gameParams, waveNumber, "life", config.life);
+      const speed = scaleWaveStat(gameParams, waveNumber, "speed", config.speed);
+      const damage = scaleWaveStat(gameParams, waveNumber, "damage", config.damage);
       const size = config.size ?? 12;
       enemies.push(
         createEnemy({

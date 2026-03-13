@@ -11,7 +11,7 @@
     "typecheck": "bunx tsc --noEmit",
     "lint": "eslint src build.js dev.js serve.js",
     "ci": "bun run typecheck && bun run test && bun run lint",
-    "simulate": "bun run src/simulate.ts"
+    "simulate": "bun run src/player/simulate.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",

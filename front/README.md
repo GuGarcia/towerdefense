@@ -6,9 +6,9 @@ Application de jeu (et plus tard replay). **TypeScript** (Bun exécute le TS nat
 
 ```bash
 make dev      # Build + watch + serveur → http://localhost:5173
-make build    # Build prod → player/dist/
+make build    # Build prod → front/dist/
 make preview  # Servir dist/ (après make build)
-make shell    # Shell dans le conteneur (Bun) avec player/ monté
+make shell    # Shell dans le conteneur (Bun) avec front/ monté
 ```
 
 Nécessite uniquement Docker ; l’image utilisée est `oven/bun:latest`.
@@ -26,7 +26,7 @@ Le code source est en **TypeScript** (`src/**/*.ts`). Le build produit du JavaSc
 
 ## CI (typage, tests, lint)
 
-À la racine du projet : `make ci` (Docker) ou dans `player/` : `bun run ci`.
+À la racine du projet : `make ci` (Docker) ou dans `front/` : `bun run ci`.
 
 - **typecheck** : `tsc --noEmit`
 - **test** : `bun test` (tests unitaires dans `src/**/*.test.ts`)

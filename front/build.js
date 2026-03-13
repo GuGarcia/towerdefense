@@ -34,5 +34,11 @@ try {
   await writeFile(join(DIST, "gameparams.json"), buf);
 } catch (_) {}
 
+// Copy player.css
+try {
+  const css = await readFile(join(ROOT, "player.css"));
+  await writeFile(join(DIST, "player.css"), css);
+} catch (_) {}
+
 console.log("Build OK → dist/");
-console.log("  index.html, index.js, gameparams.json");
+console.log("  index.html, index.js, player.css, gameparams.json");

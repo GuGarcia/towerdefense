@@ -2,7 +2,7 @@ import { describe, it, expect } from "bun:test";
 import { createGame, tick } from "./Game";
 import { createGameParams } from "./GameParams";
 import { GameState } from "./GameState";
-import { UpgradeType } from "../player/UpgradeType";
+import { UpgradeType, type UpgradeTypeValue } from "../player/UpgradeType";
 
 describe("Game", () => {
   it("createGame initializes with params and Playing state", () => {
@@ -88,5 +88,34 @@ describe("Game", () => {
     const after = tick(game, 2);
     expect(after.state).toBe(GameState.GameOver);
     expect(after.frameIndex).toBe(1);
+  });
+
+  it("replay: same seed + same recorded inputs produce identical final state", () => {
+    const params = createGameParams({ seed: 12345, wave: { baseIntervalFrames: 10 } });
+    const recordedInputs: { frame: number; buyUpgrade?: UpgradeTypeValue }[] = [
+      { frame: 5, buyUpgrade: UpgradeType.Damage },
+      { frame: 12, buyUpgrade: UpgradeType.Life },
+      { frame: 20, buyUpgrade: undefined },
+    ];
+
+    let gameLive = createGame(params);
+    for (let frame = 1; frame <= 25; frame++) {
+      const input = recordedInputs.find((r) => r.frame === frame);
+      gameLive = tick(gameLive, frame, input?.buyUpgrade != null ? { buyUpgrade: input.buyUpgrade } : undefined);
+    }
+
+    let gameReplay = createGame(params);
+    for (let frame = 1; frame <= 25; frame++) {
+      const input = recordedInputs.find((r) => r.frame === frame);
+      gameReplay = tick(gameReplay, frame, input?.buyUpgrade != null ? { buyUpgrade: input.buyUpgrade } : undefined);
+    }
+
+    expect(gameReplay.state).toBe(gameLive.state);
+    expect(gameReplay.player.life).toBe(gameLive.player.life);
+    expect(gameReplay.player.damage).toBe(gameLive.player.damage);
+    expect(gameReplay.money).toBe(gameLive.money);
+    expect(gameReplay.enemiesKilled).toBe(gameLive.enemiesKilled);
+    expect(gameReplay.enemies.length).toBe(gameLive.enemies.length);
+    expect(gameReplay.projectiles.length).toBe(gameLive.projectiles.length);
   });
 });

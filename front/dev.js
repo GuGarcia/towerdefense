@@ -27,6 +27,10 @@ async function buildOnce() {
     const buf = await readFile(join(ROOT, "gameparams.json"));
     await writeFile(join(DIST, "gameparams.json"), buf);
   } catch (_) {}
+  try {
+    const css = await readFile(join(ROOT, "player.css"));
+    await writeFile(join(DIST, "player.css"), css);
+  } catch (_) {}
   console.log("Build OK → dist/");
 }
 

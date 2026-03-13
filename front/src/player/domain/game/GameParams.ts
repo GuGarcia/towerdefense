@@ -13,6 +13,12 @@ export interface GameParams {
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
     readonly initialRange?: number;
+    /** Upgrade delta factors (per level): damage +15% = 0.15, life +10% = 0.1, etc. */
+    readonly upgradeFactorDamage?: number;
+    readonly upgradeFactorLife?: number;
+    readonly upgradeFactorRegen?: number;
+    readonly upgradeFactorAttackSpeed?: number;
+    readonly upgradeFactorRange?: number;
   };
   readonly economy: {
     /** Cost for first upgrade (level 0 → 1). */
@@ -69,6 +75,11 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,
+      upgradeFactorDamage: 0.15,
+      upgradeFactorLife: 0.1,
+      upgradeFactorRegen: 0.5,
+      upgradeFactorAttackSpeed: 0.15,
+      upgradeFactorRange: 0.15,
     },
     economy: {
       upgradeCostBase: 10,

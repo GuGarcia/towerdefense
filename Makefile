@@ -2,7 +2,7 @@
 # Depuis la racine du projet : make dev, make build, make preview
 
 BUN_IMAGE := oven/bun:latest
-PLAYER_DIR := $(CURDIR)/player
+FRONT_DIR := $(CURDIR)/front
 
 .PHONY: dev build preview shell ci simulate
 
@@ -14,7 +14,7 @@ PARAMS ?= gameparams.json
 # CI : install deps puis typage, tests, lint
 ci:
 	docker run --rm \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		$(BUN_IMAGE) \
 		sh -c "bun install && bun run ci"
@@ -22,16 +22,16 @@ ci:
 # Serveur de dev (hot reload) — http://localhost:5173
 dev:
 	docker run --rm -it \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		-p 5173:5173 \
 		$(BUN_IMAGE) \
 		run dev
 
-# Build prod → player/dist/
+# Build prod → front/dist/
 build:
 	docker run --rm \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		$(BUN_IMAGE) \
 		run build
@@ -39,16 +39,16 @@ build:
 # Servir les fichiers (preview, après make build tu peux servir dist/ manuellement si besoin)
 preview:
 	docker run --rm -it \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		-p 5173:5173 \
 		$(BUN_IMAGE) \
 		run preview
 
-# Shell dans le conteneur avec le dossier player monté
+# Shell dans le conteneur avec le dossier front monté
 shell:
 	docker run --rm -it \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		$(BUN_IMAGE) \
 		/bin/sh
@@ -58,7 +58,7 @@ shell:
 # make simulate RUNS=100 SIMOUT=./out PARAMS=simulate-params.json
 simulate:
 	docker run --rm \
-		-v "$(PLAYER_DIR):/app" \
+		-v "$(FRONT_DIR):/app" \
 		-w /app \
 		$(BUN_IMAGE) \
-		bun run src/simulate.ts $(RUNS) $(SIMOUT) $(PARAMS)
+		bun run src/player/simulate.ts $(RUNS) $(SIMOUT) $(PARAMS)
