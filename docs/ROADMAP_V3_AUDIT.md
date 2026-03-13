@@ -105,10 +105,11 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
   - `createRafClock(onTick)` dans `FixedClock.ts` ; l’entrée player utilise `createRafClock` (rAF + pas fixe 1/60 s). Rendu synchronisé à l’écran, déterminisme conservé.
   - Objectif : meilleure intégration avec le rafraîchissement écran, et facilité d’accélération / ralenti cohérents.
 
-- **5.2. Optimisations de performance**
+- **5.2. Optimisations de performance** (à faire si besoin)
   - Si le nombre d’ennemis augmente fortement :
-    - Envisager des structures plus compactes (arrays plats, pooling d’objets).
-    - Introduire un culling (ne pas dessiner les entités hors écran si un jour la vue n’est plus centrée).
+    - Envisager des structures plus compactes (arrays plats, pooling d’objets) dans `Game` / listes `enemies` et `projectiles`.
+    - Introduire un culling dans `CanvasRenderer` : ne dessiner que les entités dont la bounding box intersecte le viewport (utile si la vue n’est plus toujours centrée).
+  - Pour l’instant le modèle (copies d’objets, pas de pool) reste adapté au scale actuel.
 
 ### 6. Documentation et guidelines
 
