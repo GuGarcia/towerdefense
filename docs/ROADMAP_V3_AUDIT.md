@@ -2,7 +2,9 @@
 
 Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d’améliorations incrémentales et prépare la migration vers un domaine `player` intégré au front.
 
-### 0. Cible d’architecture : `front/src/player/{Domain,Application,Infra}`
+**État actuel** : la migration est faite. Le code vit dans **`front/src/player/`** (domain, application, infrastructure). L’entrée front est `front/src/index.ts` qui importe le player. Le Makefile cible `front/`. Les points 1.1 à 1.3, 2.1, 3.1, 3.2, 4.1 et 6.1 sont réalisés. Il reste notamment 4.2 (tests HUD/domaine), 5.x (long terme) et 2.2 (thèmes, basse priorité).
+
+### 0. Cible d’architecture : `front/src/player/{Domain,Application,Infra}` ✅ (fait)
 
 - **Objectif global**
   - Isoler le “player” comme un sous-domaine à part entière, réutilisable (jeu web, simulateur, outils d’équilibrage, éditeur de paramètres, etc.).
@@ -94,10 +96,8 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
     - Rejouer le recording et vérifier que le `Game` final est identique.
   - Priorité : **haute**.
 
-- **4.2. Vérifier la cohérence HUD / domaine**
-  - Ajouter quelques tests (ou snapshots visuels si besoin plus tard) pour s’assurer que :
-    - Le HUD de vague (progrès, “Prochaine vague”) reflète bien `WaveSpawner`.
-    - Les stats “Ennemis (vague X)” restent cohérentes lors de changements de `GameParams`.
+- **4.2. Vérifier la cohérence HUD / domaine** ✅ (fait)
+  - Tests ajoutés dans `WaveSpawner.test.ts` : cohérence `getWaveComposition` / `getWaveEnemyStats`, et `getWaveNumberAtFrame(getWaveStartFrame(n)) === n`.
   - Priorité : **basse à moyenne**.
 
 ### 5. Long terme / évolutions possibles

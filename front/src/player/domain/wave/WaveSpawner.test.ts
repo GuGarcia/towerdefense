@@ -3,6 +3,8 @@ import {
   getWaveNumberAtFrame,
   getWaveStartFrame,
   getEnemiesToSpawnThisFrame,
+  getWaveComposition,
+  getWaveEnemyStats,
 } from "./WaveSpawner";
 import { createGameParams } from "../game/GameParams";
 
@@ -68,5 +70,22 @@ describe("WaveSpawner", () => {
     }
     expect(totalProgressive).toBe(totalAtOnce);
     expect(getEnemiesToSpawnThisFrame(1, progressive).length).toBeLessThan(totalAtOnce);
+  });
+
+  it("HUD consistency: getWaveComposition matches getWaveEnemyStats counts", () => {
+    const p = createGameParams({ wave: { baseIntervalFrames: 300 } });
+    for (const waveNum of [1, 2, 5]) {
+      const comp = getWaveComposition(p, waveNum);
+      const stats = getWaveEnemyStats(p, waveNum);
+      expect(comp.base).toBe(stats.base.count);
+      expect(comp.rapid).toBe(stats.rapid.count);
+      expect(comp.boss).toBe(stats.boss.count);
+    }
+  });
+
+  it("HUD consistency: wave number at wave start frame is correct", () => {
+    const p = createGameParams({ wave: { baseIntervalFrames: 100 } });
+    expect(getWaveNumberAtFrame(getWaveStartFrame(1, p), p)).toBe(1);
+    expect(getWaveNumberAtFrame(getWaveStartFrame(3, p), p)).toBe(3);
   });
 });
