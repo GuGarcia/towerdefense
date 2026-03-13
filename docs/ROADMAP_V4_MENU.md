@@ -1,8 +1,8 @@
 # Roadmap Menu — Interface complète (Menu / Settings / Paramètres de partie)
 
-Ce document décrit la roadmap pour une interface complète : menu principal, paramètres applicatifs, formulaire « Partie personnalisée », liste des parties et partage. Il peut être réalisé sur le projet actuel (`player/`) ou sur le front après la migration prévue dans `docs/ROADMAP_AUDIT.md`.
+Ce document décrit la roadmap pour une interface complète : menu principal, paramètres applicatifs, formulaire « Partie personnalisée », liste des parties et partage. Elle est réalisée dans **`front/`** après la migration prévue dans `docs/ROADMAP_V3_AUDIT.md`.
 
-**Lancer le jeu** : à la racine, `make dev` ou `cd player && bun run dev`.
+**Lancer le jeu** : à la racine, `make dev` ou `cd front && bun run dev`.
 
 ---
 

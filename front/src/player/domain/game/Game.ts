@@ -82,7 +82,6 @@ function applyWaveEconomy(game: Game, frameIndex: number): number {
 function updateEnemiesAndStuck(game: Game, frameIndex: number): Enemy[] {
   const toSpawn = getEnemiesToSpawnThisFrame(frameIndex, game.params);
   let enemies = [...game.enemies, ...toSpawn].map(moveTowardCenter);
-  const interval = game.params.wave.stuckEnemyAttackIntervalFrames ?? 60;
   enemies = enemies.map((e) => {
     const incomingDamage = e.incomingDamage ?? 0;
     if (e.stuck) return e;

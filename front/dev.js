@@ -11,7 +11,7 @@ const DIST = join(ROOT, "dist");
 async function buildOnce() {
   await mkdir(DIST, { recursive: true });
   const result = await Bun.build({
-    entrypoints: [join(ROOT, "src", "index.ts")],
+    entrypoints: [join(ROOT, "src", "app", "index.tsx")],
     outdir: DIST,
     minify: false,
     target: "browser",
@@ -37,7 +37,7 @@ async function buildOnce() {
 await buildOnce();
 
 Bun.spawn({
-  cmd: ["bun", "build", join(ROOT, "src", "index.ts"), "--outdir", DIST, "--watch"],
+  cmd: ["bun", "build", join(ROOT, "src", "app", "index.tsx"), "--outdir", DIST, "--watch"],
   cwd: ROOT,
   stdout: "inherit",
   stderr: "inherit",
@@ -49,10 +49,16 @@ const getMime = (path) => MIME[path.slice(path.lastIndexOf("."))] ?? "applicatio
 Bun.serve({
   port: 5173,
   async fetch(req) {
-    const path = new URL(req.url).pathname === "/" ? "/index.html" : new URL(req.url).pathname;
-    const file = Bun.file(join(DIST, path.slice(1) || "index.html"));
+    const pathname = new URL(req.url).pathname;
+    const path = pathname === "/" ? "/index.html" : pathname;
+    const filePath = path.slice(1) || "index.html";
+    const file = Bun.file(join(DIST, filePath));
     const exists = await file.exists();
-    if (!exists) return new Response("Not found", { status: 404 });
+    // SPA fallback: unknown paths serve index.html for client-side routing
+    if (!exists) {
+      const html = Bun.file(join(DIST, "index.html"));
+      return new Response(html, { headers: { "Content-Type": "text/html" } });
+    }
     return new Response(file, { headers: { "Content-Type": getMime(path) } });
   },
 });

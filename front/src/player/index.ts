@@ -1,6 +1,6 @@
 /**
- * Entry point: 1 or N players side by side. Change PLAYER_COUNT to test determinism (e.g. 4).
- * Records inputs for export; supports loading a recording for replay.
+ * Player bootstrap: 1 or N players side by side. Records inputs for export; supports loading a recording for replay.
+ * Exported runPlayer() is used when mounting the game from the React app (e.g. /play route).
  */
 import { createGame, tick, type Game, type GameInput } from "./domain/game/Game";
 import { createGameParams } from "./domain/game/GameParams";
@@ -58,18 +58,32 @@ function getUpgradeValue(
   return String(Math.round(v));
 }
 
-async function main(): Promise<void> {
+export interface RunPlayerOptions {
+  /** Override game params (merged with loaded gameparams.json). */
+  paramsOverrides?: Record<string, unknown>;
+  /** Called when user clicks "Retour au menu" on game over (e.g. navigate to /). */
+  onBackToMenu?: () => void;
+}
+
+/**
+ * Starts the game. Expects DOM elements #game, #upgrade-bars, #replay-toolbar, #game-overlay to exist.
+ * Returns a promise that resolves with a stop() function to tear down the game loop and listeners.
+ */
+export async function runPlayer(options: RunPlayerOptions = {}): Promise<{ stop: () => void }> {
+  const { paramsOverrides: optionsOverrides = {}, onBackToMenu } = options;
+
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
-  if (!canvasEl) return;
+  if (!canvasEl) return Promise.resolve({ stop: () => {} });
   const canvas = canvasEl;
   const ctxOrNull = canvas.getContext("2d");
-  if (!ctxOrNull) return;
+  if (!ctxOrNull) return Promise.resolve({ stop: () => {} });
   const ctx = ctxOrNull;
 
   const n = PLAYER_COUNT;
   const seeds = Array.from({ length: n }, () => randomSeed());
 
-  const paramsOverrides = await loadGameParams();
+  const fileOverrides = await loadGameParams();
+  const paramsOverrides = { ...fileOverrides, ...optionsOverrides };
   const games = seeds.map((seed) =>
     createGame(createGameParams({ ...paramsOverrides, seed } as Parameters<typeof createGameParams>[0]))
   );
@@ -90,7 +104,7 @@ async function main(): Promise<void> {
   }
 
   const upgradeBarsEl = document.getElementById("upgrade-bars");
-  if (!upgradeBarsEl) return;
+  if (!upgradeBarsEl) return Promise.resolve({ stop: () => {} });
   const barsContainer = upgradeBarsEl;
 
   const toolbarEl = document.getElementById("replay-toolbar");
@@ -138,6 +152,7 @@ async function main(): Promise<void> {
         frameIndices[i] = 0;
       }
     },
+    onBackToMenu,
   });
 
   setupUpgradeBars(barsContainer, n, {
@@ -201,6 +216,7 @@ async function main(): Promise<void> {
   resize();
 
   const renderer = createCanvasRenderer(canvas, () => 1);
+  const stopClock = createRafClock(step);
 
   function getViewports(): { x: number; y: number; width: number; height: number }[] {
     const w = canvas.width;
@@ -253,8 +269,12 @@ async function main(): Promise<void> {
     updateUpgradeBarsUI();
   }
 
-  createRafClock(step);
   step();
-}
 
-main();
+  return {
+    stop: () => {
+      window.removeEventListener("resize", resize);
+      stopClock();
+    },
+  };
+}

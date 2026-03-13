@@ -11,7 +11,7 @@ await mkdir(DIST, { recursive: true });
 
 // Bundle with Bun (native TypeScript)
 const result = await Bun.build({
-  entrypoints: [join(ROOT, "src", "index.ts")],
+  entrypoints: [join(ROOT, "src", "app", "index.tsx")],
   outdir: DIST,
   minify: true,
   target: "browser",
