@@ -28,36 +28,22 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
 
 ### 1. Domaine (`domain/*`)
 
-- **1.1. Refactoriser `Game.tick` en sous-fonctions pures**
-  - Extraire des fonctions internes dédiées, par exemple :
-    - `applyWaveEconomy(game, frameIndex)`
-    - `updateEnemiesAndStuck(game, frameIndex)`
-    - `handleShootingAndProjectiles(game, frameIndex)`
-    - `applyPlayerDamageAndDeath(game, frameIndex)`
-  - Objectif : garder la logique identique mais réduire la taille de `tick` et rendre la lecture plus guidée.
+- **1.1. Refactoriser `Game.tick` en sous-fonctions pures** ✅ (fait)
+  - Fonctions internes dans `Game.ts` : `applyWaveEconomy`, `updateEnemiesAndStuck`, `handleShootingAndProjectiles`, `applyStuckDamageAndCleanup`. `tick` orchestre ces étapes.
   - Priorité : **haute** (lisibilité / maintenabilité).
 
-- **1.2. Centraliser le scaling des vagues**
-  - Aujourd’hui, la logique de scaling (via `difficultyScaling`, `wave1DifficultyFactor`) est dupliquée entre :
-    - `getWaveEnemyStats`
-    - `getWaveComposition`
-    - `getEnemiesToSpawnThisFrame`
-  - Introduire un petit util, par ex. `scaleWaveStat(gameParams, waveNumber, key, base)` dans un module partagé (`WaveScaling` ou similaire).
+- **1.2. Centraliser le scaling des vagues** ✅ (fait)
+  - Module `WaveScaling.ts` avec `scaleWaveStat(gameParams, waveNumber, key, base)`. `WaveSpawner` l’utilise pour `getWaveEnemyStats`, `getWaveComposition`, `getEnemiesToSpawnThisFrame`.
   - Priorité : **moyenne**.
 
-- **1.3. Paramétrer les facteurs d’upgrade**
-  - Les coefficients d’upgrade (`+15%`, `+10%`, etc.) dans `Player.applyUpgrade` sont codés en dur.
-  - Les déplacer dans `GameParams.player` (ex. `damageUpgradeFactor`, `lifeUpgradeFactor`, …) afin de :
-    - Faciliter le balancing sans toucher au code.
-    - Permettre différents presets de difficulté.
+- **1.3. Paramétrer les facteurs d’upgrade** ✅ (fait)
+  - `GameParams.player` : champs optionnels `upgradeFactorDamage`, `upgradeFactorLife`, `upgradeFactorRegen`, `upgradeFactorAttackSpeed`, `upgradeFactorRange`. `Player.applyUpgrade` les utilise (valeurs par défaut conservées).
   - Priorité : **moyenne**.
 
 ### 2. Infrastructure (`infrastructure/*`)
 
-- **2.1. Renforcer le typage du système de replay**
-  - Dans `PlayerInputRecorder` et `ReplayInputSource`, utiliser `UpgradeTypeValue` plutôt que `string` pour `upgradeType`.
-  - Mettre à jour le type `GameRecording` pour refléter ce typage plus strict.
-  - Ajouter un test qui valide qu’un enregistrement puis un replay reproduisent exactement l’état d’une run.
+- **2.1. Renforcer le typage du système de replay** ✅ (fait)
+  - `GameRecording` / `RecordedInput` : `upgradeType: UpgradeTypeValue`. `PlayerInputRecorder.record` et `ReplayInputSource` typés en conséquence. Test replay dans `Game.test.ts` (même seed + mêmes inputs → état identique).
   - Priorité : **haute** (sécurité de type / fiabilité des replays).
 
 - **2.2. Éventuelle factorisation des couleurs / thèmes** ✅ (fait)
@@ -66,33 +52,18 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
 
 ### 3. Entrée principale et UI (`index.ts`)
 
-- **3.1. Découper la construction de l’UI**
-  - Extraire des fonctions pures côté infrastructure / UI :
-    - `setupReplayToolbar(toolbarEl, recorder, ...)`
-    - `setupUpgradeBars(upgradeBarsEl, nPlayers, onUpgradeClick)`
-    - `setupGameOverlay(canvas, onReplayClick)`
-  - Objectifs :
-    - Réduire la taille de `index.ts`.
-    - Permettre des évolutions de l’UI sans toucher au “wiring” principal du jeu.
+- **3.1. Découper la construction de l’UI** ✅ (fait)
+  - `infrastructure/ui/setupReplayToolbar.ts`, `setupUpgradeBars.ts`, `setupGameOverlay.ts`. L’index appelle ces fonctions avec les callbacks ; la construction DOM est isolée.
   - Priorité : **haute**.
 
-- **3.2. Externaliser les styles inline**
-  - Beaucoup de styles sont définis via `style.cssText` dans `index.ts`.
-  - Créer une feuille de style dédiée (ex. `player.css`) et migrer les styles :
-    - Boutons de vitesse (1x, 2x, 3x).
-    - Toolbar de replay.
-    - Overlay GAME OVER.
-    - Barres d’upgrades & barre de vie.
+- **3.2. Externaliser les styles inline** ✅ (fait)
+  - `front/player.css` : styles toolbar, overlay, upgrade bars, life bar. `index.html` charge `player.css`. Build/dev copient le CSS dans `dist/`.
   - Priorité : **moyenne** (UX / maintenabilité front).
 
 ### 4. Tests et qualité
 
-- **4.1. Couvrir les nouveaux refactors**
-  - Après extraction des sous-fonctions de `Game.tick`, ajouter des tests ciblés sur ces fonctions pour garantir la non-régression.
-  - Ajouter un test bout-en-bout de replay :
-    - Lancer une run avec quelques upgrades.
-    - Exporter le recording.
-    - Rejouer le recording et vérifier que le `Game` final est identique.
+- **4.1. Couvrir les nouveaux refactors** ✅ (fait)
+  - Test replay dans `Game.test.ts` : « replay: same seed + same recorded inputs produce identical final state ». Les sous-fonctions de `tick` sont couvertes indirectement via les tests existants sur `tick`.
   - Priorité : **haute**.
 
 - **4.2. Vérifier la cohérence HUD / domaine** ✅ (fait)
@@ -113,11 +84,7 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
 
 ### 6. Documentation et guidelines
 
-- **6.1. Mettre à jour la documentation player**
-  - Mettre à jour `player/GUIDELINES.md` (ou l’emplacement équivalent dans `front/src/player`) pour refléter :
-    - La nouvelle architecture `Domain / Application / Infra`.
-    - Les conventions de tests (où placer les tests du domaine vs. ceux du front).
-    - Les règles de déterminisme (utilisation des seeds, replays, PRNG).
-  - Mettre à jour au passage les autres docs de référence si nécessaire (`README`, docs front) pour pointer vers ces guidelines.
+- **6.1. Mettre à jour la documentation player** ✅ (fait)
+  - `front/GUIDELINES.md` : chemins `src/player/domain`, `application`, `infrastructure` ; conventions de tests (domaine vs infra) ; déterminisme et replay (`UpgradeTypeValue`, test replay). README mis à jour pour `front/`.
 
 Ce document est volontairement orienté “technique / architecture”. Pour prioriser dans le temps, tu peux commencer par les tâches à priorité **haute**, puis intégrer le reste au fil du balancing et des évolutions de gameplay.
