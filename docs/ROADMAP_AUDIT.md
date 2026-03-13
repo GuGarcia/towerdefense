@@ -1,6 +1,28 @@
 ## Roadmap audit `player/src`
 
-Ce document synthétise l’audit du dossier `player/src` et propose une roadmap d’améliorations incrémentales.
+Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d’améliorations incrémentales et prépare la migration vers un domaine `player` intégré au front.
+
+### 0. Cible d’architecture : `front/src/player/{Domain,Application,Infra}`
+
+- **Objectif global**
+  - Isoler le “player” comme un sous-domaine à part entière, réutilisable (jeu web, simulateur, outils d’équilibrage, éditeur de paramètres, etc.).
+  - Intégrer ce sous-domaine directement dans le front sous la forme :
+    - `front/src/player/Domain` : règles du jeu et entités pures (Game, Player, Enemy, Projectile, Wave, économie, GameParams, etc.).
+    - `front/src/player/Application` : orchestrateurs et cas d’usage (GameRunner, services de simulation, adaptation inputs UI → domaine, logique de replay côté app).
+    - `front/src/player/Infra` : intégrations concrètes (rendu Canvas/WebGL, horloge browser, persistance locale de replays, éventuellement API réseau).
+
+- **Bénéfices attendus**
+  - **Réutilisabilité** : même code de domaine pour d’autres interfaces (CLI de simu, outils internes, autre front).
+  - **Testabilité** : tests concentrés sur `Domain` et `Application`, sans dépendre du front complet.
+  - **Évolutivité** : possibilité de changer de techno de rendu ou de stockage sans impacter le cœur du jeu.
+
+- **Plan de migration (high-level)**
+  - Étape 1 : créer l’arborescence cible `front/src/player/{Domain,Application,Infra}` sans branchement dans l’UI.
+  - Étape 2 : déplacer progressivement le **domaine pur** (`Game`, `Player`, `Enemy`, `Projectile`, `Wave*`, `GameParams`, économie) dans `Domain`, en gardant les tests existants comme filet de sécurité.
+  - Étape 3 : déplacer les orchestrateurs (`GameLoop`, `GameRunner`, logique de replay “métier”) dans `Application`.
+  - Étape 4 : déplacer et adapter les briques d’infra (rendu canvas, clock, IO replays) dans `Infra`.
+  - Étape 5 : exposer une API front claire (`front/src/player/index.ts`) pour monter/démonter une instance de jeu depuis les composants du front.
+  - Étape 6 : supprimer progressivement l’ancien dossier `player/src` une fois la migration stabilisée (tests verts, usages front migrés).
 
 ### 1. Domaine (`domain/*`)
 
