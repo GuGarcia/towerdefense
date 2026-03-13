@@ -111,5 +111,13 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
     - Envisager des structures plus compactes (arrays plats, pooling d’objets).
     - Introduire un culling (ne pas dessiner les entités hors écran si un jour la vue n’est plus centrée).
 
-Ce document est volontairement orienté “technique / architecture”. Pour prioriser dans le temps, tu peux commencer par les tâches à priorité **haute**, puis intégrer le reste au fil du balancing et des évolutions de gameplay.
+### 6. Documentation et guidelines
 
+- **6.1. Mettre à jour la documentation player**
+  - Mettre à jour `player/GUIDELINES.md` (ou l’emplacement équivalent dans `front/src/player`) pour refléter :
+    - La nouvelle architecture `Domain / Application / Infra`.
+    - Les conventions de tests (où placer les tests du domaine vs. ceux du front).
+    - Les règles de déterminisme (utilisation des seeds, replays, PRNG).
+  - Mettre à jour au passage les autres docs de référence si nécessaire (`README`, docs front) pour pointer vers ces guidelines.
+
+Ce document est volontairement orienté “technique / architecture”. Pour prioriser dans le temps, tu peux commencer par les tâches à priorité **haute**, puis intégrer le reste au fil du balancing et des évolutions de gameplay.
