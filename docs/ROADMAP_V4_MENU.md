@@ -57,14 +57,14 @@ Ce document décrit la roadmap pour une interface complète : menu principal, pa
 
 ## 4 — Formulaire « Partie personnalisée »
 
-- [ ] **4.1** Page `/custom` avec formulaire structuré en sections (ou onglets) : **Joueur**, **Économie**, **Vagues**, **Ennemis**.
-- [ ] **4.2** **Joueur** : sliders avec min/max (ex. vie 50–200, dégâts 5–30, regen 0–0.5, attaque 0.5–5, portée 150–500). Valeurs par défaut = `createGameParams()`.
-- [ ] **4.3** **Économie** : coût de base et incrément des upgrades ; or par kill (base, rapide, boss) ; bonus de vague (base, incrément).
-- [ ] **4.4** **Vagues** : facteur difficulté vague 1 ; scaling (vie, vitesse, dégâts, nombre) ; boss toutes les N vagues.
-- [ ] **4.5** **Ennemis** : pour chaque archétype (base, rapide, boss), exposer vie, vitesse, dégâts, taille, nombre par vague (min/max cohérents avec `GameParams`).
-- [ ] **4.6** Champ **Seed** : input number + bouton « Aléatoire ».
-- [ ] **4.7** Boutons : **Annuler** (retour menu), **Lancer la partie** (construire `GameParams` depuis le formulaire, aller sur `/play`).
-- [ ] **4.8** Référence des plages recommandées : voir section « Référence sliders » en fin de document.
+- [x] **4.1** Page `/custom` avec formulaire structuré en sections (ou onglets) : **Joueur**, **Économie**, **Vagues**, **Ennemis**.
+- [x] **4.2** **Joueur** : sliders avec min/max (ex. vie 50–200, dégâts 5–30, regen 0–0.5, attaque 0.5–5, portée 150–500). Valeurs par défaut = `createGameParams()`.
+- [x] **4.3** **Économie** : coût de base et incrément des upgrades ; or par kill (base, rapide, boss) ; bonus de vague (base, incrément).
+- [x] **4.4** **Vagues** : facteur difficulté vague 1 ; scaling (vie, vitesse, dégâts, nombre) ; boss toutes les N vagues.
+- [x] **4.5** **Ennemis** : pour chaque archétype (base, rapide, boss), exposer vie, vitesse, dégâts, taille, nombre par vague (min/max cohérents avec `GameParams`).
+- [x] **4.6** Champ **Seed** : input number + bouton « Aléatoire ».
+- [x] **4.7** Boutons : **Annuler** (retour menu), **Lancer la partie** (construire `GameParams` depuis le formulaire, aller sur `/play`).
+- [x] **4.8** Référence des plages recommandées : voir section « Référence sliders » en fin de document.
 
 ---
 

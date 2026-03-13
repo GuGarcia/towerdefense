@@ -5,7 +5,7 @@
 import type { GameRecording } from "../../player/infrastructure/replay/GameRecording";
 import type { RunPlayerControls } from "../../player";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
 import { useI18n } from "../i18n/context";
 
@@ -71,17 +71,23 @@ const speedBtnStyles = (active: boolean): React.CSSProperties => ({
 
 const SPEED_VALUES = [1, 2, 3] as const;
 
+type PlayLocationState = { paramsOverrides?: Record<string, unknown> } | undefined;
+
 export function PlayPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useI18n();
   const controlsRef = useRef<RunPlayerControls | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
 
+  const paramsOverrides = (location.state as PlayLocationState)?.paramsOverrides;
+
   useEffect(() => {
     let cancelled = false;
     runPlayer({
+      paramsOverrides,
       onBackToMenu: () => navigate("/"),
     }).then((controls) => {
       if (!cancelled) controlsRef.current = controls;
@@ -91,7 +97,7 @@ export function PlayPage() {
       controlsRef.current?.stop();
       controlsRef.current = null;
     };
-  }, [navigate]);
+  }, [navigate, paramsOverrides]);
 
   const openPause = useCallback(() => {
     controlsRef.current?.pause();
