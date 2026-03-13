@@ -8,7 +8,7 @@ import { GameState } from "./domain/game/GameState";
 import { getWaveNumberAtFrame } from "./domain/wave/WaveSpawner";
 import { getUpgradeLevel } from "./domain/player/Player";
 import { getUpgradeCost } from "./domain/economy/UpgradeCost";
-import { createFixedClock } from "./infrastructure/clock/FixedClock";
+import { createRafClock } from "./infrastructure/clock/FixedClock";
 import { createCanvasRenderer } from "./infrastructure/rendering/CanvasRenderer";
 import { createPlayerInputRecorder } from "./infrastructure/replay/PlayerInputRecorder";
 import { createReplayInputSource } from "./infrastructure/replay/ReplayInputSource";
@@ -253,7 +253,7 @@ async function main(): Promise<void> {
     updateUpgradeBarsUI();
   }
 
-  createFixedClock(step);
+  createRafClock(step);
   step();
 }
 

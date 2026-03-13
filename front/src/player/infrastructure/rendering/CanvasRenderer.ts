@@ -1,5 +1,5 @@
 /**
- * Draws game state on a canvas (background, player pentagon, enemies, projectiles). Neon/synthwave style.
+ * Draws game state on a canvas (background, player pentagon, enemies, projectiles). Theme-driven (default: neon/synthwave).
  */
 import type { Game } from "../../domain/game/Game";
 import type { GameParams } from "../../domain/game/GameParams";
@@ -11,19 +11,9 @@ import {
   getWaveComposition,
   getWaveEnemyStats,
 } from "../../domain/wave/WaveSpawner";
+import { NEON_THEME, type RenderTheme } from "./theme";
 
-const NEON = {
-  bg: "#0a0a0f",
-  playerFill: "#1a1a2e",
-  playerStroke: "#00ffcc",
-  enemyBase: "#ff6b9d",
-  enemyRapid: "#c44dff",
-  enemyBoss: "#ff3366",
-  projectile: "#00ffcc",
-  grid: "rgba(0, 255, 204, 0.06)",
-};
-
-function drawPentagon(ctx: CanvasRenderingContext2D, radius: number): void {
+function drawPentagon(ctx: CanvasRenderingContext2D, radius: number, theme: RenderTheme): void {
   ctx.beginPath();
   for (let i = 0; i < 5; i++) {
     const a = (Math.PI * 2 * i) / 5 - Math.PI / 2;
@@ -33,18 +23,18 @@ function drawPentagon(ctx: CanvasRenderingContext2D, radius: number): void {
     else ctx.lineTo(x, y);
   }
   ctx.closePath();
-  ctx.fillStyle = NEON.playerFill;
+  ctx.fillStyle = theme.playerFill;
   ctx.fill();
-  ctx.strokeStyle = NEON.playerStroke;
+  ctx.strokeStyle = theme.playerStroke;
   ctx.lineWidth = 2;
   ctx.stroke();
 }
 
-function drawRangeCircle(ctx: CanvasRenderingContext2D, range: number): void {
+function drawRangeCircle(ctx: CanvasRenderingContext2D, range: number, theme: RenderTheme): void {
   if (range <= 0) return;
   ctx.beginPath();
   ctx.arc(0, 0, range, 0, Math.PI * 2);
-  ctx.strokeStyle = "rgba(0, 255, 204, 0.5)";
+  ctx.strokeStyle = theme.accentDim;
   ctx.lineWidth = 1.5;
   ctx.setLineDash([6, 6]);
   ctx.stroke();
@@ -56,9 +46,9 @@ function angleTowardCenter(e: Enemy): number {
   return Math.atan2(-e.x, -e.y);
 }
 
-function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy): void {
+function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy, theme: RenderTheme): void {
   const color =
-    e.archetype === "boss" ? NEON.enemyBoss : e.archetype === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
+    e.archetype === "boss" ? theme.enemyBoss : e.archetype === "rapid" ? theme.enemyRapid : theme.enemyBase;
   const cx = e.x;
   const cy = -e.y;
   const size = e.size;
@@ -77,18 +67,18 @@ function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy): void {
   if ((e.hitFlashFrames ?? 0) > 0) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
     ctx.fillRect(-size / 2, -size / 2, size, size);
-    ctx.strokeStyle = NEON.projectile;
+    ctx.strokeStyle = theme.projectile;
     ctx.strokeRect(-size / 2, -size / 2, size, size);
   }
   ctx.restore();
 }
 
-function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile): void {
+function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile, theme: RenderTheme): void {
   ctx.beginPath();
   ctx.arc(p.x, -p.y, 4, 0, Math.PI * 2);
-  ctx.fillStyle = NEON.projectile;
+  ctx.fillStyle = theme.projectile;
   ctx.fill();
-  ctx.strokeStyle = NEON.playerStroke;
+  ctx.strokeStyle = theme.playerStroke;
   ctx.lineWidth = 1;
   ctx.stroke();
 }
@@ -102,7 +92,8 @@ export interface Viewport {
 
 export function createCanvasRenderer(
   canvas: HTMLCanvasElement,
-  getScale: () => number
+  getScale: () => number,
+  theme: RenderTheme = NEON_THEME
 ): (game: Game, viewport?: Viewport) => void {
   return function render(game: Game, viewport?: Viewport): void {
     const ctx = canvas.getContext("2d");
@@ -119,7 +110,7 @@ export function createCanvasRenderer(
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (!viewport) ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = NEON.bg;
+    ctx.fillStyle = theme.bg;
     ctx.fillRect(vp.x, vp.y, vp.width, vp.height);
 
     ctx.save();
@@ -129,24 +120,24 @@ export function createCanvasRenderer(
     ctx.translate(cx, cy);
     ctx.scale(scale, scale);
 
-    // Range circle (portée de tir du joueur)
-    drawRangeCircle(ctx, game.player.range);
+    drawRangeCircle(ctx, game.player.range, theme);
 
-    for (const e of game.enemies) drawEnemy(ctx, e);
-    for (const p of game.projectiles) drawProjectile(ctx, p);
-    drawPentagon(ctx, 40);
+    for (const e of game.enemies) drawEnemy(ctx, e, theme);
+    for (const p of game.projectiles) drawProjectile(ctx, p, theme);
+    drawPentagon(ctx, 40, theme);
 
     ctx.restore();
 
-    drawWaveHud(ctx, game, vp);
-    drawEnemyStatsHud(ctx, game, vp);
+    drawWaveHud(ctx, game, vp, theme);
+    drawEnemyStatsHud(ctx, game, vp, theme);
   };
 }
 
 function drawWaveHud(
   ctx: CanvasRenderingContext2D,
   game: Game,
-  vp: { x: number; y: number; width: number; height: number }
+  vp: { x: number; y: number; width: number; height: number },
+  theme: RenderTheme
 ): void {
   const params = game.params;
   const frameIndex = game.frameIndex;
@@ -168,17 +159,17 @@ function drawWaveHud(
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  ctx.fillStyle = "rgba(0, 255, 204, 0.95)";
+  ctx.fillStyle = theme.accentMuted;
   ctx.font = "14px monospace";
   ctx.textAlign = "center";
   ctx.fillText(`Vague ${waveNumber <= 0 ? 1 : waveNumber}`, centerX, topY);
 
-  ctx.strokeStyle = "rgba(0, 255, 204, 0.5)";
+  ctx.strokeStyle = theme.accentDim;
   ctx.lineWidth = 1;
   ctx.strokeRect(barX, barY, barWidth, barHeight);
-  ctx.fillStyle = "rgba(0, 255, 204, 0.2)";
+  ctx.fillStyle = theme.accentBarBg;
   ctx.fillRect(barX, barY, barWidth, barHeight);
-  ctx.fillStyle = "#00ffcc";
+  ctx.fillStyle = theme.accent;
   ctx.fillRect(barX, barY, barWidth * progress, barHeight);
 
   const nextWave = waveNumber <= 0 ? 1 : waveNumber + 1;
@@ -187,7 +178,7 @@ function drawWaveHud(
   if (comp.base > 0) nextParts.push(`${comp.base} base`);
   if (comp.rapid > 0) nextParts.push(`${comp.rapid} rapid`);
   if (comp.boss > 0) nextParts.push("1 boss");
-  ctx.fillStyle = "rgba(0, 255, 204, 0.8)";
+  ctx.fillStyle = theme.accentMuted;
   ctx.font = "11px monospace";
   ctx.fillText(
     nextParts.length ? `Prochaine vague : ${nextParts.join(", ")}` : "",
@@ -207,7 +198,8 @@ const ENEMY_TYPE_LABELS: Record<keyof GameParams["enemies"], string> = {
 function drawEnemyStatsHud(
   ctx: CanvasRenderingContext2D,
   game: Game,
-  vp: { x: number; y: number; width: number; height: number }
+  vp: { x: number; y: number; width: number; height: number },
+  theme: RenderTheme
 ): void {
   const params = game.params;
   const waveNumber = Math.max(1, getWaveNumberAtFrame(game.frameIndex, params));
@@ -219,7 +211,7 @@ function drawEnemyStatsHud(
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  ctx.fillStyle = "rgba(0, 255, 204, 0.95)";
+  ctx.fillStyle = theme.accentMuted;
   ctx.font = "bold 12px monospace";
   ctx.textAlign = "left";
   ctx.fillText(`Ennemis (vague ${waveNumber})`, left, top);
@@ -228,11 +220,11 @@ function drawEnemyStatsHud(
   const keys: (keyof typeof stats)[] = ["base", "rapid", "boss"];
   for (const key of keys) {
     const s = stats[key];
-    ctx.fillStyle = key === "boss" ? NEON.enemyBoss : key === "rapid" ? NEON.enemyRapid : NEON.enemyBase;
+    ctx.fillStyle = key === "boss" ? theme.enemyBoss : key === "rapid" ? theme.enemyRapid : theme.enemyBase;
     ctx.font = "11px monospace";
     ctx.fillText(ENEMY_TYPE_LABELS[key], left, top);
     top += lineHeight;
-    ctx.fillStyle = "rgba(0, 255, 204, 0.85)";
+    ctx.fillStyle = theme.accentMuted;
     ctx.font = "10px monospace";
     const lifeStr = Math.round(s.life).toString();
     const speedStr = s.speed.toFixed(1);

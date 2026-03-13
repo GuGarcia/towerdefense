@@ -2,7 +2,7 @@
 
 Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d’améliorations incrémentales et prépare la migration vers un domaine `player` intégré au front.
 
-**État actuel** : la migration est faite. Le code vit dans **`front/src/player/`** (domain, application, infrastructure). L’entrée front est `front/src/index.ts` qui importe le player. Le Makefile cible `front/`. Les points 1.1 à 1.3, 2.1, 3.1, 3.2, 4.1 et 6.1 sont réalisés. Il reste notamment 4.2 (tests HUD/domaine), 5.x (long terme) et 2.2 (thèmes, basse priorité).
+**État actuel** : la migration est faite. Le code vit dans **`front/src/player/`** (domain, application, infrastructure). L’entrée front est `front/src/index.ts` qui importe le player. Le Makefile cible `front/`. Les points 1.1 à 1.3, 2.1, 2.2, 3.1, 3.2, 4.1, 4.2, 5.1 et 6.1 sont réalisés. Il reste 5.2 (optimisations perfs, long terme).
 
 ### 0. Cible d’architecture : `front/src/player/{Domain,Application,Infra}` ✅ (fait)
 
@@ -60,9 +60,8 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
   - Ajouter un test qui valide qu’un enregistrement puis un replay reproduisent exactement l’état d’une run.
   - Priorité : **haute** (sécurité de type / fiabilité des replays).
 
-- **2.2. Éventuelle factorisation des couleurs / thèmes**
-  - `CanvasRenderer` contient une palette NEON inline via l’objet `NEON`.
-  - Si plusieurs thèmes sont envisagés, extraire ce genre de configuration dans un module ou une factory (ex. `createCanvasRenderer(canvas, getScale, theme)`).
+- **2.2. Éventuelle factorisation des couleurs / thèmes** ✅ (fait)
+  - Module `front/src/player/infrastructure/rendering/theme.ts` : `RenderTheme`, `NEON_THEME`. `createCanvasRenderer(canvas, getScale, theme?)` accepte un thème optionnel (défaut NEON).
   - Priorité : **basse** (cosmétique / extensibilité).
 
 ### 3. Entrée principale et UI (`index.ts`)
@@ -102,8 +101,8 @@ Ce document synthétise l’audit du dossier `player/src`, propose une roadmap d
 
 ### 5. Long terme / évolutions possibles
 
-- **5.1. Améliorer la clock de jeu**
-  - Étudier une clock basée sur `requestAnimationFrame` ou un système de pas de temps paramétrable (vitesse de simulation ≠ FPS d’affichage).
+- **5.1. Améliorer la clock de jeu** ✅ (fait)
+  - `createRafClock(onTick)` dans `FixedClock.ts` ; l’entrée player utilise `createRafClock` (rAF + pas fixe 1/60 s). Rendu synchronisé à l’écran, déterminisme conservé.
   - Objectif : meilleure intégration avec le rafraîchissement écran, et facilité d’accélération / ralenti cohérents.
 
 - **5.2. Optimisations de performance**
