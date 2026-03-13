@@ -10,6 +10,8 @@ export interface Enemy {
   y: number;
   life: number;
   maxLife: number;
+  /** Total damage from projectiles already fired and expected to hit this enemy. */
+  incomingDamage?: number;
   speed: number;
   damage: number;
   size: number;
@@ -51,6 +53,7 @@ export function createEnemy(params: CreateEnemyParams): Enemy {
     damage,
     size,
     archetype: archetype ?? EnemyArchetype.Base,
+    incomingDamage: 0,
   };
 }
 

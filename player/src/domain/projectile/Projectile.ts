@@ -3,6 +3,8 @@
  */
 export interface Projectile {
   id: number;
+  /** Optional target enemy id this projectile was fired at. */
+  targetEnemyId?: number;
   x: number;
   y: number;
   vx: number;
@@ -24,13 +26,15 @@ export interface CreateProjectileParams {
   dx: number;
   dy: number;
   damage: number;
+  targetEnemyId?: number;
 }
 
 export function createProjectile(params: CreateProjectileParams): Projectile {
-  const { x, y, dx, dy, damage } = params;
+  const { x, y, dx, dy, damage, targetEnemyId } = params;
   const d = Math.sqrt(dx * dx + dy * dy) || 1;
   return {
     id: params.id ?? nextProjectileId(),
+    targetEnemyId,
     x,
     y,
     vx: (dx / d) * PROJECTILE_SPEED,

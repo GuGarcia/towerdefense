@@ -98,18 +98,23 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   // Mark enemies that reached the center as stuck (no hitbox: multiple can stick)
   const interval = game.params.wave.stuckEnemyAttackIntervalFrames ?? 60;
   next.enemies = next.enemies.map((e) => {
+    const incomingDamage = e.incomingDamage ?? 0;
     if (e.stuck) return e;
     if (distanceToCenter(e) <= PLAYER_HITBOX_RADIUS) {
       const { x, y } = clampToCircleRadius(e.x, e.y, PLAYER_HITBOX_RADIUS);
-      return { ...e, stuck: true, lastDamageFrame: frameIndex, x, y };
+      return { ...e, stuck: true, lastDamageFrame: frameIndex, x, y, incomingDamage };
     }
-    return e;
+    return { ...e, incomingDamage };
   });
 
   next.player = applyRegen(next.player, game.params);
 
   const alive = next.enemies.filter((e) => !isDead(e));
-  const inRange = alive.filter((e) => distanceToCenter(e) <= next.player.range);
+  const effectiveAlive = alive.filter((e) => {
+    const incoming = e.incomingDamage ?? 0;
+    return e.life - incoming > 0;
+  });
+  const inRange = effectiveAlive.filter((e) => distanceToCenter(e) <= next.player.range);
   const nearest = inRange.length
     ? inRange.reduce((a, b) => (distanceToCenter(a) < distanceToCenter(b) ? a : b))
     : null;
@@ -118,8 +123,18 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
     const { dx, dy } = directionTowardCenter(nearest.x, nearest.y);
     next.projectiles = [
       ...next.projectiles,
-      createProjectile({ x: 0, y: 0, dx: -dx, dy: -dy, damage: next.player.damage }),
+      createProjectile({
+        x: 0,
+        y: 0,
+        dx: -dx,
+        dy: -dy,
+        damage: next.player.damage,
+        targetEnemyId: nearest.id,
+      }),
     ];
+    next.enemies = next.enemies.map((e) =>
+      e.id === nearest.id ? { ...e, incomingDamage: (e.incomingDamage ?? 0) + next.player.damage } : e
+    );
     next.player = consumeShotCooldown(next.player);
   } else {
     next.player = advanceShotCooldown(next.player);
@@ -130,17 +145,26 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   const enemyDamage: Record<number, number> = {};
   const remainingProjectiles: Projectile[] = [];
   for (const proj of next.projectiles) {
-    let hit = false;
+    let hitEnemy: Enemy | null = null;
     for (const enemy of next.enemies) {
       if (isDead(enemy)) continue;
       const d = Math.sqrt((proj.x - enemy.x) ** 2 + (proj.y - enemy.y) ** 2);
       if (d <= enemy.size + 8) {
-        enemyDamage[enemy.id] = (enemyDamage[enemy.id] ?? 0) + proj.damage;
-        hit = true;
+        hitEnemy = enemy;
         break;
       }
     }
-    if (!hit) remainingProjectiles.push(proj);
+
+    if (hitEnemy) {
+      enemyDamage[hitEnemy.id] = (enemyDamage[hitEnemy.id] ?? 0) + proj.damage;
+      next.enemies = next.enemies.map((e) =>
+        e.id === proj.targetEnemyId
+          ? { ...e, incomingDamage: Math.max(0, (e.incomingDamage ?? 0) - proj.damage) }
+          : e
+      );
+    } else {
+      remainingProjectiles.push(proj);
+    }
   }
   next.projectiles = remainingProjectiles;
   next.enemies = next.enemies.map((e) => {
