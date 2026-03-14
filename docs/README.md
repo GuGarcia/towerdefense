@@ -13,7 +13,8 @@ Jeu de tower defense en navigateur : le joueur contrôle une **forme géométriq
 
 ## Gameplay
 
-- En **tuant des ennemis**, le joueur gagne de **l’argent** et peut **améliorer ses caractéristiques** ; le coût des upgrades augmente (formule réglable via paramètres de partie).
+- **Cash** (en partie) : en tuant des ennemis et en atteignant des vagues, le joueur gagne du cash et peut **acheter des upgrades** ; le coût augmente de façon exponentielle (formule réglable via paramètres).
+- **Coins** (meta-progression) : en fin de run (mort ou quitter, pas si sauvegarde), le joueur gagne des coins pour améliorer les stats de départ et débloquer des upgrades (voir [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md)).
 - Les ennemis arrivent par **vagues** de plus en plus difficiles.
 - **Toutes les 10 vagues** : un **boss**.
 - **Durée cible** d’une partie : ~10 minutes (réglable via paramètres).
@@ -54,5 +55,6 @@ Ce README sert de **one-pager** : une référence unique pour ce qu’on attend 
 | **Menu / UI complète** | ✅ Fait — Routes (/, /custom, /play, /replay, /settings), i18n FR/EN, formulaire partie personnalisée, liste replays, partage (lien config + export). | [ROADMAP_V4_MENU.md](./ROADMAP_V4_MENU.md) |
 | **Mobile** | 🟡 En cours — Viewport OK. À faire : layout responsive (barre pause, upgrades, Custom), cibles tactiles 44px, safe area, optionnel PWA. | [ROADMAP_V5_MOBILE.md](./ROADMAP_V5_MOBILE.md) |
 | **Déploiement** | ⬜ À faire — Pas encore de Dockerfile ni docker-compose. Prévoir Dockerfile, `docker-compose.yml` (dokploy-network), .dockerignore, config Dokploy. | [ROADMAP_V6_DEPLOY.md](./ROADMAP_V6_DEPLOY.md) |
+| **Gameplay / Meta-progression** | ⬜ À faire — Coins (meta) vs cash (run), gain de coins en fin de partie, difficulté %, nouveaux stats (armure, thorns, crit, vampirisme, etc.), catégories d’upgrades, formules coût exponentiel / gain linéaire. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
 
 **Lancer en local** : `make dev` ou `cd front && bun run dev`.
