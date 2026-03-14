@@ -40,5 +40,21 @@ try {
   await writeFile(join(DIST, "player.css"), css);
 } catch (_) {}
 
+// Copy PWA manifest and icons
+const { mkdir } = await import("fs/promises");
+try {
+  const manifest = await readFile(join(ROOT, "manifest.json"));
+  await writeFile(join(DIST, "manifest.json"), manifest);
+} catch (_) {}
+try {
+  await mkdir(join(DIST, "icons"), { recursive: true });
+  const icon = await readFile(join(ROOT, "icons", "icon.svg"));
+  await writeFile(join(DIST, "icons", "icon.svg"), icon);
+} catch (_) {}
+try {
+  const sw = await readFile(join(ROOT, "sw.js"));
+  await writeFile(join(DIST, "sw.js"), sw);
+} catch (_) {}
+
 console.log("Build OK → dist/");
-console.log("  index.html, index.js, player.css, gameparams.json");
+console.log("  index.html, index.js, player.css, gameparams.json, manifest.json, icons/");

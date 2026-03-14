@@ -31,6 +31,19 @@ async function buildOnce() {
     const css = await readFile(join(ROOT, "player.css"));
     await writeFile(join(DIST, "player.css"), css);
   } catch (_) {}
+  try {
+    const manifest = await readFile(join(ROOT, "manifest.json"));
+    await writeFile(join(DIST, "manifest.json"), manifest);
+  } catch (_) {}
+  try {
+    await mkdir(join(DIST, "icons"), { recursive: true });
+    const icon = await readFile(join(ROOT, "icons", "icon.svg"));
+    await writeFile(join(DIST, "icons", "icon.svg"), icon);
+  } catch (_) {}
+  try {
+    const sw = await readFile(join(ROOT, "sw.js"));
+    await writeFile(join(DIST, "sw.js"), sw);
+  } catch (_) {}
   console.log("Build OK → dist/");
 }
 

@@ -12,6 +12,10 @@ if (!rootEl) throw new Error("Missing #root");
 
 const initialLocale = getStoredLocale();
 
+if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+
 createRoot(rootEl).render(
   <I18nProvider initialLocale={initialLocale}>
     <BrowserRouter>

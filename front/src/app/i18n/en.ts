@@ -81,6 +81,7 @@ export const en: TranslationKeys = {
   "game.statsEnemies": "Enemy stats",
   "game.info": "Game info",
   "game.seed": "Seed",
+  "game.rotateLandscape": "For a better experience, rotate your device to landscape.",
   "gameOver.title": "GAME OVER",
   "gameOver.replay": "Replay",
   "gameOver.backToMenu": "Back to menu",

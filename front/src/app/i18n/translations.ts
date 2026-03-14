@@ -86,6 +86,7 @@ export type TranslationKeys = {
   "game.statsEnemies": string;
   "game.info": string;
   "game.seed": string;
+  "game.rotateLandscape": string;
   "gameOver.title": string;
   "gameOver.replay": string;
   "gameOver.backToMenu": string;

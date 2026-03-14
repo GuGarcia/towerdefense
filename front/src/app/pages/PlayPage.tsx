@@ -158,6 +158,14 @@ export function PlayPage() {
     return () => document.body.classList.remove("play-page");
   }, []);
 
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const original = meta.getAttribute("content") ?? "";
+    meta.setAttribute("content", "width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no");
+    return () => meta.setAttribute("content", original);
+  }, []);
+
   const handleExport = useCallback(() => {
     controlsRef.current?.exportRecording();
   }, []);
