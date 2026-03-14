@@ -33,3 +33,18 @@ Si on ajoute un multiplicateur de difficulté **d** (ex. 1.0 = normal, 1.5 = dif
 - Le jeu a déjà `enemiesKilled` et `frameIndex` ; la vague est dérivée via `getWaveNumberAtFrame(frameIndex, params)`.
 - Il n’y a pas encore de score affiché ou persisté.
 - La difficulté (ROADMAP V7) est prévue comme multiplicateur global (50% / 100% / 150%) sur les stats des ennemis.
+
+---
+
+## Accessibilité
+
+Idées à considérer pour rendre le jeu plus accessible :
+
+- **Clavier** : navigation complète au clavier (menu, achats d’upgrades, pause).
+- **Contraste / thème** : option contraste élevé ou thème clair pour mieux distinguer joueur, ennemis et projectiles.
+- **Texte** : tailles de police configurables ou lisibles par défaut ; éviter le texte dans les images.
+- **Réduction de mouvement** : option pour limiter ou désactiver les animations / effets visuels intenses.
+- **Feedback sonore** : sons distincts pour les événements importants (kill, dégâts, vague) ; pas d’info critique uniquement visuelle.
+- **Sous-titres / indicateurs** : pour les sons importants si on ajoute du son.
+- **Focus visible** : contour ou indicateur clair pour l’élément focal (boutons, liens).
+- **ARIA / sémantique** : bons rôles et labels pour les lecteurs d’écran sur le menu et l’UI en jeu.
