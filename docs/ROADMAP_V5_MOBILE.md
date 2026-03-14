@@ -38,14 +38,14 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 | **3.1.1** Barre de pause | Pause à gauche ; Vitesse 1x/2x/3x + Auto à droite. Media query : `flex-wrap`, gap, boutons 44px min. | ✅ Fait |
 | **3.1.2** Barres d’upgrade (`#upgrade-bars`) | Scroll horizontal sur mobile (`overflow-x: auto`), barres en `min-width: 280px`, life bar réduite. À retravailler en V7 (catégories). | ✅ Fait |
 | **3.1.3** Canvas | Déjà en `width: 100%`, `height: 100%` et `resize()` dans `player/index.ts` qui fait `canvas.width = clientWidth`, `canvas.height = clientHeight`. Le rendu s’adapte. Vérifier le ratio (portrait vs paysage) : en portrait le canvas peut être très haut et étroit ; le jeu reste jouable mais l’affichage peut être dégradé. Option : encourager l’orientation paysage pour le jeu (message ou lock orientation si supporté). | Moyenne |
-| **3.1.4** Overlay Pause | Liste de boutons (Reprendre, Export, Charger replay, Paramètres, Quitter). En petit écran, s’assurer que la liste ne déborde pas et reste scrollable si besoin. Augmenter un peu la zone de tap si les boutons sont trop serrés. | Moyenne |
-| **3.1.5** Overlay Game Over | Même principe : titre, stats, boutons Rejouer / Retour / Sauvegarder. Vérifier tailles et espacements. | Moyenne |
+| **3.1.4** Overlay Pause | Liste scrollable (`overflow-y: auto`), padding safe-area, boutons 44px en mobile. | ✅ Fait |
+| **3.1.5** Overlay Game Over | Overflow + padding safe-area, titre/stats en `clamp()`, boutons 44px. | ✅ Fait |
 
 ### 3.2 Menu principal (`MenuPage`, `/`)
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **3.2.1** Titre et boutons | Titre 42px, boutons 18px. Sur très petit écran, réduire avec une media query (ex. titre 28px, boutons 16px) ou utiliser `clamp()`. | Moyenne |
+| **3.2.1** Titre et boutons | Titre et liens en `clamp()` (ex. titre 28px–42px, boutons 16px–18px). | ✅ Fait |
 | **3.2.2** Bannière config partagée | Déjà en `flexWrap: wrap`. Vérifier padding et lisibilité sur étroit. | Faible |
 
 ### 3.3 Partie personnalisée (`CustomPage`, `/custom`)
@@ -84,7 +84,7 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **5.1** Tailles de police relatives | Remplacer les tailles fixes (11px, 12px, 18px, etc.) par des valeurs responsives (media queries ou `clamp()`) pour que les textes restent lisibles sur petit écran sans être disproportionnés sur grand écran. Cibler en priorité : barre d’upgrade (11px), boutons de pause, titres. | Moyenne |
+| **5.1** Tailles de police relatives | `clamp()` sur titre/stats game over, boutons upgrade (11px), menu (titre, liens). | ✅ Fait |
 | **5.2** Contraste | Conserver un contraste suffisant (texte cyan sur fond sombre) pour la lisibilité en extérieur ou sur écran moyen. Pas de changement attendu si la charte actuelle est respectée. | Faible |
 
 ---
@@ -133,7 +133,7 @@ Et dans le viewport (si besoin) :
 ## 9 — Récapitulatif des priorités
 
 - **Fait** : Viewport, pull-to-refresh, barre de pause (wrap, 1x–3x + Auto), barres d’upgrade (scroll horizontal), Custom (colonnes, sliders 44px), cibles 44px, safe area, feedback :active.
-- **Reste (priorité moyenne)** : Overlays Pause / Game Over (scroll, espacements), menu (typo responsive), Replay (tailles tap), typo clamp(), zoom optionnel.
+- **Reste (priorité moyenne)** : Replay (tailles tap), zoom optionnel. Optionnel : message orientation paysage.
 - **Basse** : PWA, message orientation paysage.
 
 ---

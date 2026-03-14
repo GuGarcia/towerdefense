@@ -20,7 +20,7 @@ const menuStyles: React.CSSProperties = {
 };
 
 const titleStyles: React.CSSProperties = {
-  fontSize: "42px",
+  fontSize: "clamp(28px, 5vw, 42px)",
   fontWeight: "bold",
   marginBottom: "16px",
   textShadow: "0 0 20px rgba(0, 255, 204, 0.5)",
@@ -28,7 +28,7 @@ const titleStyles: React.CSSProperties = {
 
 const linkStyles: React.CSSProperties = {
   padding: "14px 32px",
-  fontSize: "18px",
+  fontSize: "clamp(16px, 2.5vw, 18px)",
   fontWeight: 600,
   color: "#00ffcc",
   background: "rgba(0, 255, 204, 0.1)",
