@@ -11,9 +11,9 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
 | **1.1** Viewport | Déjà en place : `<meta name="viewport" content="width=device-width, initial-scale=1.0" />`. Vérifier qu’aucun autre meta ne le surcharge. | ✅ Fait |
-| **1.2** Empêcher le zoom involontaire en jeu | Sur la page de jeu (`/play`), `touch-action: manipulation` sur #game-wrapper limite le double-tap zoom. Option : `user-scalable=no` dans le viewport pour bloquer tout zoom. | ✅ Partiel |
+| **1.2** Empêcher le zoom involontaire en jeu | Sur `/play` : viewport meta mis à jour en JS avec `user-scalable=no` au montage, restauré au démontage. `touch-action: manipulation` sur #game-wrapper. | ✅ Fait |
 | **1.3** Pull-to-refresh | Désactiver le pull-to-refresh sur la zone jeu quand on est sur `/play`. CSS `overscroll-behavior: none` sur `body.play-page`. | ✅ Fait |
-| **1.4** Barre d’adresse / mode standalone | Pour une expérience type « app », prévoir un manifest PWA (§7) avec `display: standalone` ou `minimal-ui`. | Basse |
+| **1.4** Barre d’adresse / mode standalone | Manifest PWA avec `display: standalone` (§7). | ✅ Fait |
 
 ---
 
@@ -115,9 +115,9 @@ Et dans le viewport (si besoin) :
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **7.1** Manifest | Ajouter un `manifest.json` (ou équivalent) avec nom, short_name, icônes (plusieurs résolutions), `display: standalone` ou `minimal-ui`, `theme_color`, `background_color`. | Basse |
-| **7.2** Service Worker | Pour un mode hors-ligne basique ou un chargement plus rapide, enregistrer un service worker. Peut être fait dans un second temps. | Basse |
-| **7.3** Icônes | Fournir au moins une icône 192×192 et une 512×512 pour le splash et l’écran d’accueil. | Basse |
+| **7.1** Manifest | `manifest.json` : name, short_name, display: standalone, theme_color, background_color, icône SVG. Lien dans index.html + meta theme-color. | ✅ Fait |
+| **7.2** Service Worker | `sw.js` : cache des assets. Enregistrement dans l'app. | ✅ Fait |
+| **7.3** Icônes | Icône SVG (pentagone néon) dans `icons/icon.svg`, référencée dans le manifest. | ✅ Fait |
 
 ---
 
@@ -125,16 +125,15 @@ Et dans le viewport (si besoin) :
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **8.1** Message orientation | En portrait, le canvas peut être très étroit. Option : afficher un message du type « Pour une meilleure expérience, tournez votre appareil en paysage » sur `/play` quand `window.innerWidth < window.innerHeight` (ou seuil proche). Masquer le message en paysage. | Basse |
+| **8.1** Message orientation | Non retenu : le jeu reste jouable en **portrait et en paysage**, pas d’overlay bloquant. | — |
 | **8.2** Lock orientation | L’API Screen Orientation (lock) n’est pas supportée partout et peut être intrusive. À considérer seulement si le jeu devient vraiment illisible en portrait. | Basse |
 
 ---
 
 ## 9 — Récapitulatif des priorités
 
-- **Fait** : Viewport, pull-to-refresh, barre de pause (wrap, 1x–3x + Auto), barres d’upgrade (scroll horizontal), Custom (colonnes, sliders 44px), cibles 44px, safe area, feedback :active.
-- **Reste (priorité moyenne)** : Replay (tailles tap), zoom optionnel. Optionnel : message orientation paysage.
-- **Basse** : PWA, message orientation paysage.
+- **Fait** : Viewport, zoom désactivé sur /play (user-scalable=no), pull-to-refresh, barre de pause, barres d’upgrade (scroll), Custom responsive, cibles 44px, safe area, overlays scroll, typo clamp(), PWA (manifest, icône SVG, service worker). Jeu jouable en portrait et paysage.
+- **Reste (priorité moyenne)** : Replay (tailles tap).
 
 ---
 
@@ -146,7 +145,7 @@ Et dans le viewport (si besoin) :
 4. **Safe area** : viewport-fit et padding env(safe-area-inset-*).
 5. **Comportement** : overscroll-behavior / prevention du refresh sur la page jeu ; ajustement hover/active.
 6. **Typo** : clamp() ou media queries pour les textes critiques.
-7. **Optionnel** : PWA manifest, message d’orientation paysage.
+7. **Optionnel** : PWA manifest (fait). Jeu utilisable en portrait et paysage (pas de message d’orientation).
 
 ---
 
