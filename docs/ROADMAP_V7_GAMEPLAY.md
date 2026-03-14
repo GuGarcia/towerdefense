@@ -59,6 +59,8 @@ Valeurs de départ (à équilibrer) : **1 coin/vague**, **1 coin/boss**, **100 %
 
 ### 4.1 Noms et catégories
 
+**UI** : La barre d'upgrades en bas d'écran (actuellement peu utilisable) sera retravaillée avec l'introduction des catégories : organisation par onglets ou sections (Attack / Defense / Economy / Utility), lisibilité et cibles tactiles.
+
 Les upgrades sont répartis en **4 catégories** pour l’UI (pas de limite du nombre d’upgrades par catégorie en run) :
 
 | Catégorie | Rôle |

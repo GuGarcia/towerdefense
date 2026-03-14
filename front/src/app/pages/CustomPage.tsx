@@ -95,6 +95,11 @@ const rowStyles: React.CSSProperties = {
 };
 
 const labelStyles: React.CSSProperties = { minWidth: "180px", fontSize: "13px" };
+
+const customRowClass = "custom-row";
+const customLabelClass = "custom-label";
+const customSectionClass = "custom-section";
+const customActionsClass = "custom-actions";
 const inputStyles: React.CSSProperties = {
   padding: "6px 10px",
   fontFamily: "monospace",
@@ -120,8 +125,8 @@ function SliderRow({
   onChange: (v: number) => void;
 }) {
   return (
-    <div style={rowStyles}>
-      <span style={labelStyles}>{label}</span>
+    <div className={customRowClass} style={rowStyles}>
+      <span className={customLabelClass} style={labelStyles}>{label}</span>
       <input
         type="range"
         min={min}
@@ -152,8 +157,8 @@ function NumberInput({
   onChange: (v: number) => void;
 }) {
   return (
-    <div style={rowStyles}>
-      <span style={labelStyles}>{label}</span>
+    <div className={customRowClass} style={rowStyles}>
+      <span className={customLabelClass} style={labelStyles}>{label}</span>
       <input
         type="number"
         min={min}
@@ -255,12 +260,12 @@ export function CustomPage() {
   }, [form]);
 
   return (
-    <div style={pageStyles}>
+    <div className="custom-page" style={pageStyles}>
       <h1 style={{ marginBottom: "16px", fontSize: "24px" }}>{t("custom.title")}</h1>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.myConfigs")}</h2>
-        <div style={{ ...rowStyles, flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
+        <div className={customRowClass} style={{ ...rowStyles, flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
           <input
             type="text"
             placeholder={t("custom.configNamePlaceholder")}
@@ -278,7 +283,7 @@ export function CustomPage() {
         {savedConfigs.length > 0 && (
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {savedConfigs.map((c) => (
-              <li key={c.id} style={{ ...rowStyles, marginBottom: "6px" }}>
+              <li key={c.id} className={customRowClass} style={{ ...rowStyles, marginBottom: "6px" }}>
                 <span style={{ flex: 1, fontSize: "13px", overflow: "hidden", textOverflow: "ellipsis" }}>{c.name}</span>
                 <button type="button" style={{ ...inputStyles, cursor: "pointer", padding: "4px 10px" }} onClick={() => handleLoadConfig(c.form)}>
                   {t("custom.loadConfig")}
@@ -292,10 +297,10 @@ export function CustomPage() {
         )}
       </div>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.seed")}</h2>
-        <div style={rowStyles}>
-          <span style={labelStyles}>{t("custom.seed")}</span>
+        <div className={customRowClass} style={rowStyles}>
+          <span className={customLabelClass} style={labelStyles}>{t("custom.seed")}</span>
           <input
             type="number"
             value={form.seed}
@@ -308,7 +313,7 @@ export function CustomPage() {
         </div>
       </div>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionPlayer")}</h2>
         <SliderRow label={t("custom.playerLife")} value={form.player.initialLife} min={20} max={500} step={5} onChange={(v) => updateNested("player", "initialLife", v)} />
         <SliderRow label={t("custom.playerMaxLife")} value={form.player.initialMaxLife} min={20} max={500} step={5} onChange={(v) => updateNested("player", "initialMaxLife", v)} />
@@ -318,7 +323,7 @@ export function CustomPage() {
         <SliderRow label={t("custom.playerRange")} value={form.player.initialRange ?? 300} min={100} max={800} step={25} onChange={(v) => updateNested("player", "initialRange", v)} />
       </div>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionEconomy")}</h2>
         <SliderRow label={t("custom.costBase")} value={form.economy.upgradeCostBase} min={1} max={100} step={1} onChange={(v) => updateNested("economy", "upgradeCostBase", v)} />
         <SliderRow label={t("custom.costIncrement")} value={form.economy.upgradeCostIncrement} min={0} max={50} step={1} onChange={(v) => updateNested("economy", "upgradeCostIncrement", v)} />
@@ -329,7 +334,7 @@ export function CustomPage() {
         <SliderRow label={t("custom.waveBonusIncrement")} value={form.economy.waveBonusIncrement} min={0} max={50} step={1} onChange={(v) => updateNested("economy", "waveBonusIncrement", v)} />
       </div>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionWaves")}</h2>
         <SliderRow label={t("custom.wave1Factor")} value={form.wave.wave1DifficultyFactor} min={0.1} max={1.5} step={0.1} onChange={(v) => updateNested("wave", "wave1DifficultyFactor", v)} />
         <SliderRow label={t("custom.scalingLife")} value={form.wave.difficultyScaling.life} min={1} max={1.5} step={0.01} onChange={(v) => updateDeep("wave", "difficultyScaling", "life", v)} />
@@ -339,7 +344,7 @@ export function CustomPage() {
         <NumberInput label={t("custom.bossEvery")} value={form.wave.bossEveryNWaves} min={1} max={30} onChange={(v) => updateNested("wave", "bossEveryNWaves", v)} />
       </div>
 
-      <div style={sectionStyles}>
+      <div className={customSectionClass} style={sectionStyles}>
         <h2 style={{ marginBottom: "12px", fontSize: "16px" }}>{t("custom.sectionEnemies")}</h2>
         <h3 style={{ fontSize: "14px", marginBottom: "8px" }}>{t("custom.enemyBase")}</h3>
         <SliderRow label={t("custom.enemyLife")} value={form.enemies.base.life} min={5} max={100} step={1} onChange={(v) => updateDeep("enemies", "base", "life", v)} />
@@ -360,7 +365,7 @@ export function CustomPage() {
         <SliderRow label={t("custom.enemySize")} value={form.enemies.boss.size} min={16} max={80} step={2} onChange={(v) => updateDeep("enemies", "boss", "size", v)} />
       </div>
 
-      <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
+      <div className={customActionsClass} style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
         <Link to="/" style={{ color: "#00ffcc", padding: "10px 20px", border: "2px solid #00ffcc", borderRadius: "6px", textDecoration: "none" }}>
           {t("custom.cancel")}
         </Link>

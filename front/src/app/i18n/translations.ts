@@ -83,6 +83,9 @@ export type TranslationKeys = {
   "pause.quit": string;
   "pause.speed": string;
   "pause.auto": string;
+  "game.statsEnemies": string;
+  "game.info": string;
+  "game.seed": string;
   "gameOver.title": string;
   "gameOver.replay": string;
   "gameOver.backToMenu": string;

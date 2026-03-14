@@ -90,12 +90,17 @@ export interface Viewport {
   height: number;
 }
 
+export interface RenderOptions {
+  /** When true, draw the enemy stats HUD (Ennemis vague X, PV/Vit/Dég etc.). Default false. */
+  showEnemyStats?: boolean;
+}
+
 export function createCanvasRenderer(
   canvas: HTMLCanvasElement,
   getScale: () => number,
   theme: RenderTheme = NEON_THEME
-): (game: Game, viewport?: Viewport) => void {
-  return function render(game: Game, viewport?: Viewport): void {
+): (game: Game, viewport?: Viewport, options?: RenderOptions) => void {
+  return function render(game: Game, viewport?: Viewport, options?: RenderOptions): void {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -129,7 +134,9 @@ export function createCanvasRenderer(
     ctx.restore();
 
     drawWaveHud(ctx, game, vp, theme);
-    drawEnemyStatsHud(ctx, game, vp, theme);
+    if (options?.showEnemyStats) {
+      drawEnemyStatsHud(ctx, game, vp, theme);
+    }
   };
 }
 

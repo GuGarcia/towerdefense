@@ -1,9 +1,9 @@
 /**
  * Game view: renders the player DOM (canvas, overlay, upgrade bars) and runs the game loop.
- * One bar: Pause (left), speed 1x/2x/3x/5x/10x (right). Export and Load replay in pause menu.
+ * One bar: Pause (left), speed 1x/2x/3x (right). Export and Load replay in pause menu.
  */
 import type { GameRecording } from "../../player/infrastructure/replay/GameRecording";
-import type { RunPlayerControls } from "../../player";
+import type { RunPlayerControls, InfoPanelData } from "../../player";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
@@ -14,7 +14,7 @@ const containerStyles: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   width: "100%",
-  height: "100vh",
+  height: "100%",
   overflow: "hidden",
   background: "#0a0a0f",
 };
@@ -70,7 +70,7 @@ const speedBtnStyles = (active: boolean): React.CSSProperties => ({
   cursor: "pointer",
 });
 
-const SPEED_VALUES = [1, 2, 3, 5, 10] as const;
+const SPEED_VALUES = [1, 2, 3] as const;
 
 type PlayLocationState =
   | { paramsOverrides?: Record<string, unknown>; loadReplayId?: string }
@@ -85,6 +85,19 @@ export function PlayPage() {
   const [paused, setPaused] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [autoMode, setAutoMode] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoPanelData, setInfoPanelData] = useState<InfoPanelData | null>(null);
+
+  useEffect(() => {
+    if (!showInfo || !controlsRef.current) return;
+    let rafId: number;
+    const tick = () => {
+      setInfoPanelData(controlsRef.current?.getInfoPanelData() ?? null);
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [showInfo]);
 
   const state = location.state as PlayLocationState;
   const paramsOverrides = state?.paramsOverrides;
@@ -140,6 +153,11 @@ export function PlayPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    document.body.classList.add("play-page");
+    return () => document.body.classList.remove("play-page");
+  }, []);
+
   const handleExport = useCallback(() => {
     controlsRef.current?.exportRecording();
   }, []);
@@ -178,27 +196,14 @@ export function PlayPage() {
   );
 
   return (
-    <div style={containerStyles}>
-      <div style={pauseBarStyles}>
-        <div style={speedGroupStyles}>
+    <div className="play-page-container" style={containerStyles}>
+      <div className="pause-bar" style={pauseBarStyles}>
+        <div className="speed-group" style={speedGroupStyles}>
           <button type="button" style={pauseButtonStyles} onClick={openPause}>
             {t("pause.title")}
           </button>
-          <button
-            type="button"
-            style={speedBtnStyles(autoMode)}
-            onClick={() => {
-              setAutoMode((prev) => {
-                const next = !prev;
-                controlsRef.current?.setAutoMode(next);
-                return next;
-              });
-            }}
-          >
-            {t("pause.auto")}
-          </button>
         </div>
-        <div style={speedGroupStyles}>
+        <div className="speed-group" style={speedGroupStyles}>
           <span style={{ fontSize: "12px", marginRight: "4px", color: "rgba(0,255,204,0.9)" }}>
             {t("pause.speed")}:
           </span>
@@ -215,10 +220,115 @@ export function PlayPage() {
               {s}x
             </button>
           ))}
+          <button
+            type="button"
+            style={speedBtnStyles(autoMode)}
+            onClick={() => {
+              setAutoMode((prev) => {
+                const next = !prev;
+                controlsRef.current?.setAutoMode(next);
+                return next;
+              });
+            }}
+          >
+            {t("pause.auto")}
+          </button>
         </div>
       </div>
       <div id="game-wrapper" style={{ flex: 1, minHeight: 0, position: "relative", display: "flex" }}>
         <canvas id="game" style={{ display: "block", width: "100%", height: "100%" }} width={800} height={600} />
+        <button
+          type="button"
+          className="game-info-btn"
+          onClick={() => setShowInfo((prev) => !prev)}
+          title={t("game.info")}
+          style={{
+            position: "absolute",
+            top: "8px",
+            right: "8px",
+            zIndex: 12,
+            width: "32px",
+            height: "32px",
+            minWidth: "32px",
+            minHeight: "32px",
+            padding: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "monospace",
+            fontSize: "16px",
+            fontWeight: 600,
+            color: showInfo ? "rgba(0, 255, 204, 1)" : "rgba(0, 255, 204, 0.85)",
+            background: showInfo ? "rgba(0, 255, 204, 0.25)" : "rgba(0, 255, 204, 0.1)",
+            border: "1px solid #00ffcc",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          ⓘ
+        </button>
+        {showInfo && (
+          <div
+            className="game-info-overlay"
+            style={{
+              position: "absolute",
+              top: "48px",
+              right: "8px",
+              left: "8px",
+              maxWidth: "320px",
+              marginLeft: "auto",
+              zIndex: 12,
+              background: "rgba(15, 15, 24, 0.98)",
+              border: "2px solid #00ffcc",
+              borderRadius: "8px",
+              padding: "16px 20px",
+              color: "#00ffcc",
+              fontFamily: "monospace",
+              fontSize: "14px",
+              boxShadow: "0 0 24px rgba(0, 255, 204, 0.3)",
+            }}
+          >
+            <div style={{ marginBottom: "8px", fontWeight: 600 }}>{t("game.info")}</div>
+            <div style={{ marginBottom: "12px" }}>
+              {t("game.seed")}: {infoPanelData?.seed ?? controlsRef.current?.getSeed() ?? "—"}
+            </div>
+            {infoPanelData && (
+              <div style={{ marginBottom: "12px", fontSize: "12px" }}>
+                <div style={{ fontWeight: 600, marginBottom: "6px" }}>
+                  {t("game.statsEnemies")} (vague {infoPanelData.waveNumber})
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "4rem 2.5rem 2.5rem 2.5rem 2rem",
+                    gap: "2px 8px",
+                    alignItems: "baseline",
+                  }}
+                >
+                  <span style={{ opacity: 0.85 }}> </span>
+                  <span style={{ opacity: 0.85, textAlign: "center" }}>❤</span>
+                  <span style={{ opacity: 0.85, textAlign: "center" }}>⚡</span>
+                  <span style={{ opacity: 0.85, textAlign: "center" }}>⚔</span>
+                  <span style={{ opacity: 0.85, textAlign: "center" }}>×</span>
+                  {(["base", "rapid", "boss"] as const).map((key) => {
+                    const s = infoPanelData.stats[key];
+                    const label = key === "base" ? "Base" : key === "rapid" ? "Rapide" : "Boss";
+                    const color = key === "boss" ? "#ff3366" : key === "rapid" ? "#c44dff" : "#ff6b9d";
+                    return (
+                      <div key={key} style={{ display: "contents" }}>
+                        <span style={{ color }}>{label}</span>
+                        <span style={{ opacity: 0.9, textAlign: "center" }}>{Math.round(s.life)}</span>
+                        <span style={{ opacity: 0.9, textAlign: "center" }}>{s.speed.toFixed(1)}</span>
+                        <span style={{ opacity: 0.9, textAlign: "center" }}>{Math.round(s.damage)}</span>
+                        <span style={{ opacity: 0.9, textAlign: "center" }}>{s.count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div
           id="game-overlay"
           style={{
@@ -246,7 +356,7 @@ export function PlayPage() {
       <div id="upgrade-bars" />
 
       {paused && (
-        <div style={pauseOverlayStyles}>
+        <div className="pause-overlay" style={pauseOverlayStyles}>
           <h2 style={{ marginBottom: "8px" }}>— {t("pause.title")} —</h2>
           <button type="button" style={pauseButtonStyles} onClick={closePause}>
             {t("pause.resume")}

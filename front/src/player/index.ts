@@ -5,7 +5,7 @@
 import { createGame, tick, type Game, type GameInput } from "./domain/game/Game";
 import { createGameParams } from "./domain/game/GameParams";
 import { GameState } from "./domain/game/GameState";
-import { getWaveNumberAtFrame } from "./domain/wave/WaveSpawner";
+import { getWaveNumberAtFrame, getWaveEnemyStats } from "./domain/wave/WaveSpawner";
 import { getUpgradeLevel } from "./domain/player/Player";
 import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { createRafClock } from "./infrastructure/clock/FixedClock";
@@ -76,12 +76,21 @@ export interface RunPlayerOptions {
   saveButtonLabel?: string;
 }
 
+/** Data for the info panel (seed + enemy stats for current wave). */
+export interface InfoPanelData {
+  seed: number;
+  waveNumber: number;
+  stats: ReturnType<typeof getWaveEnemyStats>;
+}
+
 export type RunPlayerControls = {
   stop: () => void;
   pause: () => void;
   resume: () => void;
   setSpeedMultiplier: (n: number) => void;
   setAutoMode: (on: boolean) => void;
+  getSeed: () => number;
+  getInfoPanelData: () => InfoPanelData;
   exportRecording: () => void;
   loadReplay: (recording: GameRecording) => void;
 };
@@ -102,6 +111,8 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     resume: () => {},
     setSpeedMultiplier: () => {},
     setAutoMode: () => {},
+    getSeed: () => 0,
+    getInfoPanelData: () => ({ seed: 0, waveNumber: 1, stats: { base: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, rapid: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, boss: { life: 0, speed: 0, damage: 0, size: 0, count: 0 } } }),
     exportRecording: () => {},
     loadReplay: () => {},
   };
@@ -295,21 +306,6 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     return viewports;
   }
 
-  function drawSeedTopRight(
-    c: CanvasRenderingContext2D,
-    vp: { x: number; y: number; width: number; height: number },
-    seed: number
-  ): void {
-    c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    c.fillStyle = "rgba(0, 255, 204, 0.9)";
-    c.font = "11px monospace";
-    c.textAlign = "right";
-    c.fillText(`Seed ${seed}`, vp.x + vp.width - 6, vp.y + 14);
-    c.textAlign = "left";
-    c.restore();
-  }
-
   function step(): void {
     for (let s = 0; s < speedMultiplier; s++) {
       for (let i = 0; i < gameStates.length; i++) {
@@ -322,8 +318,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const viewports = getViewports();
     for (let i = 0; i < gameStates.length; i++) {
-      renderer(gameStates[i], viewports[i]);
-      drawSeedTopRight(ctx, viewports[i], seeds[i]);
+      renderer(gameStates[i], viewports[i], { showEnemyStats: false });
     }
     updateUpgradeBarsUI();
   }
@@ -346,6 +341,13 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     },
     setAutoMode: (on) => {
       autoMode = on;
+    },
+    getSeed: () => seeds[0],
+    getInfoPanelData: () => {
+      const game = gameStates[0];
+      const waveNumber = game ? Math.max(1, getWaveNumberAtFrame(game.frameIndex, game.params)) : 1;
+      const params = game?.params ?? createGameParams();
+      return { seed: seeds[0], waveNumber, stats: getWaveEnemyStats(params, waveNumber) };
     },
     exportRecording: doExport,
     loadReplay: doLoadReplay,

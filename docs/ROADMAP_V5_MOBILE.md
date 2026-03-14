@@ -31,6 +31,8 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 ### 3.1 Page de jeu (`PlayPage`, `/play`)
 
+**Note** : La barre d'upgrades en bas (`#upgrade-bars`) est peu utilisable en l'état ; elle sera retravaillée avec la V7 (catégories d'upgrades, cf. [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md)).
+
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
 | **3.1.1** Barre de pause | Actuellement : flex avec « Pause », « Auto », et les boutons 1x–10x côte à côte. Sur petit écran, tout ne tient pas. Adapter : passer en `flex-wrap` ou regrouper les vitesses dans un menu déroulant / sous-menu, ou réduire padding et taille de police. | Haute |
