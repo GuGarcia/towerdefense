@@ -41,7 +41,6 @@ try {
 } catch (_) {}
 
 // Copy PWA manifest and icons
-const { mkdir } = await import("fs/promises");
 try {
   const manifest = await readFile(join(ROOT, "manifest.json"));
   await writeFile(join(DIST, "manifest.json"), manifest);

@@ -54,7 +54,7 @@ Ce README sert de **one-pager** : une référence unique pour ce qu’on attend 
 | **Migration front** | ✅ Fait — Code player dans `front/src/player/` (domain, application, infrastructure). Makefile et entrée ciblent `front/`. | [ROADMAP_V3_AUDIT.md](./ROADMAP_V3_AUDIT.md) |
 | **Menu / UI complète** | ✅ Fait — Routes (/, /custom, /play, /replay, /settings), i18n FR/EN, formulaire partie personnalisée, liste replays, partage (lien config + export). | [ROADMAP_V4_MENU.md](./ROADMAP_V4_MENU.md) |
 | **Mobile** | 🟡 En cours — Viewport, safe area, zoom désactivé sur /play, barre pause, upgrades (scroll), Custom responsive, cibles 44px, overlays, typo clamp(), PWA. Jeu en portrait et paysage. Reste : Replay (tailles tap), etc. | [ROADMAP_V5_MOBILE.md](./ROADMAP_V5_MOBILE.md) |
-| **Déploiement** | ⬜ À faire — Pas encore de Dockerfile ni docker-compose. Prévoir Dockerfile, `docker-compose.yml` (dokploy-network), .dockerignore, config Dokploy. | [ROADMAP_V6_DEPLOY.md](./ROADMAP_V6_DEPLOY.md) |
+| **Déploiement** | 🟡 En cours — Dockerfile (`front/`), `docker-compose.yml` (dokploy-network), `.dockerignore`, `.env.example`. Reste : config Dokploy (Compose path, domaine, webhook). | [ROADMAP_V6_DEPLOY.md](./ROADMAP_V6_DEPLOY.md) |
 | **Gameplay / Meta-progression** | ⬜ À faire — Coins (meta) vs cash (run), gain de coins en fin de partie, difficulté %, nouveaux stats (armure, thorns, crit, vampirisme, etc.), catégories d’upgrades, formules coût exponentiel / gain linéaire. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
 
 **Lancer en local** : `make dev` ou `cd front && bun run dev`.
