@@ -58,7 +58,7 @@ Ce document décrit les étapes pour préparer le dépôt au déploiement avec *
 | **5.1** Projet et service | Créer un projet puis un service de type **Docker Compose**, relié au dépôt Git (GitHub, etc.). | Haute |
 | **5.2** Compose path | Définir le chemin du fichier Compose : `./docker-compose.yml`. Branche : en général `main` ou `master`. | Haute |
 | **5.3** Domaine | Dans l’onglet **Domains**, associer un domaine (A record pointant vers le serveur) et le faire correspondre au service (port du container). Prévoir HTTPS via Let’s Encrypt (Traefik). | Haute |
-| **5.4** Webhook | Activer le webhook fourni par Dokploy pour déclencher un déploiement automatique à chaque push sur la branche cible. | Moyenne |
+| **5.4** Webhook | Webhook activé : déploiement auto sur push `main`. | ✅ Fait |
 
 ---
 
@@ -83,7 +83,7 @@ Ce document décrit les étapes pour préparer le dépôt au déploiement avec *
 ## 8 — Récapitulatif des priorités
 
 - **Côté repo (fait)** : Dockerfile (`front/`), docker-compose.yml (service `web`, réseau `dokploy-network`, port 80), nginx pour les statiques, .dockerignore (`front/`), .env.example.
-- **Reste** : Configuration Dokploy (Compose path `./docker-compose.yml`, domaine, webhook).
+- **Reste** : Rien (Compose path, domaine, webhook en place ; prod https://td.gugarcia.ovh/).
 - **Moyenne** : Variables d’environnement (env_file / environment), .env.example, webhook.
 - **Basse** : Labels Traefik dans le compose (si pas d’usage de l’onglet Domains), volumes, doc des variables.
 
