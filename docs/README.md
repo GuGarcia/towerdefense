@@ -53,7 +53,7 @@ Ce README sert de **one-pager** : une référence unique pour ce qu’on attend 
 | **Cœur jeu (domaine, app, infra)** | ✅ Fait — Phases 0 à 3 du [ROADMAP](./ROADMAP.md) : setup, domaine (Game, Player, Enemy, Wave, économie, replay), boucle de jeu, rendu Canvas. | [ROADMAP.md](./ROADMAP.md) |
 | **Migration front** | ✅ Fait — Code player dans `front/src/player/` (domain, application, infrastructure). Makefile et entrée ciblent `front/`. | [ROADMAP_V3_AUDIT.md](./ROADMAP_V3_AUDIT.md) |
 | **Menu / UI complète** | ✅ Fait — Routes (/, /custom, /play, /replay, /settings), i18n FR/EN, formulaire partie personnalisée, liste replays, partage (lien config + export). | [ROADMAP_V4_MENU.md](./ROADMAP_V4_MENU.md) |
-| **Mobile** | 🟡 En cours — Viewport OK. À faire : layout responsive (barre pause, upgrades, Custom), cibles tactiles 44px, safe area, optionnel PWA. | [ROADMAP_V5_MOBILE.md](./ROADMAP_V5_MOBILE.md) |
+| **Mobile** | 🟡 En cours — Viewport, safe area, barre pause (wrap, 1x–3x), upgrades (scroll), Custom responsive, cibles 44px, overscroll/pull-to-refresh. Reste : overlays, typo, Replay, optionnel PWA. | [ROADMAP_V5_MOBILE.md](./ROADMAP_V5_MOBILE.md) |
 | **Déploiement** | ⬜ À faire — Pas encore de Dockerfile ni docker-compose. Prévoir Dockerfile, `docker-compose.yml` (dokploy-network), .dockerignore, config Dokploy. | [ROADMAP_V6_DEPLOY.md](./ROADMAP_V6_DEPLOY.md) |
 | **Gameplay / Meta-progression** | ⬜ À faire — Coins (meta) vs cash (run), gain de coins en fin de partie, difficulté %, nouveaux stats (armure, thorns, crit, vampirisme, etc.), catégories d’upgrades, formules coût exponentiel / gain linéaire. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
 

@@ -11,8 +11,8 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
 | **1.1** Viewport | Déjà en place : `<meta name="viewport" content="width=device-width, initial-scale=1.0" />`. Vérifier qu’aucun autre meta ne le surcharge. | ✅ Fait |
-| **1.2** Empêcher le zoom involontaire en jeu | Sur la page de jeu (`/play`), ajouter `user-scalable=no` ou gérer `touch-action: none` sur le canvas pour éviter le pinch-zoom pendant la partie. Alternative : laisser le zoom mais éviter les double-tap zoom sur les boutons. | Moyenne |
-| **1.3** Pull-to-refresh | Désactiver le pull-to-refresh sur la zone jeu (body ou #root en plein écran) quand on est sur `/play`, pour ne pas recharger la page en pleine partie. CSS `overscroll-behavior: none` ou JS `preventDefault` sur touchmove. | Moyenne |
+| **1.2** Empêcher le zoom involontaire en jeu | Sur la page de jeu (`/play`), `touch-action: manipulation` sur #game-wrapper limite le double-tap zoom. Option : `user-scalable=no` dans le viewport pour bloquer tout zoom. | ✅ Partiel |
+| **1.3** Pull-to-refresh | Désactiver le pull-to-refresh sur la zone jeu quand on est sur `/play`. CSS `overscroll-behavior: none` sur `body.play-page`. | ✅ Fait |
 | **1.4** Barre d’adresse / mode standalone | Pour une expérience type « app », prévoir un manifest PWA (§7) avec `display: standalone` ou `minimal-ui`. | Basse |
 
 ---
@@ -23,7 +23,7 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 |-------|--------|----------|
 | **2.1** Clics = taps | Les événements `click` sont déjà déclenchés par un tap sur mobile. S’assurer qu’aucun délai important (ex. 300 ms) n’est ajouté (les navigateurs modernes l’ont en grande partie supprimé). Pas de changement majeur attendu. | Faible |
 | **2.2** Zone tactile du canvas | Le canvas ne reçoit pas de clic pour le gameplay (pas de visée souris). Les seules zones interactives sont les barres d’upgrade et les overlays. Vérifier que les boutons de l’overlay Game Over et Pause restent bien cliquables (z-index, taille). | Faible |
-| **2.3** Pas de hover sur mobile | Remplacer ou compléter les styles `:hover` par des états visibles au focus / `:active` pour les boutons, afin que le feedback soit clair au doigt. Vérifier `player.css` (boutons upgrade, overlay) et les styles inline des pages. | Moyenne |
+| **2.3** Pas de hover sur mobile | Remplacer ou compléter les styles `:hover` par des états visibles au focus / `:active` pour les boutons. `:active` ajouté sur les boutons d’overlay (game over, pause). | ✅ Fait |
 
 ---
 
@@ -35,8 +35,8 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **3.1.1** Barre de pause | Actuellement : flex avec « Pause », « Auto », et les boutons 1x–10x côte à côte. Sur petit écran, tout ne tient pas. Adapter : passer en `flex-wrap` ou regrouper les vitesses dans un menu déroulant / sous-menu, ou réduire padding et taille de police. | Haute |
-| **3.1.2** Barres d’upgrade (`#upgrade-bars`) | Une barre par joueur avec life bar (100px min), 5 boutons d’upgrade, argent. En mobile portrait, une seule barre peut déjà dépasser. Options : (a) scroll horizontal avec `overflow-x: auto` et barres en `min-width`, (b) réduire le nombre de boutons visibles (icônes + menu), (c) life bar plus courte et texte plus petit. Adapter `player.css` et éventuellement `setupUpgradeBars.ts` (structure ou classes). | Haute |
+| **3.1.1** Barre de pause | Pause à gauche ; Vitesse 1x/2x/3x + Auto à droite. Media query : `flex-wrap`, gap, boutons 44px min. | ✅ Fait |
+| **3.1.2** Barres d’upgrade (`#upgrade-bars`) | Scroll horizontal sur mobile (`overflow-x: auto`), barres en `min-width: 280px`, life bar réduite. À retravailler en V7 (catégories). | ✅ Fait |
 | **3.1.3** Canvas | Déjà en `width: 100%`, `height: 100%` et `resize()` dans `player/index.ts` qui fait `canvas.width = clientWidth`, `canvas.height = clientHeight`. Le rendu s’adapte. Vérifier le ratio (portrait vs paysage) : en portrait le canvas peut être très haut et étroit ; le jeu reste jouable mais l’affichage peut être dégradé. Option : encourager l’orientation paysage pour le jeu (message ou lock orientation si supporté). | Moyenne |
 | **3.1.4** Overlay Pause | Liste de boutons (Reprendre, Export, Charger replay, Paramètres, Quitter). En petit écran, s’assurer que la liste ne déborde pas et reste scrollable si besoin. Augmenter un peu la zone de tap si les boutons sont trop serrés. | Moyenne |
 | **3.1.5** Overlay Game Over | Même principe : titre, stats, boutons Rejouer / Retour / Sauvegarder. Vérifier tailles et espacements. | Moyenne |
@@ -52,8 +52,8 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **3.3.1** Formulaire | Beaucoup de lignes (sliders + labels). Les `rowStyles` sont en flex avec `minWidth: 180px` pour les labels. En mobile : (a) empiler label au-dessus du slider (flex-direction: column) ou (b) réduire min-width et taille de police. Adapter les sections pour qu’elles restent lisibles. | Haute |
-| **3.3.2** Sliders | Les `<input type="range">` sont plus difficiles à manipuler au doigt. S’assurer qu’ils ont une hauteur tactile suffisante (min-height ou padding). Éviter les zones de tap trop petites. | Moyenne |
+| **3.3.1** Formulaire | Classes `custom-row`, `custom-section`. En mobile : `flex-direction: column` sur les lignes, labels et sliders empilés. | ✅ Fait |
+| **3.3.2** Sliders | `min-height: 44px` sur les sliders en mobile, `width: 100%`. | ✅ Fait |
 | **3.3.3** Bloc « Mes configs » | Input + boutons Sauvegarder / Export + liste des configs. En étroit, passer les boutons à la ligne ou les mettre sous l’input. | Moyenne |
 | **3.3.4** Défilement | La page a `overflowY: auto`. Vérifier que le scroll fonctionne bien sur mobile (pas de blocage par overflow hidden sur un parent). | Faible |
 
@@ -75,7 +75,7 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **4.1** Zone de tap minimale | Recommandation courante : au moins 44×44 px pour les contrôles interactifs. Auditer tous les boutons (menu, pause, upgrade, overlay, formulaire custom, replay). Agrandir padding ou min-height/min-width où nécessaire. | Haute |
+| **4.1** Zone de tap minimale | Au moins 44×44 px : barre de pause, boutons upgrade, overlays (game over, pause), replay toolbar, bouton ⓘ, Custom (actions). | ✅ Fait |
 | **4.2** Espacement | Éviter que deux boutons soient trop proches (risque de tap accidentel). Garder un gap suffisant entre les boutons de vitesse, d’upgrade, etc. | Moyenne |
 
 ---
@@ -93,7 +93,7 @@ Ce document détaille les adaptations nécessaires pour que l’application Towe
 
 | Tâche | Détail | Priorité |
 |-------|--------|----------|
-| **6.1** Padding safe area | Sur iPhone X et suivants (et certains Android), utiliser `env(safe-area-inset-top)`, `env(safe-area-inset-bottom)`, etc., pour que le contenu ne soit pas masqué par l’encoche ou la barre de navigation. Appliquer sur le conteneur principal (ex. body ou #root) et éventuellement sur la barre de pause et la barre d’upgrades. Prévoir un viewport qui inclut `viewport-fit=cover` si on veut le plein écran. | Moyenne |
+| **6.1** Padding safe area | `viewport-fit=cover` dans le viewport ; `env(safe-area-inset-*)` sur body, play-page-container et panneau info (bouton ⓘ). | ✅ Fait |
 
 Exemple CSS :
 
@@ -132,9 +132,9 @@ Et dans le viewport (si besoin) :
 
 ## 9 — Récapitulatif des priorités
 
-- **Haute** : Barre de pause et barres d’upgrade sur petit écran ; formulaire Custom responsive ; tailles de cibles tactiles.
-- **Moyenne** : Comportement navigateur (zoom, pull-to-refresh), feedback tactile (hover/active), canvas/overlays en petit écran, sliders et blocs Custom, Replay, safe area, typo responsive.
-- **Basse** : PWA, orientation, détails de polish.
+- **Fait** : Viewport, pull-to-refresh, barre de pause (wrap, 1x–3x + Auto), barres d’upgrade (scroll horizontal), Custom (colonnes, sliders 44px), cibles 44px, safe area, feedback :active.
+- **Reste (priorité moyenne)** : Overlays Pause / Game Over (scroll, espacements), menu (typo responsive), Replay (tailles tap), typo clamp(), zoom optionnel.
+- **Basse** : PWA, message orientation paysage.
 
 ---
 
