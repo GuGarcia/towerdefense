@@ -58,3 +58,5 @@ Ce README sert de **one-pager** : une référence unique pour ce qu’on attend 
 | **Gameplay / Meta-progression** | ⬜ À faire — Coins (meta) vs cash (run), gain de coins en fin de partie, difficulté %, nouveaux stats (armure, thorns, crit, vampirisme, etc.), catégories d’upgrades, formules coût exponentiel / gain linéaire. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
 
 **Lancer en local** : `make dev` ou `cd front && bun run dev`.
+
+**Déployer sur Dokploy** : voir [DEPLOY_DOKPLOY.md](./DEPLOY_DOKPLOY.md).

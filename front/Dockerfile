@@ -10,6 +10,8 @@ RUN bun run build
 
 # Run stage: nginx sert les fichiers statiques
 FROM nginx:alpine AS runner
+# Supprimer la config par défaut pour éviter tout conflit
+RUN rm -f /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80

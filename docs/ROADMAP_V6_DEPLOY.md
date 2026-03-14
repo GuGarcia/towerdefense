@@ -4,7 +4,7 @@ Ce document décrit les étapes pour préparer le dépôt au déploiement avec *
 
 **Contexte** : Dockerfile (dans `front/`), `docker-compose.yml` à la racine, `.dockerignore` dans `front/`, `.env.example` à la racine. Reste la configuration Dokploy (UI) et le domaine. Dokploy attend une source Git avec un chemin vers un fichier Compose (ex. `./docker-compose.yml`) et construit ou utilise des images Docker.
 
-**Référence** : [Dokploy — Docker Compose](https://docs.dokploy.com/docs/core/docker-compose), [Example](https://docs.dokploy.com/docs/core/docker-compose/example).
+**Référence** : [Dokploy — Docker Compose](https://docs.dokploy.com/docs/core/docker-compose), [Example](https://docs.dokploy.com/docs/core/docker-compose/example). **Guide pas à pas** : [DEPLOY_DOKPLOY.md](./DEPLOY_DOKPLOY.md).
 
 ---
 
