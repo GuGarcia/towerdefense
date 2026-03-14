@@ -57,6 +57,12 @@ function getUpgradeValue(
   return String(Math.round(v));
 }
 
+export interface ReplaySummary {
+  wave: number;
+  timeSeconds: number;
+  enemiesKilled: number;
+}
+
 export interface RunPlayerOptions {
   /** Override game params (merged with loaded gameparams.json). */
   paramsOverrides?: Record<string, unknown>;
@@ -64,6 +70,10 @@ export interface RunPlayerOptions {
   onBackToMenu?: () => void;
   /** When true, automatically buy the cheapest affordable upgrade each frame. */
   initialAutoMode?: boolean;
+  /** Called when user clicks "Sauvegarder" on game over with (recording, summary). */
+  onSaveReplay?: (recording: GameRecording, summary: ReplaySummary) => void;
+  /** Label for the save button in game over overlay (e.g. "Sauvegarder"). */
+  saveButtonLabel?: string;
 }
 
 export type RunPlayerControls = {
@@ -82,7 +92,7 @@ export type RunPlayerControls = {
  * Toolbar (speed, export, load) is not rendered by the player; the app places them in the pause bar and pause menu.
  */
 export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlayerControls> {
-  const { paramsOverrides: optionsOverrides = {}, onBackToMenu, initialAutoMode = false } = options;
+  const { paramsOverrides: optionsOverrides = {}, onBackToMenu, initialAutoMode = false, onSaveReplay, saveButtonLabel } = options;
   let autoMode = initialAutoMode;
 
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
@@ -171,6 +181,19 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     replayGetInput = createReplayInputSource(recording);
   }
 
+  function getSaveReplayPayload(): { recording: GameRecording; summary: ReplaySummary } | null {
+    if (isReplay || gameStates.length === 0) return null;
+    const game = gameStates.find((g) => g.state === GameState.GameOver);
+    if (!game) return null;
+    const recording: GameRecording = recorder.getRecording(seeds[0], game.params);
+    const summary: ReplaySummary = {
+      wave: getWaveNumberAtFrame(game.frameIndex, game.params),
+      timeSeconds: game.frameIndex / 60,
+      enemiesKilled: game.enemiesKilled,
+    };
+    return { recording, summary };
+  }
+
   const gameOverlayEl = setupGameOverlay(canvas, document.getElementById("game-overlay"), {
     onReplayClick: () => {
       if (isReplay) {
@@ -187,6 +210,9 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
       }
     },
     onBackToMenu,
+    getSaveReplayPayload: onSaveReplay ? getSaveReplayPayload : undefined,
+    onSaveReplay,
+    saveButtonLabel,
   });
 
   setupUpgradeBars(barsContainer, n, {

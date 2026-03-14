@@ -70,17 +70,17 @@ Ce document décrit la roadmap pour une interface complète : menu principal, pa
 
 ## 5 — Liste des parties et sauvegarde
 
-- [ ] **5.1** Persistance : clé localStorage (ex. `towerdefense_replays`) pour une liste d’entrées (id, date, seed, params, recording ou ref, résumé : vague, temps, ennemis tués).
-- [ ] **5.2** À la fin d’une partie (Game Over) ou sur action « Sauvegarder », ajouter l’entrée à la liste (avec politique de limite, ex. 20–50 dernières parties).
-- [ ] **5.3** Écran « Charger un replay » (ou `/replay`) : afficher la liste ; pour chaque entrée : infos + **Charger** (lance le replay) + **Partager**.
-- [ ] **5.4** Option file picker conservée pour charger un replay depuis un fichier JSON externe.
+- [x] **5.1** Persistance : clé localStorage (ex. `towerdefense_replays`) pour une liste d’entrées (id, date, seed, params, recording ou ref, résumé : vague, temps, ennemis tués).
+- [x] **5.2** À la fin d’une partie (Game Over) ou sur action « Sauvegarder », ajouter l’entrée à la liste (avec politique de limite, ex. 20–50 dernières parties).
+- [x] **5.3** Écran « Charger un replay » (ou `/replay`) : afficher la liste ; pour chaque entrée : infos + **Charger** (lance le replay) + **Partager**.
+- [x] **5.4** Option file picker conservée pour charger un replay depuis un fichier JSON externe.
 
 ---
 
 ## 6 — Partage
 
-- [ ] **6.1** « Partager » : au minimum export du fichier replay (JSON) déjà existant ; idéalement en plus : génération d’un **lien de configuration** (seed + params encodés en query ou hash) pour que quelqu’un puisse lancer la même config.
-- [ ] **6.2** Si lien de config : au chargement de l’URL avec paramètre, proposer « Lancer cette configuration partagée » (préremplir ou lancer directement).
+- [x] **6.1** « Partager » : au minimum export du fichier replay (JSON) déjà existant ; idéalement en plus : génération d’un **lien de configuration** (seed + params encodés en query ou hash) pour que quelqu’un puisse lancer la même config.
+- [x] **6.2** Si lien de config : au chargement de l’URL avec paramètre, proposer « Lancer cette configuration partagée » (préremplir ou lancer directement).
 
 ---
 
@@ -88,7 +88,7 @@ Ce document décrit la roadmap pour une interface complète : menu principal, pa
 
 - [x] **7.1** Si React : ajouter React + React Router, point d’entrée qui monte l’app dans un `#root` ; composant « Game » qui encapsule le canvas et la logique actuelle de `index.ts`.
 - [x] **7.2** Réutiliser le domaine et l’infra existants (`createGame`, `createGameParams`, `tick`, rendu, replay) sans les dupliquer ; le jeu reste déterministe (seed + params + inputs).
-- [ ] **7.3** Gestion de la durée de partie : soit `durationFrames` très grand (ex. 1 an en frames), soit logique « pas de limite » dans la boucle (jouer jusqu’à Game Over uniquement).
+- [x] **7.3** Gestion de la durée de partie : soit `durationFrames` très grand (ex. 1 an en frames), soit logique « pas de limite » dans la boucle (jouer jusqu’à Game Over uniquement).
 
 ---
 

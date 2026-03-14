@@ -1,6 +1,6 @@
 /**
  * Game view: renders the player DOM (canvas, overlay, upgrade bars) and runs the game loop.
- * One bar: Pause (left), speed 1x/2x/3x (right). Export and Load replay in pause menu.
+ * One bar: Pause (left), speed 1x/2x/3x/5x/10x (right). Export and Load replay in pause menu.
  */
 import type { GameRecording } from "../../player/infrastructure/replay/GameRecording";
 import type { RunPlayerControls } from "../../player";
@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
 import { useI18n } from "../i18n/context";
+import { saveReplay, getReplayById } from "../replayList";
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -69,9 +70,11 @@ const speedBtnStyles = (active: boolean): React.CSSProperties => ({
   cursor: "pointer",
 });
 
-const SPEED_VALUES = [1, 2, 3] as const;
+const SPEED_VALUES = [1, 2, 3, 5, 10] as const;
 
-type PlayLocationState = { paramsOverrides?: Record<string, unknown> } | undefined;
+type PlayLocationState =
+  | { paramsOverrides?: Record<string, unknown>; loadReplayId?: string }
+  | undefined;
 
 export function PlayPage() {
   const navigate = useNavigate();
@@ -83,22 +86,31 @@ export function PlayPage() {
   const [speed, setSpeed] = useState(1);
   const [autoMode, setAutoMode] = useState(false);
 
-  const paramsOverrides = (location.state as PlayLocationState)?.paramsOverrides;
+  const state = location.state as PlayLocationState;
+  const paramsOverrides = state?.paramsOverrides;
+  const loadReplayId = state?.loadReplayId;
 
   useEffect(() => {
     let cancelled = false;
     runPlayer({
       paramsOverrides,
       onBackToMenu: () => navigate("/"),
+      onSaveReplay: (recording, summary) => saveReplay(recording, summary),
+      saveButtonLabel: t("gameOver.save"),
     }).then((controls) => {
-      if (!cancelled) controlsRef.current = controls;
+      if (cancelled) return;
+      controlsRef.current = controls;
+      if (loadReplayId) {
+        const entry = getReplayById(loadReplayId);
+        if (entry) controls.loadReplay(entry.recording);
+      }
     });
     return () => {
       cancelled = true;
       controlsRef.current?.stop();
       controlsRef.current = null;
     };
-  }, [navigate, paramsOverrides]);
+  }, [navigate, paramsOverrides, loadReplayId, t]);
 
   const openPause = useCallback(() => {
     controlsRef.current?.pause();

@@ -1,10 +1,20 @@
 /**
- * Ensures game-over overlay exists and wires replay + back-to-menu buttons.
+ * Ensures game-over overlay exists and wires replay + back-to-menu + save buttons.
  */
+export interface SaveReplayPayload {
+  recording: import("../../infrastructure/replay/GameRecording").GameRecording;
+  summary: { wave: number; timeSeconds: number; enemiesKilled: number };
+}
+
 export interface SetupGameOverlayOptions {
   onReplayClick: () => void;
   /** When provided, a "Retour au menu" button is shown and calls this. */
   onBackToMenu?: () => void;
+  /** When both provided, a "Sauvegarder" button is shown; on click, getPayload() is called and onSaveReplay with the result. */
+  getSaveReplayPayload?: () => SaveReplayPayload | null;
+  onSaveReplay?: (recording: SaveReplayPayload["recording"], summary: SaveReplayPayload["summary"]) => void;
+  /** Label for the save button (e.g. "Sauvegarder"). */
+  saveButtonLabel?: string;
 }
 
 export function setupGameOverlay(
@@ -12,7 +22,7 @@ export function setupGameOverlay(
   overlayEl: HTMLElement | null,
   options: SetupGameOverlayOptions
 ): HTMLElement {
-  const { onReplayClick, onBackToMenu } = options;
+  const { onReplayClick, onBackToMenu, getSaveReplayPayload, onSaveReplay, saveButtonLabel = "Sauvegarder" } = options;
   let gameWrapperEl = document.getElementById("game-wrapper");
   let gameOverlayEl = overlayEl ?? document.getElementById("game-overlay");
 
@@ -47,6 +57,13 @@ export function setupGameOverlay(
       backBtn.textContent = "Retour au menu";
       gameOverlayEl.appendChild(backBtn);
     }
+    if (getSaveReplayPayload && onSaveReplay) {
+      const saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "btn-save-overlay";
+      saveBtn.textContent = saveButtonLabel;
+      gameOverlayEl.appendChild(saveBtn);
+    }
     gameWrapperEl.appendChild(gameOverlayEl);
   }
 
@@ -64,6 +81,20 @@ export function setupGameOverlay(
       gameOverlayEl.appendChild(backBtn);
     }
     backBtn.addEventListener("click", onBackToMenu);
+  }
+  if (gameOverlayEl && getSaveReplayPayload && onSaveReplay) {
+    let saveBtn = gameOverlayEl.querySelector<HTMLButtonElement>(".btn-save-overlay");
+    if (!saveBtn) {
+      saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.className = "btn-save-overlay";
+      saveBtn.textContent = saveButtonLabel;
+      gameOverlayEl.appendChild(saveBtn);
+    }
+    saveBtn.addEventListener("click", () => {
+      const payload = getSaveReplayPayload();
+      if (payload) onSaveReplay(payload.recording, payload.summary);
+    });
   }
 
   if (gameOverlayEl) {

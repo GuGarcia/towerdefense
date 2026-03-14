@@ -63,7 +63,7 @@ describe("Game", () => {
     let game = createGame(params);
     game = { ...game, money: 0 };
     const damageBefore = game.player.damage;
-    game = tick(game, 1, { buyUpgrade: UpgradeType.Damage });
+    game = tick(game, 0, { buyUpgrade: UpgradeType.Damage });
     expect(game.money).toBe(0);
     expect(game.player.damage).toBe(damageBefore);
   });

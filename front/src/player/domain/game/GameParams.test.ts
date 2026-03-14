@@ -5,7 +5,7 @@ describe("GameParams", () => {
   it("returns default params when no overrides", () => {
     const p = createGameParams();
     expect(p.seed).toBe(0);
-    expect(p.durationFrames).toBe(60 * 60 * 10);
+    expect(p.durationFrames).toBe(60 * 60 * 24 * 365);
     expect(p.player.initialLife).toBe(100);
     expect(p.player.initialAttackSpeed).toBe(2);
     expect(p.economy.upgradeCostBase).toBe(10);

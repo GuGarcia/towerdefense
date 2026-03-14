@@ -67,7 +67,7 @@ type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]>
 export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameParams {
   const params: GameParams = {
     seed: 0,
-    durationFrames: 60 * 60 * 10,
+    durationFrames: 60 * 60 * 24 * 365,
     player: {
       initialLife: 100,
       initialMaxLife: 100,
