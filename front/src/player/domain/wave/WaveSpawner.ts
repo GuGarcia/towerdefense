@@ -8,6 +8,11 @@ import { createEnemy, nextEnemyId } from "../enemy/Enemy";
 import { scaleWaveStat } from "./WaveScaling";
 import { isBossWave } from "./Wave";
 
+function applyDifficultyMultiplier(gameParams: GameParams, value: number): number {
+  const pct = gameParams.wave.difficultyPercent ?? 100;
+  return value * (pct / 100);
+}
+
 function createRng(seed: number): () => number {
   let s = seed;
   return function () {
@@ -55,23 +60,23 @@ export function getWaveEnemyStats(
   const bossCount = isBossWave(waveNumber, gameParams) ? Math.min(1, Math.floor(scale("count", boss?.countPerWave ?? 0))) : 0;
   return {
     base: {
-      life: scale("life", b?.life ?? 0),
-      speed: scale("speed", b?.speed ?? 0),
-      damage: scale("damage", b?.damage ?? 0),
+      life: applyDifficultyMultiplier(gameParams, scale("life", b?.life ?? 0)),
+      speed: applyDifficultyMultiplier(gameParams, scale("speed", b?.speed ?? 0)),
+      damage: applyDifficultyMultiplier(gameParams, scale("damage", b?.damage ?? 0)),
       size: b?.size ?? 12,
-      count: Math.floor(scale("count", b?.countPerWave ?? 0)),
+      count: Math.floor(applyDifficultyMultiplier(gameParams, scale("count", b?.countPerWave ?? 0))),
     },
     rapid: {
-      life: scale("life", r?.life ?? 0),
-      speed: scale("speed", r?.speed ?? 0),
-      damage: scale("damage", r?.damage ?? 0),
+      life: applyDifficultyMultiplier(gameParams, scale("life", r?.life ?? 0)),
+      speed: applyDifficultyMultiplier(gameParams, scale("speed", r?.speed ?? 0)),
+      damage: applyDifficultyMultiplier(gameParams, scale("damage", r?.damage ?? 0)),
       size: r?.size ?? 6,
-      count: Math.floor(scale("count", r?.countPerWave ?? 0)),
+      count: Math.floor(applyDifficultyMultiplier(gameParams, scale("count", r?.countPerWave ?? 0))),
     },
     boss: {
-      life: scale("life", boss?.life ?? 0),
-      speed: scale("speed", boss?.speed ?? 0),
-      damage: scale("damage", boss?.damage ?? 0),
+      life: applyDifficultyMultiplier(gameParams, scale("life", boss?.life ?? 0)),
+      speed: applyDifficultyMultiplier(gameParams, scale("speed", boss?.speed ?? 0)),
+      damage: applyDifficultyMultiplier(gameParams, scale("damage", boss?.damage ?? 0)),
       size: boss?.size ?? 32,
       count: bossCount,
     },
@@ -87,10 +92,10 @@ export function getWaveComposition(
   const baseConfig = gameParams.enemies.base;
   const rapidConfig = gameParams.enemies.rapid;
   const bossConfig = gameParams.enemies.boss;
-  const base = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", baseConfig?.countPerWave ?? 0));
-  const rapid = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", rapidConfig?.countPerWave ?? 0));
+  const base = Math.floor(applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "count", baseConfig?.countPerWave ?? 0)));
+  const rapid = Math.floor(applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "count", rapidConfig?.countPerWave ?? 0)));
   const boss = isBossWave(waveNumber, gameParams)
-    ? Math.min(1, Math.floor(scaleWaveStat(gameParams, waveNumber, "count", bossConfig?.countPerWave ?? 0)))
+    ? Math.min(1, Math.floor(applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "count", bossConfig?.countPerWave ?? 0))))
     : 0;
   return { base, rapid, boss };
 }
@@ -114,7 +119,7 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
       counts.push(0);
       continue;
     }
-    let count = Math.floor(scaleWaveStat(gameParams, waveNumber, "count", config.countPerWave ?? 1));
+    let count = Math.floor(applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "count", config.countPerWave ?? 1)));
     if (archetype === EnemyArchetype.Boss) count = Math.min(1, count);
     counts.push(count);
   }
@@ -149,9 +154,9 @@ export function getEnemiesToSpawnThisFrame(frameIndex: number, gameParams: GameP
       const angle = getKthRandom(gameParams.seed + waveStart * 7919, slotIndex) * Math.PI * 2;
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
-      const life = scaleWaveStat(gameParams, waveNumber, "life", config.life);
-      const speed = scaleWaveStat(gameParams, waveNumber, "speed", config.speed);
-      const damage = scaleWaveStat(gameParams, waveNumber, "damage", config.damage);
+      const life = applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "life", config.life));
+      const speed = applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "speed", config.speed));
+      const damage = applyDifficultyMultiplier(gameParams, scaleWaveStat(gameParams, waveNumber, "damage", config.damage));
       const size = config.size ?? 12;
       enemies.push(
         createEnemy({

@@ -88,4 +88,15 @@ describe("WaveSpawner", () => {
     expect(getWaveNumberAtFrame(getWaveStartFrame(1, p), p)).toBe(1);
     expect(getWaveNumberAtFrame(getWaveStartFrame(3, p), p)).toBe(3);
   });
+
+  it("difficultyPercent scales enemy stats and counts", () => {
+    const p100 = createGameParams({ wave: { difficultyPercent: 100 } });
+    const p150 = createGameParams({ wave: { difficultyPercent: 150 } });
+    const s100 = getWaveEnemyStats(p100, 1);
+    const s150 = getWaveEnemyStats(p150, 1);
+    expect(s150.base.life).toBeCloseTo(s100.base.life * 1.5);
+    expect(s150.base.damage).toBeCloseTo(s100.base.damage * 1.5);
+    expect(s150.base.speed).toBeCloseTo(s100.base.speed * 1.5);
+    expect(s150.base.count).toBeGreaterThanOrEqual(s100.base.count);
+  });
 });

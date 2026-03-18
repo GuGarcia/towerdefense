@@ -23,6 +23,7 @@ import {
   getStoredMeta,
   LIFE_DELTA_PER_LEVEL,
   DAMAGE_DELTA_PER_LEVEL,
+  getDifficultyPercent,
 } from "../app/metaStorage";
 
 const PLAYER_COUNT = 1;
@@ -157,6 +158,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
   const baseGameParams = createGameParams(baseOverrides as Parameters<typeof createGameParams>[0]);
   const lifeDelta = storedMeta.lifeLevel * LIFE_DELTA_PER_LEVEL;
   const damageDelta = storedMeta.damageLevel * DAMAGE_DELTA_PER_LEVEL;
+  const difficultyPercent = getDifficultyPercent(storedMeta);
 
   const paramsOverrides = {
     ...baseOverrides,
@@ -171,6 +173,10 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
       coinPerWaveBase: storedMeta.coinPerWaveBase,
       coinPerWavePercent: storedMeta.coinPerWavePercent,
       coinPerBossBase: storedMeta.coinPerBossBase,
+    },
+    wave: {
+      ...(((baseOverrides as unknown as { wave?: Record<string, unknown> }).wave ?? {}) as Record<string, unknown>),
+      difficultyPercent,
     },
   };
   const games = seeds.map((seed) =>

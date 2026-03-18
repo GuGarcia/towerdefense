@@ -13,16 +13,20 @@ import {
   buyCoinWaveBaseUpgrade,
   buyCoinWavePercentUpgrade,
   buyCoinBossBaseUpgrade,
+  buyDifficultyUpgrade,
   getNextLifeUpgradeCost,
   getNextDamageUpgradeCost,
   getNextCoinWaveBaseUpgradeCost,
   getNextCoinWavePercentUpgradeCost,
   getNextCoinBossBaseUpgradeCost,
+  getNextDifficultyUpgradeCost,
   LIFE_DELTA_PER_LEVEL,
   DAMAGE_DELTA_PER_LEVEL,
   COIN_WAVE_BASE_DELTA_PER_LEVEL,
   COIN_WAVE_PERCENT_DELTA_PER_LEVEL,
   COIN_BOSS_BASE_DELTA_PER_LEVEL,
+  getDifficultyPercent,
+  DIFFICULTY_PERCENT_DELTA_PER_LEVEL,
 } from "../metaStorage";
 
 const menuStyles: React.CSSProperties = {
@@ -152,6 +156,17 @@ export function MenuPage() {
             }}
           >
             Coin/boss +{COIN_BOSS_BASE_DELTA_PER_LEVEL} (base {meta.coinPerBossBase}) - coût {getNextCoinBossBaseUpgradeCost(meta)}
+          </button>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextDifficultyUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextDifficultyUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextDifficultyUpgradeCost(meta)}
+            onClick={() => {
+              buyDifficultyUpgrade();
+              refreshMeta();
+            }}
+          >
+            Difficulté +{DIFFICULTY_PERCENT_DELTA_PER_LEVEL}% (actuel {getDifficultyPercent(meta)}%) - coût {getNextDifficultyUpgradeCost(meta)}
           </button>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
 import { useI18n } from "../i18n/context";
 import { saveReplay, getReplayById } from "../replayList";
-import { addCoins, getStoredMeta } from "../metaStorage";
+import { addCoins, getStoredMeta, getDifficultyPercent } from "../metaStorage";
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -381,6 +381,9 @@ export function PlayPage() {
           <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
             Coin/wave: <strong>{meta.coinPerWaveBase}</strong> × <strong>{meta.coinPerWavePercent}%</strong> · Coin/boss:{" "}
             <strong>{meta.coinPerBossBase}</strong>
+          </div>
+          <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
+            Difficulté: <strong>{getDifficultyPercent(meta)}%</strong>
           </div>
           <button type="button" style={pauseButtonStyles} onClick={closePause}>
             {t("pause.resume")}

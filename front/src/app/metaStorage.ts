@@ -12,6 +12,7 @@ export type StoredMeta = {
   coinPerBossBase: number; // coin/boss base
   lifeLevel: number; // meta upgrade level: +initialLife/maxLife
   damageLevel: number; // meta upgrade level: +initialDamage
+  difficultyLevel: number; // meta difficulty level (0 => 100%)
 };
 
 const META_KEY = "towerdefense_meta";
@@ -25,6 +26,8 @@ export const DAMAGE_DELTA_PER_LEVEL = 1;
 export const COIN_WAVE_BASE_DELTA_PER_LEVEL = 1;
 export const COIN_WAVE_PERCENT_DELTA_PER_LEVEL = 1; // +1%
 export const COIN_BOSS_BASE_DELTA_PER_LEVEL = 1;
+export const DIFFICULTY_PERCENT_BASE = 100;
+export const DIFFICULTY_PERCENT_DELTA_PER_LEVEL = 10;
 
 const DEFAULT_META: StoredMeta = {
   version: META_VERSION,
@@ -34,6 +37,7 @@ const DEFAULT_META: StoredMeta = {
   coinPerBossBase: 1,
   lifeLevel: 0,
   damageLevel: 0,
+  difficultyLevel: 0,
 };
 
 export function getStoredMeta(): StoredMeta {
@@ -80,6 +84,10 @@ function coinBossBaseLevel(meta: StoredMeta): number {
   return Math.max(0, meta.coinPerBossBase - 1);
 }
 
+export function getDifficultyPercent(meta: StoredMeta = getStoredMeta()): number {
+  return DIFFICULTY_PERCENT_BASE + meta.difficultyLevel * DIFFICULTY_PERCENT_DELTA_PER_LEVEL;
+}
+
 export function getNextLifeUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
   return costForNextLevel(meta.lifeLevel);
 }
@@ -98,6 +106,10 @@ export function getNextCoinWavePercentUpgradeCost(meta: StoredMeta = getStoredMe
 
 export function getNextCoinBossBaseUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
   return costForNextLevel(coinBossBaseLevel(meta));
+}
+
+export function getNextDifficultyUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
+  return costForNextLevel(meta.difficultyLevel);
 }
 
 export function buyLifeUpgrade(): { ok: boolean; coins: number; nextLevel: number } {
@@ -158,5 +170,18 @@ export function buyCoinBossBaseUpgrade(): { ok: boolean; coins: number; nextBase
   };
   setStoredMeta(next);
   return { ok: true, coins: next.coins, nextBase: next.coinPerBossBase };
+}
+
+export function buyDifficultyUpgrade(): { ok: boolean; coins: number; nextLevel: number } {
+  const meta = getStoredMeta();
+  const cost = costForNextLevel(meta.difficultyLevel);
+  if (meta.coins < cost) return { ok: false, coins: meta.coins, nextLevel: meta.difficultyLevel };
+  const next = {
+    ...meta,
+    coins: meta.coins - cost,
+    difficultyLevel: meta.difficultyLevel + 1,
+  };
+  setStoredMeta(next);
+  return { ok: true, coins: next.coins, nextLevel: next.difficultyLevel };
 }
 

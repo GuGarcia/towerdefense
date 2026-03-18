@@ -46,6 +46,8 @@ export interface GameParams {
     readonly stuckEnemyAttackIntervalFrames: number;
     /** Multiply wave 1 stats by this factor to make the start very easy (e.g. 0.5 = half difficulty). */
     readonly wave1DifficultyFactor?: number;
+    /** Global difficulty multiplier (50 = easy, 100 = normal, 150 = hard). */
+    readonly difficultyPercent?: number;
     readonly difficultyScaling: {
       readonly life: number;
       readonly speed: number;
@@ -104,6 +106,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       bossEveryNWaves: 10,
       stuckEnemyAttackIntervalFrames: 60,
       wave1DifficultyFactor: 0.6,
+      difficultyPercent: 100,
       difficultyScaling: { life: 1.1, speed: 1.02, damage: 1.05, count: 1.1 },
     },
     enemies: {
