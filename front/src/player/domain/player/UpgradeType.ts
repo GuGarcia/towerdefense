@@ -13,6 +13,7 @@ export const UpgradeType = Object.freeze({
   CritChance: "critChance",
   CritDamage: "critDamage",
   Vampirism: "vampirism",
+  CashBonusPercent: "cashBonusPercent",
 } as const);
 
 export type UpgradeTypeValue = (typeof UpgradeType)[keyof typeof UpgradeType];

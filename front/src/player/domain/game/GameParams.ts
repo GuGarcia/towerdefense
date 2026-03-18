@@ -37,6 +37,10 @@ export interface GameParams {
     readonly initialVampirismPercent?: number;
     /** Step added to vampirismPercent per Vampirism upgrade level (percentage points). */
     readonly vampirismPercentStep?: number;
+    /** Initial cash bonus percent (applied to cash gained). */
+    readonly initialCashBonusPercent?: number;
+    /** Step added to cashBonusPercent per CashBonusPercent upgrade level (percentage points). */
+    readonly cashBonusPercentStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -122,6 +126,8 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       critDamagePercentStep: 10,
       initialVampirismPercent: 0,
       vampirismPercentStep: 5,
+      initialCashBonusPercent: 0,
+      cashBonusPercentStep: 5,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

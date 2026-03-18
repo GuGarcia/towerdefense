@@ -131,5 +131,8 @@ describe("Player", () => {
 
     const afterVampirism = applyUpgrade(p, UpgradeType.Vampirism, params);
     expect(afterVampirism.vampirismPercent).toBeGreaterThan(0);
+
+    const afterCashBonus = applyUpgrade(p, UpgradeType.CashBonusPercent, params);
+    expect(afterCashBonus.cashBonusPercent).toBeGreaterThan(0);
   });
 });

@@ -26,6 +26,8 @@ export interface Player {
   critDamagePercent: number;
   /** Healing as % of damage dealt to enemies (vampirism). */
   vampirismPercent: number;
+  /** Bonus cash gained from kills and wave bonuses (cash %). */
+  cashBonusPercent: number;
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
@@ -46,6 +48,7 @@ export interface PlayerInitial {
   critChance?: number;
   critDamagePercent?: number;
   vampirismPercent?: number;
+  cashBonusPercent?: number;
   regen: number;
   attackSpeed: number;
   /** Shooting range; default 300 if omitted. */
@@ -72,6 +75,7 @@ export function createPlayer(initial: PlayerInitial): Player {
     critChance = 0,
     critDamagePercent = 150,
     vampirismPercent = 0,
+    cashBonusPercent = 0,
     range = 300,
   } = initial;
   const cooldown = getShotCooldownFrames(initial);
@@ -86,6 +90,7 @@ export function createPlayer(initial: PlayerInitial): Player {
     critChance,
     critDamagePercent,
     vampirismPercent,
+    cashBonusPercent,
     regen,
     attackSpeed,
     range,
@@ -101,6 +106,7 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.CritChance]: 0,
       [UpgradeType.CritDamage]: 0,
       [UpgradeType.Vampirism]: 0,
+      [UpgradeType.CashBonusPercent]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -202,6 +208,11 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
       const delta = p?.vampirismPercentStep ?? 5;
       const next = Math.max(0, Math.min(99, player.vampirismPercent + delta));
       return { ...player, vampirismPercent: next, upgradeLevels: levels };
+    }
+    case UpgradeType.CashBonusPercent: {
+      const delta = p?.cashBonusPercentStep ?? 5;
+      const next = Math.max(0, Math.min(99, player.cashBonusPercent + delta));
+      return { ...player, cashBonusPercent: next, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };

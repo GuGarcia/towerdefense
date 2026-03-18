@@ -72,6 +72,7 @@ export function createGame(gameParams: GameParams): Game {
     critChance: p.initialCritChance ?? 0,
     critDamagePercent: p.initialCritDamagePercent ?? 150,
     vampirismPercent: p.initialVampirismPercent ?? 0,
+    cashBonusPercent: p.initialCashBonusPercent ?? 0,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
     range: p.initialRange ?? 300,
@@ -214,13 +215,14 @@ function handleShootingAndProjectiles(
   }
 
   const currency = params.economy.currencyPerKill;
+  const cashMultiplier = 1 + nextPlayer.cashBonusPercent / 100;
   const coinPerBoss = params.economy.coinPerBossBase;
   let earned = 0;
   let killedThisFrame = 0;
   let earnedCoins = 0;
   for (const e of nextEnemies) {
     if (isDead(e)) {
-      earned += currency[e.archetype as keyof typeof currency] ?? currency.base;
+      earned += (currency[e.archetype as keyof typeof currency] ?? currency.base) * cashMultiplier;
       killedThisFrame += 1;
       if (e.archetype === EnemyArchetype.Boss) earnedCoins += coinPerBoss;
     }
@@ -272,7 +274,7 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   let next: Game = { ...game, frameIndex };
   next = {
     ...next,
-    money: next.money + applyWaveEconomy(game, frameIndex),
+    money: next.money + applyWaveEconomy(game, frameIndex) * (1 + game.player.cashBonusPercent / 100),
     coinsEarned: next.coinsEarned + applyWaveCoins(game, frameIndex),
   };
 
