@@ -56,6 +56,8 @@ function getUpgradeValue(
     armorFixed: number;
     thornsFixed: number;
     thornsPercent: number;
+    critChance: number;
+    critDamagePercent: number;
   },
   key: (typeof UPGRADE_TYPES)[number]
 ): string {
@@ -78,6 +80,8 @@ function getUpgradeValue(
   if (key === "regen" || key === "attackSpeed") return v.toFixed(1);
   if (key === "armorPercent") return `${Math.round(v)}%`;
   if (key === "thorns") return `${Math.round(player.thornsFixed)} + ${Math.round(player.thornsPercent)}%`;
+  if (key === "critChance") return `${Math.round(player.critChance)}%`;
+  if (key === "critDamage") return `${Math.round(player.critDamagePercent)}%`;
   return String(Math.round(v));
 }
 

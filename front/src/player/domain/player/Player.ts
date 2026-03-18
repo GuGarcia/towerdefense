@@ -20,6 +20,10 @@ export interface Player {
   thornsFixed: number;
   /** Additional thorns as % of damage received by the player. */
   thornsPercent: number;
+  /** Chance (0-100) that a shot is critical. Deterministic per shot. */
+  critChance: number;
+  /** Crit damage multiplier in percent (ex: 150 => x1.5). */
+  critDamagePercent: number;
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
@@ -37,6 +41,8 @@ export interface PlayerInitial {
   armorFixed?: number;
   thornsFixed?: number;
   thornsPercent?: number;
+  critChance?: number;
+  critDamagePercent?: number;
   regen: number;
   attackSpeed: number;
   /** Shooting range; default 300 if omitted. */
@@ -60,6 +66,8 @@ export function createPlayer(initial: PlayerInitial): Player {
     armorFixed = 0,
     thornsFixed = 0,
     thornsPercent = 0,
+    critChance = 0,
+    critDamagePercent = 150,
     range = 300,
   } = initial;
   const cooldown = getShotCooldownFrames(initial);
@@ -71,6 +79,8 @@ export function createPlayer(initial: PlayerInitial): Player {
     armorFixed,
     thornsFixed,
     thornsPercent,
+    critChance,
+    critDamagePercent,
     regen,
     attackSpeed,
     range,
@@ -83,6 +93,8 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.ArmorPercent]: 0,
       [UpgradeType.ArmorFixed]: 0,
       [UpgradeType.Thorns]: 0,
+      [UpgradeType.CritChance]: 0,
+      [UpgradeType.CritDamage]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -170,6 +182,15 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
         thornsPercent: player.thornsPercent + deltaPercent,
         upgradeLevels: levels,
       };
+    }
+    case UpgradeType.CritChance: {
+      const delta = p?.critChanceStep ?? 5;
+      const next = Math.max(0, Math.min(99, player.critChance + delta));
+      return { ...player, critChance: next, upgradeLevels: levels };
+    }
+    case UpgradeType.CritDamage: {
+      const delta = p?.critDamagePercentStep ?? 10;
+      return { ...player, critDamagePercent: player.critDamagePercent + delta, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };

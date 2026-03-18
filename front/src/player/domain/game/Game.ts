@@ -33,6 +33,14 @@ import { getEnemiesToSpawnThisFrame, getWaveNumberAtFrame } from "../wave/WaveSp
 
 const PLAYER_HITBOX_RADIUS = 40;
 
+function pseudoRandom01(seed: number, frameIndex: number): number {
+  // Deterministic 0..1 generator for gameplay effects (crit, etc.).
+  let x = (seed ^ Math.imul(frameIndex, 0x9e3779b9)) >>> 0;
+  x = Math.imul(x ^ (x >>> 15), x | 1);
+  x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+  return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+}
+
 export interface GameInput {
   buyUpgrade?: UpgradeTypeValue;
 }
@@ -61,6 +69,8 @@ export function createGame(gameParams: GameParams): Game {
     armorFixed: p.initialArmorFixed ?? 0,
     thornsFixed: p.initialThornsFixed ?? 0,
     thornsPercent: p.initialThornsPercent ?? 0,
+    critChance: p.initialCritChance ?? 0,
+    critDamagePercent: p.initialCritDamagePercent ?? 150,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
     range: p.initialRange ?? 300,
@@ -134,6 +144,14 @@ function handleShootingAndProjectiles(
 
   if (nearest && canShoot(nextPlayer)) {
     const { dx, dy } = directionTowardCenter(nearest.x, nearest.y);
+    const baseDamage = nextPlayer.damage;
+    let shotDamage = baseDamage;
+    if (nextPlayer.critChance > 0) {
+      const roll = pseudoRandom01(params.seed, _frameIndex);
+      if (roll < nextPlayer.critChance / 100) {
+        shotDamage = baseDamage * (nextPlayer.critDamagePercent / 100);
+      }
+    }
     nextProjectiles = [
       ...nextProjectiles,
       createProjectile({
@@ -141,12 +159,12 @@ function handleShootingAndProjectiles(
         y: 0,
         dx: -dx,
         dy: -dy,
-        damage: nextPlayer.damage,
+        damage: shotDamage,
         targetEnemyId: nearest.id,
       }),
     ];
     nextEnemies = nextEnemies.map((e) =>
-      e.id === nearest!.id ? { ...e, incomingDamage: (e.incomingDamage ?? 0) + nextPlayer.damage } : e
+      e.id === nearest!.id ? { ...e, incomingDamage: (e.incomingDamage ?? 0) + shotDamage } : e
     );
     nextPlayer = consumeShotCooldown(nextPlayer);
   } else {

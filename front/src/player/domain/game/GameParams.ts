@@ -25,6 +25,14 @@ export interface GameParams {
     readonly thornsFixedStep?: number;
     /** Step added to thornsPercent per thorns upgrade level. */
     readonly thornsPercentStep?: number;
+    /** Initial crit chance in % (0-99). */
+    readonly initialCritChance?: number;
+    /** Initial crit damage multiplier in % (ex: 150 => x1.5). */
+    readonly initialCritDamagePercent?: number;
+    /** Step added to critChance per CritChance upgrade level (percentage points). */
+    readonly critChanceStep?: number;
+    /** Step added to critDamagePercent per CritDamage upgrade level (percentage points). */
+    readonly critDamagePercentStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -104,6 +112,10 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialThornsPercent: 0,
       thornsFixedStep: 2,
       thornsPercentStep: 5,
+      initialCritChance: 0,
+      initialCritDamagePercent: 150,
+      critChanceStep: 5,
+      critDamagePercentStep: 10,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

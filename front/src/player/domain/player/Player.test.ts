@@ -122,5 +122,11 @@ describe("Player", () => {
     const afterThorns = applyUpgrade(p, UpgradeType.Thorns, params);
     expect(afterThorns.thornsFixed).toBeGreaterThan(0);
     expect(afterThorns.thornsPercent).toBeGreaterThan(0);
+
+    const afterCritChance = applyUpgrade(p, UpgradeType.CritChance, params);
+    expect(afterCritChance.critChance).toBeGreaterThan(0);
+
+    const afterCritDamage = applyUpgrade(p, UpgradeType.CritDamage, params);
+    expect(afterCritDamage.critDamagePercent).toBeGreaterThan(150);
   });
 });
