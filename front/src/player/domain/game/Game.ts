@@ -57,6 +57,8 @@ export function createGame(gameParams: GameParams): Game {
     life: p.initialLife,
     maxLife: p.initialMaxLife,
     damage: p.initialDamage,
+    armorPercent: p.initialArmorPercent ?? 0,
+    armorFixed: p.initialArmorFixed ?? 0,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
     range: p.initialRange ?? 300,

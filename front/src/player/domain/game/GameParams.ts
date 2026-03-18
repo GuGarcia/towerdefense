@@ -9,6 +9,12 @@ export interface GameParams {
     readonly initialLife: number;
     readonly initialMaxLife: number;
     readonly initialDamage: number;
+    /** Initial armor percent: damage reduction applied before fixed armor. */
+    readonly initialArmorPercent?: number;
+    /** Initial fixed armor: applied after armor percent. */
+    readonly initialArmorFixed?: number;
+    /** Step (in percentage points) added to armorPercent per armorPercent upgrade level. */
+    readonly armorPercentStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -80,6 +86,9 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialLife: 100,
       initialMaxLife: 100,
       initialDamage: 10,
+      initialArmorPercent: 0,
+      initialArmorFixed: 0,
+      armorPercentStep: 5,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

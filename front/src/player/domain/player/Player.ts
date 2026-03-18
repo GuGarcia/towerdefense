@@ -12,6 +12,10 @@ export interface Player {
   life: number;
   maxLife: number;
   damage: number;
+  /** Reduction percentage applied before fixed armor. */
+  armorPercent: number;
+  /** Fixed damage reduction applied after armorPercent. */
+  armorFixed: number;
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
@@ -25,6 +29,8 @@ export interface PlayerInitial {
   life: number;
   maxLife: number;
   damage: number;
+  armorPercent?: number;
+  armorFixed?: number;
   regen: number;
   attackSpeed: number;
   /** Shooting range; default 300 if omitted. */
@@ -38,12 +44,23 @@ export function getShotCooldownFrames(player: { attackSpeed: number }): number {
 }
 
 export function createPlayer(initial: PlayerInitial): Player {
-  const { life, maxLife, damage, regen, attackSpeed, range = 300 } = initial;
+  const {
+    life,
+    maxLife,
+    damage,
+    regen,
+    attackSpeed,
+    armorPercent = 0,
+    armorFixed = 0,
+    range = 300,
+  } = initial;
   const cooldown = getShotCooldownFrames(initial);
   return {
     life,
     maxLife,
     damage,
+    armorPercent,
+    armorFixed,
     regen,
     attackSpeed,
     range,
@@ -53,13 +70,17 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.Regen]: 0,
       [UpgradeType.AttackSpeed]: 0,
       [UpgradeType.Range]: 0,
+      [UpgradeType.ArmorPercent]: 0,
     },
     framesSinceLastShot: cooldown,
   };
 }
 
 export function takeDamage(player: Player, amount: number): Player {
-  return { ...player, life: Math.max(0, player.life - amount) };
+  // Order: apply % armor, then apply fixed armor.
+  const afterPct = amount * (1 - (player.armorPercent ?? 0) / 100);
+  const afterFixed = Math.max(0, afterPct - (player.armorFixed ?? 0));
+  return { ...player, life: Math.max(0, player.life - afterFixed) };
 }
 
 export function applyRegen(player: Player, _params?: GameParams): Player {
@@ -119,6 +140,10 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
     case UpgradeType.Range: {
       const delta = (p?.initialRange ?? 300) * f.range;
       return { ...player, range: player.range + delta, upgradeLevels: levels };
+    }
+    case UpgradeType.ArmorPercent: {
+      const delta = p?.armorPercentStep ?? 5;
+      return { ...player, armorPercent: player.armorPercent + delta, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };

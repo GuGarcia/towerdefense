@@ -47,6 +47,20 @@ describe("Player", () => {
     expect(takeDamage(hit, 100).life).toBe(0);
   });
 
+  it("takeDamage applies armorPercent then armorFixed", () => {
+    const p = createPlayer({
+      life: 100,
+      maxLife: 100,
+      damage: 0,
+      armorPercent: 50, // 30 -> 15
+      armorFixed: 5, // 15 -> 10
+      regen: 0,
+      attackSpeed: 1,
+    });
+    const hit = takeDamage(p, 30);
+    expect(hit.life).toBe(90);
+  });
+
   it("applyRegen caps at maxLife", () => {
     const p = createPlayer({
       life: 98,
@@ -98,5 +112,8 @@ describe("Player", () => {
 
     const afterSpeed = applyUpgrade(p, UpgradeType.AttackSpeed, params);
     expect(afterSpeed.attackSpeed).toBeGreaterThan(2);
+
+    const afterArmor = applyUpgrade(p, UpgradeType.ArmorPercent, params);
+    expect(afterArmor.armorPercent).toBeGreaterThan(0);
   });
 });
