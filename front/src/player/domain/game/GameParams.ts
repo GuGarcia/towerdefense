@@ -15,6 +15,8 @@ export interface GameParams {
     readonly initialArmorFixed?: number;
     /** Step (in percentage points) added to armorPercent per armorPercent upgrade level. */
     readonly armorPercentStep?: number;
+    /** Step added to armorFixed per armorFixed upgrade level. */
+    readonly armorFixedStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -89,6 +91,7 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialArmorPercent: 0,
       initialArmorFixed: 0,
       armorPercentStep: 5,
+      armorFixedStep: 2,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

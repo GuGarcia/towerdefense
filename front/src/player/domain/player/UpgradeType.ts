@@ -8,6 +8,7 @@ export const UpgradeType = Object.freeze({
   AttackSpeed: "attackSpeed",
   Range: "range",
   ArmorPercent: "armorPercent",
+  ArmorFixed: "armorFixed",
 } as const);
 
 export type UpgradeTypeValue = (typeof UpgradeType)[keyof typeof UpgradeType];

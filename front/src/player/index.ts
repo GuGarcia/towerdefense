@@ -46,7 +46,15 @@ async function loadGameParams(): Promise<Record<string, unknown>> {
 }
 
 function getUpgradeValue(
-  player: { damage: number; maxLife: number; regen: number; attackSpeed: number; range: number; armorPercent: number },
+  player: {
+    damage: number;
+    maxLife: number;
+    regen: number;
+    attackSpeed: number;
+    range: number;
+    armorPercent: number;
+    armorFixed: number;
+  },
   key: (typeof UPGRADE_TYPES)[number]
 ): string {
   const v =
@@ -62,7 +70,9 @@ function getUpgradeValue(
               ? player.range
               : key === "armorPercent"
                 ? player.armorPercent
-                : player.range;
+                : key === "armorFixed"
+                  ? player.armorFixed
+                  : player.range;
   if (key === "regen" || key === "attackSpeed") return v.toFixed(1);
   if (key === "armorPercent") return `${Math.round(v)}%`;
   return String(Math.round(v));

@@ -71,6 +71,7 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.AttackSpeed]: 0,
       [UpgradeType.Range]: 0,
       [UpgradeType.ArmorPercent]: 0,
+      [UpgradeType.ArmorFixed]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -144,6 +145,10 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
     case UpgradeType.ArmorPercent: {
       const delta = p?.armorPercentStep ?? 5;
       return { ...player, armorPercent: player.armorPercent + delta, upgradeLevels: levels };
+    }
+    case UpgradeType.ArmorFixed: {
+      const delta = p?.armorFixedStep ?? 2;
+      return { ...player, armorFixed: player.armorFixed + delta, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };
