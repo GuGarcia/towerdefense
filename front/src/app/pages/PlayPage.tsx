@@ -87,7 +87,7 @@ export function PlayPage() {
   const [speed, setSpeed] = useState(1);
   const [autoMode, setAutoMode] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [metaCoins, setMetaCoins] = useState(() => getStoredMeta().coins);
+  const [meta, setMeta] = useState(() => getStoredMeta());
   const [infoPanelData, setInfoPanelData] = useState<InfoPanelData | null>(null);
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export function PlayPage() {
   const openPause = useCallback(() => {
     controlsRef.current?.pause();
     setPaused(true);
-    setMetaCoins(getStoredMeta().coins);
+    setMeta(getStoredMeta());
   }, []);
 
   const closePause = useCallback(() => {
@@ -373,7 +373,14 @@ export function PlayPage() {
         <div className="pause-overlay" style={pauseOverlayStyles}>
           <h2 style={{ marginBottom: "8px" }}>— {t("pause.title")} —</h2>
           <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
-            Coins meta: <strong>{metaCoins}</strong>
+            Coins meta: <strong>{meta.coins}</strong>
+          </div>
+          <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
+            Life lvl: <strong>{meta.lifeLevel}</strong> · Dmg lvl: <strong>{meta.damageLevel}</strong>
+          </div>
+          <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
+            Coin/wave: <strong>{meta.coinPerWaveBase}</strong> × <strong>{meta.coinPerWavePercent}%</strong> · Coin/boss:{" "}
+            <strong>{meta.coinPerBossBase}</strong>
           </div>
           <button type="button" style={pauseButtonStyles} onClick={closePause}>
             {t("pause.resume")}
