@@ -10,10 +10,19 @@ import {
   getStoredMeta,
   buyLifeUpgrade,
   buyDamageUpgrade,
+  buyCoinWaveBaseUpgrade,
+  buyCoinWavePercentUpgrade,
+  buyCoinBossBaseUpgrade,
   getNextLifeUpgradeCost,
   getNextDamageUpgradeCost,
+  getNextCoinWaveBaseUpgradeCost,
+  getNextCoinWavePercentUpgradeCost,
+  getNextCoinBossBaseUpgradeCost,
   LIFE_DELTA_PER_LEVEL,
   DAMAGE_DELTA_PER_LEVEL,
+  COIN_WAVE_BASE_DELTA_PER_LEVEL,
+  COIN_WAVE_PERCENT_DELTA_PER_LEVEL,
+  COIN_BOSS_BASE_DELTA_PER_LEVEL,
 } from "../metaStorage";
 
 const menuStyles: React.CSSProperties = {
@@ -110,6 +119,39 @@ export function MenuPage() {
             }}
           >
             Dmg +{DAMAGE_DELTA_PER_LEVEL} (lvl {meta.damageLevel}) - coût {getNextDamageUpgradeCost(meta)}
+          </button>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextCoinWaveBaseUpgradeCost(meta)}
+            onClick={() => {
+              buyCoinWaveBaseUpgrade();
+              refreshMeta();
+            }}
+          >
+            Coin/wave +{COIN_WAVE_BASE_DELTA_PER_LEVEL} (base {meta.coinPerWaveBase}) - coût {getNextCoinWaveBaseUpgradeCost(meta)}
+          </button>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinWavePercentUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinWavePercentUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextCoinWavePercentUpgradeCost(meta)}
+            onClick={() => {
+              buyCoinWavePercentUpgrade();
+              refreshMeta();
+            }}
+          >
+            % coin/wave +{COIN_WAVE_PERCENT_DELTA_PER_LEVEL}% (pct {meta.coinPerWavePercent}%) - coût {getNextCoinWavePercentUpgradeCost(meta)}
+          </button>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextCoinBossBaseUpgradeCost(meta)}
+            onClick={() => {
+              buyCoinBossBaseUpgrade();
+              refreshMeta();
+            }}
+          >
+            Coin/boss +{COIN_BOSS_BASE_DELTA_PER_LEVEL} (base {meta.coinPerBossBase}) - coût {getNextCoinBossBaseUpgradeCost(meta)}
           </button>
         </div>
       </div>

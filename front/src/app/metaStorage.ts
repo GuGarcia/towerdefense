@@ -22,6 +22,9 @@ export const UPGRADE_COST_FACTOR = 1.1;
 
 export const LIFE_DELTA_PER_LEVEL = 5;
 export const DAMAGE_DELTA_PER_LEVEL = 1;
+export const COIN_WAVE_BASE_DELTA_PER_LEVEL = 1;
+export const COIN_WAVE_PERCENT_DELTA_PER_LEVEL = 1; // +1%
+export const COIN_BOSS_BASE_DELTA_PER_LEVEL = 1;
 
 const DEFAULT_META: StoredMeta = {
   version: META_VERSION,
@@ -65,12 +68,36 @@ function costForNextLevel(currentLevel: number): number {
   return Math.floor(UPGRADE_COST_BASE * Math.pow(UPGRADE_COST_FACTOR, currentLevel));
 }
 
+function coinWaveBaseLevel(meta: StoredMeta): number {
+  return Math.max(0, meta.coinPerWaveBase - 1);
+}
+
+function coinWavePercentLevel(meta: StoredMeta): number {
+  return Math.max(0, meta.coinPerWavePercent - 100);
+}
+
+function coinBossBaseLevel(meta: StoredMeta): number {
+  return Math.max(0, meta.coinPerBossBase - 1);
+}
+
 export function getNextLifeUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
   return costForNextLevel(meta.lifeLevel);
 }
 
 export function getNextDamageUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
   return costForNextLevel(meta.damageLevel);
+}
+
+export function getNextCoinWaveBaseUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
+  return costForNextLevel(coinWaveBaseLevel(meta));
+}
+
+export function getNextCoinWavePercentUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
+  return costForNextLevel(coinWavePercentLevel(meta));
+}
+
+export function getNextCoinBossBaseUpgradeCost(meta: StoredMeta = getStoredMeta()): number {
+  return costForNextLevel(coinBossBaseLevel(meta));
 }
 
 export function buyLifeUpgrade(): { ok: boolean; coins: number; nextLevel: number } {
@@ -89,5 +116,47 @@ export function buyDamageUpgrade(): { ok: boolean; coins: number; nextLevel: num
   const next = { ...meta, coins: meta.coins - cost, damageLevel: meta.damageLevel + 1 };
   setStoredMeta(next);
   return { ok: true, coins: next.coins, nextLevel: next.damageLevel };
+}
+
+export function buyCoinWaveBaseUpgrade(): { ok: boolean; coins: number; nextBase: number } {
+  const meta = getStoredMeta();
+  const nextLevel = coinWaveBaseLevel(meta);
+  const cost = costForNextLevel(nextLevel);
+  if (meta.coins < cost) return { ok: false, coins: meta.coins, nextBase: meta.coinPerWaveBase };
+  const next = {
+    ...meta,
+    coins: meta.coins - cost,
+    coinPerWaveBase: meta.coinPerWaveBase + COIN_WAVE_BASE_DELTA_PER_LEVEL,
+  };
+  setStoredMeta(next);
+  return { ok: true, coins: next.coins, nextBase: next.coinPerWaveBase };
+}
+
+export function buyCoinWavePercentUpgrade(): { ok: boolean; coins: number; nextPercent: number } {
+  const meta = getStoredMeta();
+  const nextLevel = coinWavePercentLevel(meta);
+  const cost = costForNextLevel(nextLevel);
+  if (meta.coins < cost) return { ok: false, coins: meta.coins, nextPercent: meta.coinPerWavePercent };
+  const next = {
+    ...meta,
+    coins: meta.coins - cost,
+    coinPerWavePercent: meta.coinPerWavePercent + COIN_WAVE_PERCENT_DELTA_PER_LEVEL,
+  };
+  setStoredMeta(next);
+  return { ok: true, coins: next.coins, nextPercent: next.coinPerWavePercent };
+}
+
+export function buyCoinBossBaseUpgrade(): { ok: boolean; coins: number; nextBase: number } {
+  const meta = getStoredMeta();
+  const nextLevel = coinBossBaseLevel(meta);
+  const cost = costForNextLevel(nextLevel);
+  if (meta.coins < cost) return { ok: false, coins: meta.coins, nextBase: meta.coinPerBossBase };
+  const next = {
+    ...meta,
+    coins: meta.coins - cost,
+    coinPerBossBase: meta.coinPerBossBase + COIN_BOSS_BASE_DELTA_PER_LEVEL,
+  };
+  setStoredMeta(next);
+  return { ok: true, coins: next.coins, nextBase: next.coinPerBossBase };
 }
 
