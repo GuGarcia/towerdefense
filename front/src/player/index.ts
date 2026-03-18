@@ -69,13 +69,18 @@ export interface ReplaySummary {
   enemiesKilled: number;
 }
 
+export interface RunEndPayload {
+  coinsEarned: number;
+  waveNumber: number;
+}
+
 export interface RunPlayerOptions {
   /** Override game params (merged with loaded gameparams.json). */
   paramsOverrides?: Record<string, unknown>;
   /** Called when user clicks "Retour au menu" on game over (e.g. navigate to /). */
   onBackToMenu?: () => void;
   /** Called once per run when the simulation reaches GameOver (death). */
-  onRunEnd?: (coinsEarned: number) => void;
+  onRunEnd?: (payload: RunEndPayload) => void;
   /** When true, automatically buy the cheapest affordable upgrade each frame. */
   initialAutoMode?: boolean;
   /** Called when user clicks "Sauvegarder" on game over with (recording, summary). */
@@ -103,6 +108,8 @@ export type RunPlayerControls = {
   getCoinsEarned: () => number;
   /** True when the simulation is in GameOver state. */
   isGameOver: () => boolean;
+  /** Wave number corresponding to the current frame (for quit milestones). */
+  getWaveNumberReached: () => number;
   exportRecording: () => void;
   loadReplay: (recording: GameRecording) => void;
 };
@@ -134,6 +141,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     getInfoPanelData: () => ({ seed: 0, waveNumber: 1, stats: { base: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, rapid: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, boss: { life: 0, speed: 0, damage: 0, size: 0, count: 0 } } }),
     getCoinsEarned: () => 0,
     isGameOver: () => false,
+    getWaveNumberReached: () => 1,
     exportRecording: () => {},
     loadReplay: () => {},
   };
@@ -368,7 +376,8 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
         gameStates[i] = tick(gameStates[i], frameIndices[i], input ?? undefined);
         if (!hasReportedEnd && prevState !== GameState.GameOver && gameStates[i].state === GameState.GameOver) {
           hasReportedEnd = true;
-          onRunEnd?.(gameStates[i].coinsEarned);
+          const waveNumber = Math.max(1, getWaveNumberAtFrame(gameStates[i].frameIndex, gameStates[i].params));
+          onRunEnd?.({ coinsEarned: gameStates[i].coinsEarned, waveNumber });
         }
         frameIndices[i] += 1;
       }
@@ -410,6 +419,11 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     },
     getCoinsEarned: () => gameStates[0]?.coinsEarned ?? 0,
     isGameOver: () => gameStates.some((g) => g.state === GameState.GameOver),
+    getWaveNumberReached: () => {
+      const game = gameStates[0];
+      if (!game) return 1;
+      return Math.max(1, getWaveNumberAtFrame(game.frameIndex, game.params));
+    },
     exportRecording: doExport,
     loadReplay: doLoadReplay,
   };

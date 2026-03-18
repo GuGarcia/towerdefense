@@ -13,6 +13,7 @@ export type StoredMeta = {
   lifeLevel: number; // meta upgrade level: +initialLife/maxLife
   damageLevel: number; // meta upgrade level: +initialDamage
   difficultyLevel: number; // meta difficulty level (0 => 100%)
+  bestWaveReached: number; // best wave reached in any run (used for milestone unlocks)
 };
 
 const META_KEY = "towerdefense_meta";
@@ -29,6 +30,11 @@ export const COIN_BOSS_BASE_DELTA_PER_LEVEL = 1;
 export const DIFFICULTY_PERCENT_BASE = 100;
 export const DIFFICULTY_PERCENT_DELTA_PER_LEVEL = 10;
 
+// Milestones (unlock economy upgrades by bestWaveReached).
+export const COIN_WAVE_BASE_UNLOCK_WAVE = 5;
+export const COIN_WAVE_PERCENT_UNLOCK_WAVE = 10;
+export const COIN_BOSS_UNLOCK_WAVE = 15;
+
 const DEFAULT_META: StoredMeta = {
   version: META_VERSION,
   coins: 0,
@@ -38,6 +44,7 @@ const DEFAULT_META: StoredMeta = {
   lifeLevel: 0,
   damageLevel: 0,
   difficultyLevel: 0,
+  bestWaveReached: 0,
 };
 
 export function getStoredMeta(): StoredMeta {
@@ -65,6 +72,16 @@ export function addCoins(delta: number): number {
   const next = { ...meta, coins: nextCoins };
   setStoredMeta(next);
   return nextCoins;
+}
+
+export function recordBestWaveReached(waveNumber: number): number {
+  const meta = getStoredMeta();
+  const best = Math.max(0, Math.floor(waveNumber || 0));
+  const nextBest = Math.max(meta.bestWaveReached, best);
+  if (nextBest === meta.bestWaveReached) return meta.bestWaveReached;
+  const next = { ...meta, bestWaveReached: nextBest };
+  setStoredMeta(next);
+  return nextBest;
 }
 
 function costForNextLevel(currentLevel: number): number {
@@ -132,6 +149,9 @@ export function buyDamageUpgrade(): { ok: boolean; coins: number; nextLevel: num
 
 export function buyCoinWaveBaseUpgrade(): { ok: boolean; coins: number; nextBase: number } {
   const meta = getStoredMeta();
+  if (meta.bestWaveReached < COIN_WAVE_BASE_UNLOCK_WAVE) {
+    return { ok: false, coins: meta.coins, nextBase: meta.coinPerWaveBase };
+  }
   const nextLevel = coinWaveBaseLevel(meta);
   const cost = costForNextLevel(nextLevel);
   if (meta.coins < cost) return { ok: false, coins: meta.coins, nextBase: meta.coinPerWaveBase };
@@ -146,6 +166,9 @@ export function buyCoinWaveBaseUpgrade(): { ok: boolean; coins: number; nextBase
 
 export function buyCoinWavePercentUpgrade(): { ok: boolean; coins: number; nextPercent: number } {
   const meta = getStoredMeta();
+  if (meta.bestWaveReached < COIN_WAVE_PERCENT_UNLOCK_WAVE) {
+    return { ok: false, coins: meta.coins, nextPercent: meta.coinPerWavePercent };
+  }
   const nextLevel = coinWavePercentLevel(meta);
   const cost = costForNextLevel(nextLevel);
   if (meta.coins < cost) return { ok: false, coins: meta.coins, nextPercent: meta.coinPerWavePercent };
@@ -160,6 +183,9 @@ export function buyCoinWavePercentUpgrade(): { ok: boolean; coins: number; nextP
 
 export function buyCoinBossBaseUpgrade(): { ok: boolean; coins: number; nextBase: number } {
   const meta = getStoredMeta();
+  if (meta.bestWaveReached < COIN_BOSS_UNLOCK_WAVE) {
+    return { ok: false, coins: meta.coins, nextBase: meta.coinPerBossBase };
+  }
   const nextLevel = coinBossBaseLevel(meta);
   const cost = costForNextLevel(nextLevel);
   if (meta.coins < cost) return { ok: false, coins: meta.coins, nextBase: meta.coinPerBossBase };
@@ -170,6 +196,18 @@ export function buyCoinBossBaseUpgrade(): { ok: boolean; coins: number; nextBase
   };
   setStoredMeta(next);
   return { ok: true, coins: next.coins, nextBase: next.coinPerBossBase };
+}
+
+export function isCoinWaveBaseUnlocked(meta: StoredMeta = getStoredMeta()): boolean {
+  return meta.bestWaveReached >= COIN_WAVE_BASE_UNLOCK_WAVE;
+}
+
+export function isCoinWavePercentUnlocked(meta: StoredMeta = getStoredMeta()): boolean {
+  return meta.bestWaveReached >= COIN_WAVE_PERCENT_UNLOCK_WAVE;
+}
+
+export function isCoinBossUnlocked(meta: StoredMeta = getStoredMeta()): boolean {
+  return meta.bestWaveReached >= COIN_BOSS_UNLOCK_WAVE;
 }
 
 export function buyDifficultyUpgrade(): { ok: boolean; coins: number; nextLevel: number } {

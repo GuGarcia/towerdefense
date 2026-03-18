@@ -9,7 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
 import { useI18n } from "../i18n/context";
 import { saveReplay, getReplayById } from "../replayList";
-import { addCoins, getStoredMeta, getDifficultyPercent } from "../metaStorage";
+import { addCoins, getStoredMeta, getDifficultyPercent, recordBestWaveReached } from "../metaStorage";
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -110,8 +110,9 @@ export function PlayPage() {
     runPlayer({
       paramsOverrides,
       onBackToMenu: () => navigate("/"),
-      onRunEnd: (coinsEarned) => {
+      onRunEnd: ({ coinsEarned, waveNumber }) => {
         void addCoins(coinsEarned);
+        recordBestWaveReached(waveNumber);
       },
       onSaveReplay: (recording, summary) => saveReplay(recording, summary),
       saveButtonLabel: t("gameOver.save"),
@@ -412,6 +413,8 @@ export function PlayPage() {
             onClick={() => {
               const controls = controlsRef.current;
               const isOver = controls?.isGameOver?.() ?? false;
+              const waveNumber = controls?.getWaveNumberReached?.() ?? 1;
+              recordBestWaveReached(waveNumber);
               if (!isOver) {
                 const coinsEarned = controls?.getCoinsEarned?.() ?? 0;
                 void addCoins(coinsEarned);

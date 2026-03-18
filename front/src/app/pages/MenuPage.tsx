@@ -20,6 +20,9 @@ import {
   getNextCoinWavePercentUpgradeCost,
   getNextCoinBossBaseUpgradeCost,
   getNextDifficultyUpgradeCost,
+  isCoinWaveBaseUnlocked,
+  isCoinWavePercentUnlocked,
+  isCoinBossUnlocked,
   LIFE_DELTA_PER_LEVEL,
   DAMAGE_DELTA_PER_LEVEL,
   COIN_WAVE_BASE_DELTA_PER_LEVEL,
@@ -126,8 +129,14 @@ export function MenuPage() {
           </button>
           <button
             type="button"
-            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? 1 : 0.6 }}
-            disabled={meta.coins < getNextCoinWaveBaseUpgradeCost(meta)}
+            style={{
+              ...linkStyles,
+              cursor:
+                isCoinWaveBaseUnlocked(meta) && meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? "pointer" : "not-allowed",
+              opacity:
+                isCoinWaveBaseUnlocked(meta) && meta.coins >= getNextCoinWaveBaseUpgradeCost(meta) ? 1 : 0.6,
+            }}
+            disabled={!isCoinWaveBaseUnlocked(meta) || meta.coins < getNextCoinWaveBaseUpgradeCost(meta)}
             onClick={() => {
               buyCoinWaveBaseUpgrade();
               refreshMeta();
@@ -137,8 +146,16 @@ export function MenuPage() {
           </button>
           <button
             type="button"
-            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinWavePercentUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinWavePercentUpgradeCost(meta) ? 1 : 0.6 }}
-            disabled={meta.coins < getNextCoinWavePercentUpgradeCost(meta)}
+            style={{
+              ...linkStyles,
+              cursor:
+                isCoinWavePercentUnlocked(meta) && meta.coins >= getNextCoinWavePercentUpgradeCost(meta)
+                  ? "pointer"
+                  : "not-allowed",
+              opacity:
+                isCoinWavePercentUnlocked(meta) && meta.coins >= getNextCoinWavePercentUpgradeCost(meta) ? 1 : 0.6,
+            }}
+            disabled={!isCoinWavePercentUnlocked(meta) || meta.coins < getNextCoinWavePercentUpgradeCost(meta)}
             onClick={() => {
               buyCoinWavePercentUpgrade();
               refreshMeta();
@@ -148,8 +165,14 @@ export function MenuPage() {
           </button>
           <button
             type="button"
-            style={{ ...linkStyles, cursor: meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? 1 : 0.6 }}
-            disabled={meta.coins < getNextCoinBossBaseUpgradeCost(meta)}
+            style={{
+              ...linkStyles,
+              cursor:
+                isCoinBossUnlocked(meta) && meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? "pointer" : "not-allowed",
+              opacity:
+                isCoinBossUnlocked(meta) && meta.coins >= getNextCoinBossBaseUpgradeCost(meta) ? 1 : 0.6,
+            }}
+            disabled={!isCoinBossUnlocked(meta) || meta.coins < getNextCoinBossBaseUpgradeCost(meta)}
             onClick={() => {
               buyCoinBossBaseUpgrade();
               refreshMeta();
