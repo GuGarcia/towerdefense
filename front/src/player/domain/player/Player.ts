@@ -24,6 +24,8 @@ export interface Player {
   critChance: number;
   /** Crit damage multiplier in percent (ex: 150 => x1.5). */
   critDamagePercent: number;
+  /** Healing as % of damage dealt to enemies (vampirism). */
+  vampirismPercent: number;
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
@@ -43,6 +45,7 @@ export interface PlayerInitial {
   thornsPercent?: number;
   critChance?: number;
   critDamagePercent?: number;
+  vampirismPercent?: number;
   regen: number;
   attackSpeed: number;
   /** Shooting range; default 300 if omitted. */
@@ -68,6 +71,7 @@ export function createPlayer(initial: PlayerInitial): Player {
     thornsPercent = 0,
     critChance = 0,
     critDamagePercent = 150,
+    vampirismPercent = 0,
     range = 300,
   } = initial;
   const cooldown = getShotCooldownFrames(initial);
@@ -81,6 +85,7 @@ export function createPlayer(initial: PlayerInitial): Player {
     thornsPercent,
     critChance,
     critDamagePercent,
+    vampirismPercent,
     regen,
     attackSpeed,
     range,
@@ -95,6 +100,7 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.Thorns]: 0,
       [UpgradeType.CritChance]: 0,
       [UpgradeType.CritDamage]: 0,
+      [UpgradeType.Vampirism]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -191,6 +197,11 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
     case UpgradeType.CritDamage: {
       const delta = p?.critDamagePercentStep ?? 10;
       return { ...player, critDamagePercent: player.critDamagePercent + delta, upgradeLevels: levels };
+    }
+    case UpgradeType.Vampirism: {
+      const delta = p?.vampirismPercentStep ?? 5;
+      const next = Math.max(0, Math.min(99, player.vampirismPercent + delta));
+      return { ...player, vampirismPercent: next, upgradeLevels: levels };
     }
     default:
       return { ...player, upgradeLevels: levels };

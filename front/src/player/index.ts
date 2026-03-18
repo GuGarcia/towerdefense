@@ -58,6 +58,7 @@ function getUpgradeValue(
     thornsPercent: number;
     critChance: number;
     critDamagePercent: number;
+    vampirismPercent: number;
   },
   key: (typeof UPGRADE_TYPES)[number]
 ): string {
@@ -82,6 +83,7 @@ function getUpgradeValue(
   if (key === "thorns") return `${Math.round(player.thornsFixed)} + ${Math.round(player.thornsPercent)}%`;
   if (key === "critChance") return `${Math.round(player.critChance)}%`;
   if (key === "critDamage") return `${Math.round(player.critDamagePercent)}%`;
+  if (key === "vampirism") return `${Math.round(player.vampirismPercent)}%`;
   return String(Math.round(v));
 }
 

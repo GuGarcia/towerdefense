@@ -71,6 +71,7 @@ export function createGame(gameParams: GameParams): Game {
     thornsPercent: p.initialThornsPercent ?? 0,
     critChance: p.initialCritChance ?? 0,
     critDamagePercent: p.initialCritDamagePercent ?? 150,
+    vampirismPercent: p.initialVampirismPercent ?? 0,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
     range: p.initialRange ?? 300,
@@ -196,11 +197,21 @@ function handleShootingAndProjectiles(
       remainingProjectiles.push(proj);
     }
   }
+  let vampHeal = 0;
   nextEnemies = nextEnemies.map((e) => {
     const dmg = enemyDamage[e.id];
     if (dmg == null) return e;
-    return enemyTakeDamage(e, dmg);
+    const beforeLife = e.life;
+    const after = enemyTakeDamage(e, dmg);
+    const dealt = Math.max(0, beforeLife - after.life);
+    if (dealt > 0 && nextPlayer.vampirismPercent > 0) {
+      vampHeal += dealt * (nextPlayer.vampirismPercent / 100);
+    }
+    return after;
   });
+  if (vampHeal > 0) {
+    nextPlayer = { ...nextPlayer, life: Math.min(nextPlayer.maxLife, nextPlayer.life + vampHeal) };
+  }
 
   const currency = params.economy.currencyPerKill;
   const coinPerBoss = params.economy.coinPerBossBase;

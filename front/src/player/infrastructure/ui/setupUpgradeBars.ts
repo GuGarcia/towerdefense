@@ -14,6 +14,7 @@ export const UPGRADE_LABELS: Record<string, string> = {
   thorns: "Thorns",
   critChance: "Crit%",
   critDamage: "CritDmg%",
+  vampirism: "Vampirisme",
 };
 
 export const UPGRADE_TYPES: readonly UpgradeTypeValue[] = [
@@ -27,6 +28,7 @@ export const UPGRADE_TYPES: readonly UpgradeTypeValue[] = [
   "thorns",
   "critChance",
   "critDamage",
+  "vampirism",
 ] as const;
 
 export interface SetupUpgradeBarsOptions {

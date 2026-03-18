@@ -33,6 +33,10 @@ export interface GameParams {
     readonly critChanceStep?: number;
     /** Step added to critDamagePercent per CritDamage upgrade level (percentage points). */
     readonly critDamagePercentStep?: number;
+    /** Initial vampirism percent: healing as % of damage dealt. */
+    readonly initialVampirismPercent?: number;
+    /** Step added to vampirismPercent per Vampirism upgrade level (percentage points). */
+    readonly vampirismPercentStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -116,6 +120,8 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialCritDamagePercent: 150,
       critChanceStep: 5,
       critDamagePercentStep: 10,
+      initialVampirismPercent: 0,
+      vampirismPercentStep: 5,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

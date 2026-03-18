@@ -38,6 +38,7 @@ const UPGRADE_TYPES = [
   "thorns",
   "critChance",
   "critDamage",
+  "vampirism",
 ] as const;
 type UpgradeType = (typeof UPGRADE_TYPES)[number];
 

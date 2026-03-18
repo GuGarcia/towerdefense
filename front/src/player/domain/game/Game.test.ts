@@ -110,6 +110,43 @@ describe("Game", () => {
     expect(game.enemies[0]?.life).toBe(22); // 30 - (3 + 10*0.5) = 22
   });
 
+  it("vampirism heals when projectiles damage enemies", () => {
+    const params = createGameParams({
+      seed: 1,
+      wave: { baseIntervalFrames: 999999, stuckEnemyAttackIntervalFrames: 999999 },
+      player: {
+        initialLife: 90,
+        initialMaxLife: 100,
+        initialRegen: 0,
+        initialVampirismPercent: 50,
+        initialRange: 300, // keep default behavior: enemy should be targetable
+      },
+      enemies: {
+        base: { countPerWave: 0 },
+        rapid: { countPerWave: 0 },
+        boss: { countPerWave: 0 },
+      },
+    });
+
+    let game = createGame(params);
+    const enemy = createEnemy({
+      id: 1,
+      x: 50,
+      y: 0,
+      life: 20,
+      maxLife: 20,
+      speed: 0,
+      damage: 0,
+      size: 40, // larger collision radius so the projectile hits in the same tick
+      archetype: EnemyArchetype.Base,
+    });
+    game = { ...game, enemies: [enemy] };
+
+    game = tick(game, 1);
+
+    expect(game.player.life).toBe(95); // heals 50% of dealt damage: 10 -> +5
+  });
+
   it("tick when player life <= 0 sets state to GameOver", () => {
     const params = createGameParams({
       player: { initialLife: 0, initialMaxLife: 100, initialRegen: 0 },

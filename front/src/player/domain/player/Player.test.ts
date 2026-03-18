@@ -128,5 +128,8 @@ describe("Player", () => {
 
     const afterCritDamage = applyUpgrade(p, UpgradeType.CritDamage, params);
     expect(afterCritDamage.critDamagePercent).toBeGreaterThan(150);
+
+    const afterVampirism = applyUpgrade(p, UpgradeType.Vampirism, params);
+    expect(afterVampirism.vampirismPercent).toBeGreaterThan(0);
   });
 });
