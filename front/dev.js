@@ -26,24 +26,34 @@ async function buildOnce() {
   try {
     const buf = await readFile(join(ROOT, "gameparams.json"));
     await writeFile(join(DIST, "gameparams.json"), buf);
-  } catch (_) {}
+  } catch {
+    // ignore: optional asset
+  }
   try {
     const css = await readFile(join(ROOT, "player.css"));
     await writeFile(join(DIST, "player.css"), css);
-  } catch (_) {}
+  } catch {
+    // ignore: optional asset
+  }
   try {
     const manifest = await readFile(join(ROOT, "manifest.json"));
     await writeFile(join(DIST, "manifest.json"), manifest);
-  } catch (_) {}
+  } catch {
+    // ignore: optional asset
+  }
   try {
     await mkdir(join(DIST, "icons"), { recursive: true });
     const icon = await readFile(join(ROOT, "icons", "icon.svg"));
     await writeFile(join(DIST, "icons", "icon.svg"), icon);
-  } catch (_) {}
+  } catch {
+    // ignore: optional asset
+  }
   try {
     const sw = await readFile(join(ROOT, "sw.js"));
     await writeFile(join(DIST, "sw.js"), sw);
-  } catch (_) {}
+  } catch {
+    // ignore: optional asset
+  }
   console.log("Build OK → dist/");
 }
 

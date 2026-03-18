@@ -26,6 +26,9 @@ const DEFAULT_FORM: CustomFormState = {
     currencyPerKill: { base: 10, rapid: 5, boss: 100 },
     waveBonusBase: 5,
     waveBonusIncrement: 5,
+    coinPerWaveBase: 1,
+    coinPerWavePercent: 100,
+    coinPerBossBase: 1,
   },
   wave: {
     wave1DifficultyFactor: 0.6,

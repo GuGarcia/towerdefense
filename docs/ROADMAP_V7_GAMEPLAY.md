@@ -10,10 +10,12 @@ Ce document décrit les choix de design pour le gameplay : monnaies (cash / coin
 
 ## 1 — Monnaies
 
-| Nom   | Contexte      | Rôle |
-|-------|----------------|------|
-| **Cash** | Pendant la partie | Monnaie de run : achats d’upgrades en jeu. Gagné par kills (base, rapid, boss) et bonus de vague. Réinitialisé à chaque nouvelle partie. |
-| **Coins** | Meta-progression | Monnaie persistante (localStorage). Gagnée à la **fin** de la run (mort ou quitter). Permet d’améliorer les stats de départ et de débloquer des upgrades. |
+
+| Nom       | Contexte          | Rôle                                                                                                                                                      |
+| --------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Cash**  | Pendant la partie | Monnaie de run : achats d’upgrades en jeu. Gagné par kills (base, rapid, boss) et bonus de vague. Réinitialisé à chaque nouvelle partie.                  |
+| **Coins** | Meta-progression  | Monnaie persistante (localStorage). Gagnée à la **fin** de la run (mort ou quitter). Permet d’améliorer les stats de départ et de débloquer des upgrades. |
+
 
 ### 1.1 Gain de coins en fin de run
 
@@ -63,12 +65,14 @@ Valeurs de départ (à équilibrer) : **1 coin/vague**, **1 coin/boss**, **100 %
 
 Les upgrades sont répartis en **4 catégories** pour l’UI (pas de limite du nombre d’upgrades par catégorie en run) :
 
-| Catégorie | Rôle |
-|-----------|------|
-| **Attack** | Dégâts, critique, multi-tir, range damage %, etc. |
-| **Defense** | Vie, armure, régen, vampirisme, thorns, etc. |
+
+| Catégorie   | Rôle                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| **Attack**  | Dégâts, critique, multi-tir, range damage %, etc.                    |
+| **Defense** | Vie, armure, régen, vampirisme, thorns, etc.                         |
 | **Economy** | Cash %, coin/wave, % coin/wave, coin/boss, réduction coût cash, etc. |
-| **Utility** | Portée, vitesse d’attaque, etc. |
+| **Utility** | Portée, vitesse d’attaque, etc.                                      |
+
 
 Chaque upgrade est décrit par un **UpgradeDef** (id, catégorie, coût, pas de gain, formules, etc.).
 
@@ -76,23 +80,25 @@ Chaque upgrade est décrit par un **UpgradeDef** (id, catégorie, coût, pas de 
 
 À intégrer dans le domaine (Player / GameParams) et dans les définitions d’upgrades (run + meta selon le cas).
 
-| Stat | Catégorie | Description | Note |
-|------|-----------|-------------|------|
-| **Armure %** | Defense | Réduction des dégâts reçus en %. Appliquée **avant** l’armure fixe. | Ordre : % puis fixe (avantage joueur). |
-| **Armure fixe** | Defense | Réduction fixe des dégâts reçus après le %. | |
-| **Cash %** | Economy | Bonus % sur tous les gains de cash (kills + bonus de vague). | |
-| **Coin/wave** | Economy | Coins de base ajoutés par vague atteinte (avant %). | Début à 1, incrément 1. |
-| **% coin/wave** | Economy | Multiplicateur sur le gain coin/vague (ex. 100 % = ×1). | Début 100 %, incrément 1 par 1 (100 %, 101 %, 102 %…). |
-| **Vampirisme %** | Defense | Soin en % des dégâts infligés (ou par kill). | |
-| **Thorns** | Defense | Dégâts renvoyés à l’ennemi quand il inflige des dégâts au joueur (à chaque attaque de contact). | **Valeur fixe** + **% des dégâts reçus** (les deux). |
-| **Difficulté %** | — | Multiplicateur sur la difficulté (vie, dégâts, vitesse, spawn ennemis). Avec contrepartie (ex. + coins/cash). | Partie des GameParams ; déblocable en meta. |
-| **Coin/boss** | Economy | Coins ajoutés par boss tué. | Début à 1, incrément 1. |
-| **Réduction coût cash %** | Economy | Réduction du coût en **cash** des upgrades en run. | En partie uniquement ; début 0 %, pas +0,01 % ; plafond ex. 99 %. |
-| **Réduction coût coins %** | Economy | Réduction du coût en **coins** des achats en meta. | Meta uniquement ; même principe de pas et plafond. |
-| **Chance multi-tir** | Attack | Probabilité de tirer plusieurs projectiles (ex. double tir). | Déterministe : utiliser la seed + frame. |
-| **Crit chance %** | Attack | Probabilité qu’un tir soit critique. | |
-| **Crit damage %** | Attack | Multiplicateur de dégâts quand critique (ex. 150 % = ×1,5). | |
-| **Range damage %** | Attack | Plus l’impact est loin, plus les dégâts augmentent. Formule : `damage × (1 + K × distance)`, **K** petit (ex. 0,00001 au départ). Ex. K = 0,001, distance 300, base 10 → 10 × (1 + 0,3) = 13. | Calcul au moment du hit. |
+
+| Stat                       | Catégorie | Description                                                                                                                                                                                   | Note                                                              |
+| -------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Armure %**               | Defense   | Réduction des dégâts reçus en %. Appliquée **avant** l’armure fixe.                                                                                                                           | Ordre : % puis fixe (avantage joueur).                            |
+| **Armure fixe**            | Defense   | Réduction fixe des dégâts reçus après le %.                                                                                                                                                   |                                                                   |
+| **Cash %**                 | Economy   | Bonus % sur tous les gains de cash (kills + bonus de vague).                                                                                                                                  |                                                                   |
+| **Coin/wave**              | Economy   | Coins de base ajoutés par vague atteinte (avant %).                                                                                                                                           | Début à 1, incrément 1.                                           |
+| **% coin/wave**            | Economy   | Multiplicateur sur le gain coin/vague (ex. 100 % = ×1).                                                                                                                                       | Début 100 %, incrément 1 par 1 (100 %, 101 %, 102 %…).            |
+| **Vampirisme %**           | Defense   | Soin en % des dégâts infligés (ou par kill).                                                                                                                                                  |                                                                   |
+| **Thorns**                 | Defense   | Dégâts renvoyés à l’ennemi quand il inflige des dégâts au joueur (à chaque attaque de contact).                                                                                               | **Valeur fixe** + **% des dégâts reçus** (les deux).              |
+| **Difficulté %**           | —         | Multiplicateur sur la difficulté (vie, dégâts, vitesse, spawn ennemis). Avec contrepartie (ex. + coins/cash).                                                                                 | Partie des GameParams ; déblocable en meta.                       |
+| **Coin/boss**              | Economy   | Coins ajoutés par boss tué.                                                                                                                                                                   | Début à 1, incrément 1.                                           |
+| **Réduction coût cash %**  | Economy   | Réduction du coût en **cash** des upgrades en run.                                                                                                                                            | En partie uniquement ; début 0 %, pas +0,01 % ; plafond ex. 99 %. |
+| **Réduction coût coins %** | Economy   | Réduction du coût en **coins** des achats en meta.                                                                                                                                            | Meta uniquement ; même principe de pas et plafond.                |
+| **Chance multi-tir**       | Attack    | Probabilité de tirer plusieurs projectiles (ex. double tir).                                                                                                                                  | Déterministe : utiliser la seed + frame.                          |
+| **Crit chance %**          | Attack    | Probabilité qu’un tir soit critique.                                                                                                                                                          |                                                                   |
+| **Crit damage %**          | Attack    | Multiplicateur de dégâts quand critique (ex. 150 % = ×1,5).                                                                                                                                   |                                                                   |
+| **Range damage %**         | Attack    | Plus l’impact est loin, plus les dégâts augmentent. Formule : `damage × (1 + K × distance)`, **K** petit (ex. 0,00001 au départ). Ex. K = 0,001, distance 300, base 10 → 10 × (1 + 0,3) = 13. | Calcul au moment du hit.                                          |
+
 
 *(Les stats déjà présentes — life, damage, regen, attackSpeed, range — restent ; elles peuvent être enrichies par ces nouveaux effets.)*
 
@@ -140,12 +146,14 @@ Stockage : **localStorage** (clé dédiée, ex. `towerdefense_meta`). API / comp
 
 ## 9 — Récapitulatif des contraintes
 
-| Contrainte | Règle |
-|------------|--------|
-| **Déterministe** | Seed + GameParams + séquence d’inputs → même résultat. Aucun `Math.random()` libre ; tout aléatoire (ex. crit, multi-tir) dérive de la seed et de la frame. |
-| **Actions joueur en partie** | Uniquement **achats d’upgrades**. Pas de capacité à cooldown ni d’action tactique supplémentaire. |
-| **Choix du joueur** | Pas de limite artificielle du nombre d’upgrades par type ou par catégorie en run : le joueur choisit librement où investir son cash. |
-| **Sauvegarde vs gains** | Si le joueur sauvegarde la partie (replay), il ne reçoit **pas** les coins de la run. Gains de coins uniquement à la mort ou en quittant sans sauvegarder. |
+
+| Contrainte                   | Règle                                                                                                                                                       |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Déterministe**             | Seed + GameParams + séquence d’inputs → même résultat. Aucun `Math.random()` libre ; tout aléatoire (ex. crit, multi-tir) dérive de la seed et de la frame. |
+| **Actions joueur en partie** | Uniquement **achats d’upgrades**. Pas de capacité à cooldown ni d’action tactique supplémentaire.                                                           |
+| **Choix du joueur**          | Pas de limite artificielle du nombre d’upgrades par type ou par catégorie en run : le joueur choisit librement où investir son cash.                        |
+| **Sauvegarde vs gains**      | Si le joueur sauvegarde la partie (replay), il ne reçoit **pas** les coins de la run. Gains de coins uniquement à la mort ou en quittant sans sauvegarder.  |
+
 
 ---
 

@@ -14,6 +14,7 @@ describe("Game", () => {
     expect(game.enemies).toEqual([]);
     expect(game.projectiles).toEqual([]);
     expect(game.money).toBe(0);
+    expect(game.coinsEarned).toBe(0);
   });
 
   it("tick without input advances state (spawn, move)", () => {
@@ -117,5 +118,6 @@ describe("Game", () => {
     expect(gameReplay.enemiesKilled).toBe(gameLive.enemiesKilled);
     expect(gameReplay.enemies.length).toBe(gameLive.enemies.length);
     expect(gameReplay.projectiles.length).toBe(gameLive.projectiles.length);
+    expect(gameReplay.coinsEarned).toBe(gameLive.coinsEarned);
   });
 });

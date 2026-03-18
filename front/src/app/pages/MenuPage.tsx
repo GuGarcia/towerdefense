@@ -6,6 +6,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { useI18n } from "../i18n/context";
 import { getSharedConfigFromUrl, clearSharedConfigFromUrl } from "../shareConfig";
 import { useState, useEffect } from "react";
+import {
+  getStoredMeta,
+  buyLifeUpgrade,
+  buyDamageUpgrade,
+  getNextLifeUpgradeCost,
+  getNextDamageUpgradeCost,
+  LIFE_DELTA_PER_LEVEL,
+  DAMAGE_DELTA_PER_LEVEL,
+} from "../metaStorage";
 
 const menuStyles: React.CSSProperties = {
   minHeight: "100vh",
@@ -56,11 +65,14 @@ export function MenuPage() {
   const [sharedConfig, setSharedConfig] = useState<Record<string, unknown> | null>(() =>
     getSharedConfigFromUrl()
   );
+  const [meta, setMeta] = useState(() => getStoredMeta());
 
   useEffect(() => {
     if (sharedConfig) return;
     setSharedConfig(getSharedConfigFromUrl());
   }, [sharedConfig]);
+
+  const refreshMeta = () => setMeta(getStoredMeta());
 
   const launchSharedConfig = () => {
     if (!sharedConfig) return;
@@ -72,6 +84,35 @@ export function MenuPage() {
   return (
     <div style={menuStyles}>
       <h1 style={titleStyles}>{t("menu.title")}</h1>
+      <div style={bannerStyles}>
+        <span>
+          Coins meta : <strong>{meta.coins}</strong>
+        </span>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextLifeUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextLifeUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextLifeUpgradeCost(meta)}
+            onClick={() => {
+              buyLifeUpgrade();
+              refreshMeta();
+            }}
+          >
+            Life +{LIFE_DELTA_PER_LEVEL} (lvl {meta.lifeLevel}) - coût {getNextLifeUpgradeCost(meta)}
+          </button>
+          <button
+            type="button"
+            style={{ ...linkStyles, cursor: meta.coins >= getNextDamageUpgradeCost(meta) ? "pointer" : "not-allowed", opacity: meta.coins >= getNextDamageUpgradeCost(meta) ? 1 : 0.6 }}
+            disabled={meta.coins < getNextDamageUpgradeCost(meta)}
+            onClick={() => {
+              buyDamageUpgrade();
+              refreshMeta();
+            }}
+          >
+            Dmg +{DAMAGE_DELTA_PER_LEVEL} (lvl {meta.damageLevel}) - coût {getNextDamageUpgradeCost(meta)}
+          </button>
+        </div>
+      </div>
       {sharedConfig && (
         <div style={bannerStyles}>
           <span>{t("replay.sharedConfigPrompt")}</span>

@@ -29,6 +29,12 @@ export interface GameParams {
     /** Bonus or at start of each wave: base + (waveNumber - 1) * increment (e.g. 5, 10, 15…). */
     readonly waveBonusBase: number;
     readonly waveBonusIncrement: number;
+    /** Coin economy (meta progression): base coin amount per wave reached. */
+    readonly coinPerWaveBase: number;
+    /** Coin economy multiplier: 100 => x1, 101 => x1.01, etc. */
+    readonly coinPerWavePercent: number;
+    /** Coin economy: coins per boss killed. */
+    readonly coinPerBossBase: number;
   };
   readonly wave: {
     readonly spawnRadius: number;
@@ -87,6 +93,9 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       currencyPerKill: { base: 10, rapid: 5, boss: 100 },
       waveBonusBase: 5,
       waveBonusIncrement: 5,
+      coinPerWaveBase: 1,
+      coinPerWavePercent: 100,
+      coinPerBossBase: 1,
     },
     wave: {
       spawnRadius: 600,

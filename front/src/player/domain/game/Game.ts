@@ -8,6 +8,7 @@ import type { Enemy } from "../enemy/Enemy";
 import type { Projectile } from "../projectile/Projectile";
 import type { UpgradeTypeValue } from "../player/UpgradeType";
 import { GameState } from "./GameState";
+import { EnemyArchetype } from "../enemy/EnemyArchetype";
 import {
   createPlayer,
   takeDamage as playerTakeDamage,
@@ -43,6 +44,8 @@ export interface Game {
   enemies: Enemy[];
   projectiles: Projectile[];
   money: number;
+  /** Coins earned so far during this run (meta-progression). */
+  coinsEarned: number;
   frameIndex: number;
   /** Total enemies killed this run (for game over stats). */
   enemiesKilled: number;
@@ -65,6 +68,7 @@ export function createGame(gameParams: GameParams): Game {
     enemies: [],
     projectiles: [],
     money: 0,
+    coinsEarned: 0,
     frameIndex: 0,
     enemiesKilled: 0,
   };
@@ -77,6 +81,15 @@ function applyWaveEconomy(game: Game, frameIndex: number): number {
   const base = game.params.economy.waveBonusBase ?? 5;
   const inc = game.params.economy.waveBonusIncrement ?? 5;
   return base + (waveNumber - 1) * inc;
+}
+
+function applyWaveCoins(game: Game, frameIndex: number): number {
+  const waveNumber = getWaveNumberAtFrame(frameIndex, game.params);
+  const prevWaveNumber = frameIndex > 0 ? getWaveNumberAtFrame(frameIndex - 1, game.params) : 0;
+  if (waveNumber < 1 || waveNumber <= prevWaveNumber) return 0;
+  const base = game.params.economy.coinPerWaveBase;
+  const percent = game.params.economy.coinPerWavePercent;
+  return base * (percent / 100);
 }
 
 function updateEnemiesAndStuck(game: Game, frameIndex: number): Enemy[] {
@@ -100,7 +113,7 @@ function handleShootingAndProjectiles(
   projectiles: Projectile[],
   _frameIndex: number,
   params: GameParams
-): { player: Player; enemies: Enemy[]; projectiles: Projectile[]; earned: number; killedThisFrame: number } {
+): { player: Player; enemies: Enemy[]; projectiles: Projectile[]; earned: number; earnedCoins: number; killedThisFrame: number } {
   let nextPlayer = player;
   const alive = enemies.filter((e) => !isDead(e));
   const effectiveAlive = alive.filter((e) => {
@@ -168,12 +181,15 @@ function handleShootingAndProjectiles(
   });
 
   const currency = params.economy.currencyPerKill;
+  const coinPerBoss = params.economy.coinPerBossBase;
   let earned = 0;
   let killedThisFrame = 0;
+  let earnedCoins = 0;
   for (const e of nextEnemies) {
     if (isDead(e)) {
       earned += currency[e.archetype as keyof typeof currency] ?? currency.base;
       killedThisFrame += 1;
+      if (e.archetype === EnemyArchetype.Boss) earnedCoins += coinPerBoss;
     }
   }
   return {
@@ -182,6 +198,7 @@ function handleShootingAndProjectiles(
     projectiles: remainingProjectiles,
     earned,
     killedThisFrame,
+    earnedCoins,
   };
 }
 
@@ -216,7 +233,11 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
   if (game.state === GameState.GameOver) return game;
 
   let next: Game = { ...game, frameIndex };
-  next = { ...next, money: next.money + applyWaveEconomy(game, frameIndex) };
+  next = {
+    ...next,
+    money: next.money + applyWaveEconomy(game, frameIndex),
+    coinsEarned: next.coinsEarned + applyWaveCoins(game, frameIndex),
+  };
 
   if (input?.buyUpgrade) {
     const cost = getUpgradeCost(input.buyUpgrade, getUpgradeLevel(game.player, input.buyUpgrade), game.params);
@@ -235,6 +256,7 @@ export function tick(game: Game, frameIndex: number, input?: GameInput | null): 
     projectiles: shot.projectiles,
     enemies: shot.enemies,
     money: next.money + shot.earned,
+    coinsEarned: next.coinsEarned + shot.earnedCoins,
     enemiesKilled: game.enemiesKilled + shot.killedThisFrame,
   };
 

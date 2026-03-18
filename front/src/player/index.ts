@@ -19,6 +19,11 @@ import {
   UPGRADE_TYPES,
 } from "./infrastructure/ui/setupUpgradeBars";
 import { setupGameOverlay } from "./infrastructure/ui/setupGameOverlay";
+import {
+  getStoredMeta,
+  LIFE_DELTA_PER_LEVEL,
+  DAMAGE_DELTA_PER_LEVEL,
+} from "../app/metaStorage";
 
 const PLAYER_COUNT = 1;
 
@@ -68,6 +73,8 @@ export interface RunPlayerOptions {
   paramsOverrides?: Record<string, unknown>;
   /** Called when user clicks "Retour au menu" on game over (e.g. navigate to /). */
   onBackToMenu?: () => void;
+  /** Called once per run when the simulation reaches GameOver (death). */
+  onRunEnd?: (coinsEarned: number) => void;
   /** When true, automatically buy the cheapest affordable upgrade each frame. */
   initialAutoMode?: boolean;
   /** Called when user clicks "Sauvegarder" on game over with (recording, summary). */
@@ -91,6 +98,10 @@ export type RunPlayerControls = {
   setAutoMode: (on: boolean) => void;
   getSeed: () => number;
   getInfoPanelData: () => InfoPanelData;
+  /** Coins earned so far in the current run (depends on deterministic simulation state). */
+  getCoinsEarned: () => number;
+  /** True when the simulation is in GameOver state. */
+  isGameOver: () => boolean;
   exportRecording: () => void;
   loadReplay: (recording: GameRecording) => void;
 };
@@ -101,7 +112,14 @@ export type RunPlayerControls = {
  * Toolbar (speed, export, load) is not rendered by the player; the app places them in the pause bar and pause menu.
  */
 export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlayerControls> {
-  const { paramsOverrides: optionsOverrides = {}, onBackToMenu, initialAutoMode = false, onSaveReplay, saveButtonLabel } = options;
+  const {
+    paramsOverrides: optionsOverrides = {},
+    onBackToMenu,
+    onRunEnd,
+    initialAutoMode = false,
+    onSaveReplay,
+    saveButtonLabel,
+  } = options;
   let autoMode = initialAutoMode;
 
   const canvasEl = document.getElementById("game") as HTMLCanvasElement | null;
@@ -113,6 +131,8 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
     setAutoMode: () => {},
     getSeed: () => 0,
     getInfoPanelData: () => ({ seed: 0, waveNumber: 1, stats: { base: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, rapid: { life: 0, speed: 0, damage: 0, size: 0, count: 0 }, boss: { life: 0, speed: 0, damage: 0, size: 0, count: 0 } } }),
+    getCoinsEarned: () => 0,
+    isGameOver: () => false,
     exportRecording: () => {},
     loadReplay: () => {},
   };
@@ -126,7 +146,33 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
   const seeds = Array.from({ length: n }, () => randomSeed());
 
   const fileOverrides = await loadGameParams();
-  const paramsOverrides = { ...fileOverrides, ...optionsOverrides };
+  const storedMeta = getStoredMeta();
+
+  const baseOverrides = {
+    ...fileOverrides,
+    ...optionsOverrides,
+  };
+
+  // Resolve base player stats (defaults or custom overrides), then apply meta deltas.
+  const baseGameParams = createGameParams(baseOverrides as Parameters<typeof createGameParams>[0]);
+  const lifeDelta = storedMeta.lifeLevel * LIFE_DELTA_PER_LEVEL;
+  const damageDelta = storedMeta.damageLevel * DAMAGE_DELTA_PER_LEVEL;
+
+  const paramsOverrides = {
+    ...baseOverrides,
+    player: {
+      ...(((baseOverrides as unknown as { player?: Record<string, unknown> }).player ?? {}) as Record<string, unknown>),
+      initialLife: baseGameParams.player.initialLife + lifeDelta,
+      initialMaxLife: baseGameParams.player.initialMaxLife + lifeDelta,
+      initialDamage: baseGameParams.player.initialDamage + damageDelta,
+    },
+    economy: {
+      ...(baseOverrides as Record<string, unknown>).economy as Record<string, unknown>,
+      coinPerWaveBase: storedMeta.coinPerWaveBase,
+      coinPerWavePercent: storedMeta.coinPerWavePercent,
+      coinPerBossBase: storedMeta.coinPerBossBase,
+    },
+  };
   const games = seeds.map((seed) =>
     createGame(createGameParams({ ...paramsOverrides, seed } as Parameters<typeof createGameParams>[0]))
   );
@@ -138,6 +184,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
   let isReplay = false;
   let replayGetInput: ((frame: number) => GameInput | null) | null = null;
   let speedMultiplier = 1;
+  let hasReportedEnd = false;
 
   /** Returns the cheapest affordable upgrade, or null. Used when autoMode is on. */
   function getAutoUpgrade(game: Game): GameInput | null {
@@ -212,6 +259,7 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
         return;
       }
       recorder.clear();
+      hasReportedEnd = false;
       for (let i = 0; i < n; i++) {
         seeds[i] = randomSeed();
         gameStates[i] = createGame(
@@ -309,8 +357,13 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
   function step(): void {
     for (let s = 0; s < speedMultiplier; s++) {
       for (let i = 0; i < gameStates.length; i++) {
+        const prevState = gameStates[i].state;
         const input = getInputForFrame(i, frameIndices[i]);
         gameStates[i] = tick(gameStates[i], frameIndices[i], input ?? undefined);
+        if (!hasReportedEnd && prevState !== GameState.GameOver && gameStates[i].state === GameState.GameOver) {
+          hasReportedEnd = true;
+          onRunEnd?.(gameStates[i].coinsEarned);
+        }
         frameIndices[i] += 1;
       }
     }
@@ -349,6 +402,8 @@ export async function runPlayer(options: RunPlayerOptions = {}): Promise<RunPlay
       const params = game?.params ?? createGameParams();
       return { seed: seeds[0], waveNumber, stats: getWaveEnemyStats(params, waveNumber) };
     },
+    getCoinsEarned: () => gameStates[0]?.coinsEarned ?? 0,
+    isGameOver: () => gameStates.some((g) => g.state === GameState.GameOver),
     exportRecording: doExport,
     loadReplay: doLoadReplay,
   };

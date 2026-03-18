@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { runPlayer } from "../../player";
 import { useI18n } from "../i18n/context";
 import { saveReplay, getReplayById } from "../replayList";
+import { addCoins, getStoredMeta } from "../metaStorage";
 
 const containerStyles: React.CSSProperties = {
   display: "flex",
@@ -86,6 +87,7 @@ export function PlayPage() {
   const [speed, setSpeed] = useState(1);
   const [autoMode, setAutoMode] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [metaCoins, setMetaCoins] = useState(() => getStoredMeta().coins);
   const [infoPanelData, setInfoPanelData] = useState<InfoPanelData | null>(null);
 
   useEffect(() => {
@@ -108,6 +110,9 @@ export function PlayPage() {
     runPlayer({
       paramsOverrides,
       onBackToMenu: () => navigate("/"),
+      onRunEnd: (coinsEarned) => {
+        void addCoins(coinsEarned);
+      },
       onSaveReplay: (recording, summary) => saveReplay(recording, summary),
       saveButtonLabel: t("gameOver.save"),
     }).then((controls) => {
@@ -128,6 +133,7 @@ export function PlayPage() {
   const openPause = useCallback(() => {
     controlsRef.current?.pause();
     setPaused(true);
+    setMetaCoins(getStoredMeta().coins);
   }, []);
 
   const closePause = useCallback(() => {
@@ -366,6 +372,9 @@ export function PlayPage() {
       {paused && (
         <div className="pause-overlay" style={pauseOverlayStyles}>
           <h2 style={{ marginBottom: "8px" }}>— {t("pause.title")} —</h2>
+          <div style={{ marginBottom: "8px", fontSize: "12px", opacity: 0.9 }}>
+            Coins meta: <strong>{metaCoins}</strong>
+          </div>
           <button type="button" style={pauseButtonStyles} onClick={closePause}>
             {t("pause.resume")}
           </button>
@@ -387,7 +396,19 @@ export function PlayPage() {
           <button type="button" style={pauseButtonStyles} onClick={() => { closePause(); navigate("/settings"); }}>
             {t("pause.settings")}
           </button>
-          <button type="button" style={pauseButtonStyles} onClick={() => navigate("/")}>
+          <button
+            type="button"
+            style={pauseButtonStyles}
+            onClick={() => {
+              const controls = controlsRef.current;
+              const isOver = controls?.isGameOver?.() ?? false;
+              if (!isOver) {
+                const coinsEarned = controls?.getCoinsEarned?.() ?? 0;
+                void addCoins(coinsEarned);
+              }
+              navigate("/");
+            }}
+          >
             {t("pause.quit")}
           </button>
         </div>
