@@ -11,6 +11,7 @@ export const UPGRADE_LABELS: Record<string, string> = {
   range: "Portée",
   armorPercent: "Armure%",
   armorFixed: "Armure",
+  thorns: "Thorns",
 };
 
 export const UPGRADE_TYPES: readonly UpgradeTypeValue[] = [
@@ -21,6 +22,7 @@ export const UPGRADE_TYPES: readonly UpgradeTypeValue[] = [
   "range",
   "armorPercent",
   "armorFixed",
+  "thorns",
 ] as const;
 
 export interface SetupUpgradeBarsOptions {

@@ -3,6 +3,8 @@ import { createGame, tick } from "./Game";
 import { createGameParams } from "./GameParams";
 import { GameState } from "./GameState";
 import { UpgradeType, type UpgradeTypeValue } from "../player/UpgradeType";
+import { createEnemy } from "../enemy/Enemy";
+import { EnemyArchetype } from "../enemy/EnemyArchetype";
 
 describe("Game", () => {
   it("createGame initializes with params and Playing state", () => {
@@ -67,6 +69,45 @@ describe("Game", () => {
     game = tick(game, 0, { buyUpgrade: UpgradeType.Damage });
     expect(game.money).toBe(0);
     expect(game.player.damage).toBe(damageBefore);
+  });
+
+  it("thorns retaliates against stuck enemies", () => {
+    const params = createGameParams({
+      seed: 1,
+      wave: { stuckEnemyAttackIntervalFrames: 1, baseIntervalFrames: 999999 },
+      player: {
+        initialRange: 1, // avoid player shooting at the test enemy
+        initialArmorPercent: 0,
+        initialArmorFixed: 0,
+        initialThornsFixed: 3,
+        initialThornsPercent: 50,
+      },
+      enemies: {
+        base: { countPerWave: 0 },
+        rapid: { countPerWave: 0 },
+        boss: { countPerWave: 0 },
+      },
+    });
+
+    let game = createGame(params);
+    const enemy = createEnemy({
+      id: 123,
+      x: 200,
+      y: 0,
+      life: 30,
+      speed: 0,
+      damage: 10,
+      size: 12,
+      archetype: EnemyArchetype.Base,
+    });
+    enemy.stuck = true;
+    enemy.lastDamageFrame = 0;
+    game = { ...game, enemies: [enemy] };
+
+    game = tick(game, 1);
+
+    expect(game.player.life).toBe(90); // 100 - 10
+    expect(game.enemies[0]?.life).toBe(22); // 30 - (3 + 10*0.5) = 22
   });
 
   it("tick when player life <= 0 sets state to GameOver", () => {

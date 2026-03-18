@@ -118,5 +118,9 @@ describe("Player", () => {
 
     const afterArmorFixed = applyUpgrade(p, UpgradeType.ArmorFixed, params);
     expect(afterArmorFixed.armorFixed).toBeGreaterThan(0);
+
+    const afterThorns = applyUpgrade(p, UpgradeType.Thorns, params);
+    expect(afterThorns.thornsFixed).toBeGreaterThan(0);
+    expect(afterThorns.thornsPercent).toBeGreaterThan(0);
   });
 });

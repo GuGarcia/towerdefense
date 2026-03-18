@@ -27,7 +27,7 @@ import { getUpgradeCost } from "./domain/economy/UpgradeCost";
 import { getWaveNumberAtFrame } from "./domain/wave/WaveSpawner";
 import type { GameRecording, RecordedInput } from "./infrastructure/replay/GameRecording";
 
-const UPGRADE_TYPES = ["damage", "life", "regen", "attackSpeed", "range", "armorPercent", "armorFixed"] as const;
+const UPGRADE_TYPES = ["damage", "life", "regen", "attackSpeed", "range", "armorPercent", "armorFixed", "thorns"] as const;
 type UpgradeType = (typeof UPGRADE_TYPES)[number];
 
 export type ProfileKind = "full" | "two" | "one";

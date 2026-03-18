@@ -16,6 +16,10 @@ export interface Player {
   armorPercent: number;
   /** Fixed damage reduction applied after armorPercent. */
   armorFixed: number;
+  /** Damage dealt back to enemies when they hit the player (thorns). */
+  thornsFixed: number;
+  /** Additional thorns as % of damage received by the player. */
+  thornsPercent: number;
   regen: number;
   /** Attacks per second (APS). */
   attackSpeed: number;
@@ -31,6 +35,8 @@ export interface PlayerInitial {
   damage: number;
   armorPercent?: number;
   armorFixed?: number;
+  thornsFixed?: number;
+  thornsPercent?: number;
   regen: number;
   attackSpeed: number;
   /** Shooting range; default 300 if omitted. */
@@ -52,6 +58,8 @@ export function createPlayer(initial: PlayerInitial): Player {
     attackSpeed,
     armorPercent = 0,
     armorFixed = 0,
+    thornsFixed = 0,
+    thornsPercent = 0,
     range = 300,
   } = initial;
   const cooldown = getShotCooldownFrames(initial);
@@ -61,6 +69,8 @@ export function createPlayer(initial: PlayerInitial): Player {
     damage,
     armorPercent,
     armorFixed,
+    thornsFixed,
+    thornsPercent,
     regen,
     attackSpeed,
     range,
@@ -72,6 +82,7 @@ export function createPlayer(initial: PlayerInitial): Player {
       [UpgradeType.Range]: 0,
       [UpgradeType.ArmorPercent]: 0,
       [UpgradeType.ArmorFixed]: 0,
+      [UpgradeType.Thorns]: 0,
     },
     framesSinceLastShot: cooldown,
   };
@@ -149,6 +160,16 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
     case UpgradeType.ArmorFixed: {
       const delta = p?.armorFixedStep ?? 2;
       return { ...player, armorFixed: player.armorFixed + delta, upgradeLevels: levels };
+    }
+    case UpgradeType.Thorns: {
+      const deltaFixed = p?.thornsFixedStep ?? 2;
+      const deltaPercent = p?.thornsPercentStep ?? 5;
+      return {
+        ...player,
+        thornsFixed: player.thornsFixed + deltaFixed,
+        thornsPercent: player.thornsPercent + deltaPercent,
+        upgradeLevels: levels,
+      };
     }
     default:
       return { ...player, upgradeLevels: levels };

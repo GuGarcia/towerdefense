@@ -17,6 +17,14 @@ export interface GameParams {
     readonly armorPercentStep?: number;
     /** Step added to armorFixed per armorFixed upgrade level. */
     readonly armorFixedStep?: number;
+    /** Initial thorns fixed damage dealt back per hit taken. */
+    readonly initialThornsFixed?: number;
+    /** Initial thorns percent: portion of incoming damage dealt back. */
+    readonly initialThornsPercent?: number;
+    /** Step added to thornsFixed per thorns upgrade level. */
+    readonly thornsFixedStep?: number;
+    /** Step added to thornsPercent per thorns upgrade level. */
+    readonly thornsPercentStep?: number;
     readonly initialRegen: number;
     readonly initialAttackSpeed: number;
     /** Shooting range (distance from center); default 300 if omitted. */
@@ -92,6 +100,10 @@ export function createGameParams(overrides: DeepPartial<GameParams> = {}): GameP
       initialArmorFixed: 0,
       armorPercentStep: 5,
       armorFixedStep: 2,
+      initialThornsFixed: 0,
+      initialThornsPercent: 0,
+      thornsFixedStep: 2,
+      thornsPercentStep: 5,
       initialRegen: 0.1,
       initialAttackSpeed: 2,
       initialRange: 300,

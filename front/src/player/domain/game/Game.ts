@@ -59,6 +59,8 @@ export function createGame(gameParams: GameParams): Game {
     damage: p.initialDamage,
     armorPercent: p.initialArmorPercent ?? 0,
     armorFixed: p.initialArmorFixed ?? 0,
+    thornsFixed: p.initialThornsFixed ?? 0,
+    thornsPercent: p.initialThornsPercent ?? 0,
     regen: p.initialRegen,
     attackSpeed: p.initialAttackSpeed,
     range: p.initialRange ?? 300,
@@ -217,7 +219,11 @@ function applyStuckDamageAndCleanup(
     const last = e.lastDamageFrame ?? frameIndex;
     if (frameIndex - last >= interval) {
       playerDamage += e.damage;
-      return { ...e, lastDamageFrame: frameIndex };
+      // Thorns: retaliation applied to the enemy that just damaged the player.
+      const thornsFixed = player.thornsFixed ?? 0;
+      const thornsPercent = player.thornsPercent ?? 0;
+      const retaliatory = thornsFixed + e.damage * (thornsPercent / 100);
+      return enemyTakeDamage({ ...e, lastDamageFrame: frameIndex }, retaliatory);
     }
     return e;
   });
