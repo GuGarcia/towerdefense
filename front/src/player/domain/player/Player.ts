@@ -113,8 +113,9 @@ export function createPlayer(initial: PlayerInitial): Player {
 }
 
 export function takeDamage(player: Player, amount: number): Player {
-  // Order: apply % armor, then apply fixed armor.
-  const afterPct = amount * (1 - (player.armorPercent ?? 0) / 100);
+  // Order: apply % armor (capped at 99% to avoid invulnerability), then apply fixed armor.
+  const armorPct = Math.min(99, Math.max(0, player.armorPercent ?? 0));
+  const afterPct = amount * (1 - armorPct / 100);
   const afterFixed = Math.max(0, afterPct - (player.armorFixed ?? 0));
   return { ...player, life: Math.max(0, player.life - afterFixed) };
 }
@@ -179,7 +180,8 @@ export function applyUpgrade(player: Player, upgradeType: UpgradeTypeValue, para
     }
     case UpgradeType.ArmorPercent: {
       const delta = p?.armorPercentStep ?? 5;
-      return { ...player, armorPercent: player.armorPercent + delta, upgradeLevels: levels };
+      const next = Math.max(0, Math.min(99, player.armorPercent + delta));
+      return { ...player, armorPercent: next, upgradeLevels: levels };
     }
     case UpgradeType.ArmorFixed: {
       const delta = p?.armorFixedStep ?? 2;

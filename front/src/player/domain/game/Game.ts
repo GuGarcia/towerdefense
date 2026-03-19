@@ -65,7 +65,7 @@ export function createGame(gameParams: GameParams): Game {
     life: p.initialLife,
     maxLife: p.initialMaxLife,
     damage: p.initialDamage,
-    armorPercent: p.initialArmorPercent ?? 0,
+    armorPercent: Math.min(99, Math.max(0, p.initialArmorPercent ?? 0)),
     armorFixed: p.initialArmorFixed ?? 0,
     thornsFixed: p.initialThornsFixed ?? 0,
     thornsPercent: p.initialThornsPercent ?? 0,

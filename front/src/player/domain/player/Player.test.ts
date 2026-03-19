@@ -61,6 +61,34 @@ describe("Player", () => {
     expect(hit.life).toBe(90);
   });
 
+  it("armorPercent is capped at 99% (never invulnerable)", () => {
+    const p = createPlayer({
+      life: 100,
+      maxLife: 100,
+      damage: 0,
+      armorPercent: 99,
+      armorFixed: 0,
+      regen: 0,
+      attackSpeed: 1,
+    });
+    const hit = takeDamage(p, 100);
+    expect(hit.life).toBe(99); // 1% of 100 = 1 damage
+  });
+
+  it("applyUpgrade ArmorPercent caps at 99", () => {
+    const params = createGameParams({ player: { armorPercentStep: 10 } });
+    const p = createPlayer({
+      life: 100,
+      maxLife: 100,
+      damage: 10,
+      armorPercent: 95,
+      regen: 0,
+      attackSpeed: 2,
+    });
+    const after = applyUpgrade(p, UpgradeType.ArmorPercent, params);
+    expect(after.armorPercent).toBe(99);
+  });
+
   it("applyRegen caps at maxLife", () => {
     const p = createPlayer({
       life: 98,
