@@ -7,7 +7,7 @@ Jeu de tower defense en navigateur : le joueur contrôle une **forme géométriq
 ## Personnage
 
 - **Position** : fixe au centre du board.
-- **Caractéristiques** : dégâts, vie (life / maxLife), régen, vitesse d’attaque.
+- **Caractéristiques** : dégâts, vie (life / maxLife), régen, vitesse d’attaque, armure % et fixe, thorns, crit (chance + dégâts), vampirisme %, cash % (bonus gains), portée.
 - **Visée** : auto-aim sur l’ennemi le plus proche.
 - **Actions** : tir automatique (selon la vitesse d’attaque) ; achat d’upgrades entre les tirs.
 
@@ -55,7 +55,8 @@ Ce README sert de **one-pager** : une référence unique pour ce qu’on attend 
 | **Menu / UI complète** | ✅ Fait — Routes (/, /custom, /play, /replay, /settings), i18n FR/EN, formulaire partie personnalisée, liste replays, partage (lien config + export). | [ROADMAP_V4_MENU.md](./ROADMAP_V4_MENU.md) |
 | **Mobile** | 🟡 En cours — Viewport, safe area, zoom désactivé sur /play, barre pause, upgrades (scroll), Custom responsive, cibles 44px, overlays, typo clamp(), PWA. Jeu en portrait et paysage. Reste : Replay (tailles tap), etc. | [ROADMAP_V5_MOBILE.md](./ROADMAP_V5_MOBILE.md) |
 | **Déploiement** | ✅ OK — Docker + nginx, Dokploy (Compose path, domaine, webhook). Déploiement auto sur push `main`. Prod : [https://td.gugarcia.ovh/](https://td.gugarcia.ovh/). | [ROADMAP_V6_DEPLOY.md](./ROADMAP_V6_DEPLOY.md) |
-| **Gameplay / Meta-progression** | ⬜ À faire — Coins (meta) vs cash (run), gain de coins en fin de partie, difficulté %, nouveaux stats (armure, thorns, crit, vampirisme, etc.), catégories d’upgrades, formules coût exponentiel / gain linéaire. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
+| **Gameplay / Meta-progression** | 🟡 En cours — Coins (meta) vs cash (run) ✅, gain de coins en fin de partie ✅, difficulté % ✅, stats (armure %, armure fixe, thorns, crit, vampirisme, cash %) ✅, paliers (milestones) ✅. Reste : catégories UI (Attack/Defense/Economy/Utility), range damage K, réduction coût cash %, etc. | [ROADMAP_V7_GAMEPLAY.md](./ROADMAP_V7_GAMEPLAY.md) |
+| **Serveur (V8)** | ⬜ À faire — Backend HTTP (auth OIDC, profils, meta persistée, replays), préparation de runs côté serveur, soumission et validation déterministe des récompenses (coins). | [ROADMAP_V8_SERVER.md](./ROADMAP_V8_SERVER.md) |
 
 **Lancer en local** : `make dev` ou `cd front && bun run dev`.
 

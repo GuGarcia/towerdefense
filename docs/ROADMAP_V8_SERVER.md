@@ -1,5 +1,7 @@
 # ROADMAP_V8_SERVER — Serveur de la Tower Defense
 
+**État** : document de roadmap (non implémenté). Référence : [README.md](./README.md) — récap « Où on en est ».
+
 ## Objectif
 Définir une roadmap serveur pour passer de l’actuel jeu 100% front (déterministe + replay local) à une architecture serveur en **2 phases**, en cohérence avec :
 - le gameplay déterministe et les inputs/replays : `docs/ROADMAP_V7_GAMEPLAY.md`
